@@ -43,6 +43,16 @@ body {
   z-index: -1;
 }
 
+#sea {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: -1;
+  pointer-events: none;
+}
+
 main { position: relative; max-width: 900px; margin: 0 auto; padding: 130px 1rem 6rem; }
 
 /* ---------- glass pill nav ---------- */
