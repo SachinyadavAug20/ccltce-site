@@ -70,6 +70,14 @@ main { position: relative; max-width: 900px; margin: 0 auto; padding: 130px 1rem
   letter-spacing: 0.04em;
 }
 
+.brand::after {
+  content: "_";
+  color: var(--teal);
+  animation: blink 1.2s steps(1) infinite;
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+
 .nav-links { display: flex; align-items: center; gap: 0.35rem; list-style: none; }
 
 .nav-links a {

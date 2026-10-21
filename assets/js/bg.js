@@ -49,19 +49,22 @@ if (cv) {
 
     vec2 md = (uv - uMouse) * vec2(aspect, 1.0);
     float mDist = length(md);
-    vec2 swirl = vec2(-md.y, md.x) * exp(-5.0 * mDist) * 6.0 * uVel;
+    float wake = exp(-3.5 * mDist) * length(uVel);
+    vec2 swirl = vec2(-md.y, md.x) * exp(-3.5 * mDist) * 10.0 * uVel;
 
     vec2 p = dim * (2.2 + 0.12 * sin(t * 0.7)) + swirl;
     vec2 warp = vec2(fbm(p * 1.6 + t), fbm(p * 1.6 - t + 4.0));
-    float n = fbm(p * 2.2 + warp * 1.6 + uMouse * 0.25);
+    float n = smoothstep(0.12, 0.9, fbm(p * 2.2 + warp * 1.6 + uMouse * 0.25));
     float glow = exp(-5.0 * mDist) * (0.20 + 0.06 * sin(uTime * 1.7));
-    float v = clamp(n + glow, 0.0, 1.0);
+    float rip = sin(26.0 * mDist - uTime * 4.0);
+    float v = clamp(n + glow + wake * (0.08 + 0.1 * rip), 0.0, 1.0);
     v = clamp(floor(v * 6.0 + (ign(cell) - 0.5) * 0.9) / 6.0, 0.0, 1.0);
 
     vec3 col = mix(vec3(0.006, 0.012, 0.016), vec3(0.020, 0.055, 0.060), smoothstep(0.10, 0.34, v));
     col = mix(col, vec3(0.065, 0.230, 0.205), smoothstep(0.38, 0.60, v));
     col = mix(col, vec3(0.130, 0.450, 0.400), smoothstep(0.64, 0.84, v));
     col = mix(col, vec3(0.240, 0.680, 0.600), smoothstep(0.90, 0.99, v));
+    col += step(0.992, ign(cell + floor(uTime * 2.0) * 11.0)) * v * vec3(0.30, 0.50, 0.45);
 
     for (int i = 0; i < 4; i++){
       float fi = float(i);
