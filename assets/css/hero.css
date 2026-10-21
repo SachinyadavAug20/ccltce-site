@@ -9,26 +9,30 @@
 }
 
 .wordmark {
-  width: min(92vw, 660px);
+  width: min(92vw, 700px);
   overflow: visible;
   filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.45));
   animation: bob 5s ease-in-out infinite;
 }
 
+.wordmark g { transform-box: fill-box; transform-origin: center; transition: transform 0.35s; }
+.wordmark:hover g { transform: rotate(2.5deg) scale(1.03); }
+
 .wm {
   font-family: "Baloo 2", sans-serif;
   font-weight: 800;
-  font-size: 96px;
+  font-size: 90px;
   text-anchor: middle;
+  textLength: 660;
   paint-order: stroke;
   stroke: #141d1a;
-  stroke-width: 7px;
   stroke-linejoin: round;
 }
 
-.wm.w { fill: #2bab63; }
-.wm.p { fill: #ff5d73; }
-.wm.c { fill: #f8edd0; }
+.wm.o { fill: none; stroke-width: 20px; }
+.wm.w { stroke-width: 5px; }
+.wm.p { stroke-width: 5px; }
+.wm.c { stroke-width: 6px; }
 
 @keyframes bob {
   0%, 100% { transform: translateY(0) rotate(0deg); }
