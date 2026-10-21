@@ -1,0 +1,13 @@
+{
+  "name": "ccltce-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LTCOE Coding Club website — zero build, vanilla HTML/CSS/JS",
+  "scripts": {
+    "dev": "npx -y serve -l 3000 .",
+    "start": "npx -y serve ."
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
