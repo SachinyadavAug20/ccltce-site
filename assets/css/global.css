@@ -1,5 +1,5 @@
 /* fonts + tokens */
-@import url("https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;600&display=swap");
 
 :root {
   --bg: #04070a;
@@ -19,7 +19,7 @@
 
 html { scroll-behavior: smooth; }
 
-::selection { background: rgba(45, 212, 191, 0.35); color: #04231f; }
+::selection { background: #ff5d73; color: #140b0e; }
 
 a:focus-visible, button:focus-visible {
   outline: 2px solid var(--teal);
