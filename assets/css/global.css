@@ -62,6 +62,9 @@ main { position: relative; max-width: 900px; margin: 0 auto; padding: 130px 1rem
 }
 
 .brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   font-family: var(--disp);
   font-weight: 700;
   font-size: 1.25rem;
@@ -70,8 +73,15 @@ main { position: relative; max-width: 900px; margin: 0 auto; padding: 130px 1rem
   letter-spacing: 0.04em;
 }
 
-.brand::after {
-  content: "_";
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  transition: transform 0.25s;
+}
+
+.brand:hover .brand-mark { transform: rotate(-8deg) scale(1.06); }
+
+.caret {
   color: var(--teal);
   animation: blink 1.2s steps(1) infinite;
 }

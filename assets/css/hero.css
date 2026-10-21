@@ -15,9 +15,6 @@
   animation: bob 5s ease-in-out infinite;
 }
 
-.wordmark g { transform-box: fill-box; transform-origin: center; transition: transform 0.35s; }
-.wordmark:hover g { transform: rotate(2.5deg) scale(1.03); }
-
 .wm {
   font-family: "Baloo 2", sans-serif;
   font-weight: 800;
