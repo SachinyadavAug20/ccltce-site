@@ -1,0 +1,111 @@
+/* ---------- Nav ---------- */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(9, 10, 15, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.brand {
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--txt);
+  font-size: 1rem;
+}
+
+.brand span { color: var(--indigo); }
+
+.nav-links { display: flex; gap: 0.25rem; list-style: none; }
+
+.nav-links a {
+  display: block;
+  padding: 0.55rem 0.9rem;
+  min-height: 44px;
+  color: var(--muted);
+  border-radius: 8px;
+}
+
+.nav-links a[aria-current="page"],
+.nav-links a:hover {
+  color: var(--txt);
+  background: rgba(108, 99, 255, 0.12);
+}
+
+#menu-btn {
+  display: none;
+  background: none;
+  border: 1px solid var(--card-border);
+  color: var(--txt);
+  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  font-size: 1.15rem;
+}
+
+@media (max-width: 679px) {
+  #menu-btn {
+    display: block;
+  }
+  .nav-links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    padding: 0.5rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--card-border);
+    display: none;
+  }
+  .nav-links.open {
+    display: flex;
+  }
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 1.1rem;
+  transition: border-color 0.15s;
+}
+
+.card:hover { border-color: var(--indigo); }
+
+.badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 99px;
+  border: 1px solid var(--card-border);
+  color: var(--muted);
+  background: var(--bg);
+}
+
+.badge.accent {
+  border-color: rgba(52, 211, 153, 0.4);
+  color: var(--emerald);
+}
+
+.meta { color: var(--muted); font-size: 0.85rem; font-family: var(--mono); }
+
+/* ---------- Modal ---------- */
+.dialog {
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--txt);
+  padding: 1.25rem;
+  width: min(400px, 92vw);
+}
+
+.dialog::backdrop { background: rgba(0, 0, 0, 0.6); }

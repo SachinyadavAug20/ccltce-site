@@ -1,0 +1,104 @@
+:root {
+  --bg: #090a0f;
+  --surface: #0e1018;
+  --card-border: #1c2030;
+  --txt: #e4e6ee;
+  --muted: #8b90a3;
+  --indigo: #6c63ff;
+  --emerald: #34d399;
+  --font: "Inter", system-ui, sans-serif;
+  --mono: "JetBrains Mono", "Fira Code", monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--txt);
+  font-family: var(--font);
+  line-height: 1.55;
+  min-height: 100dvh;
+}
+
+img {
+  max-width: 100%;
+}
+
+a {
+  color: var(--indigo);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--mono);
+  letter-spacing: -0.02em;
+}
+
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 5rem;
+}
+
+.page-head {
+  margin: 1.5rem 0;
+}
+
+.page-head h1 {
+  font-size: clamp(1.4rem, 4vw, 2rem);
+}
+
+.page-head p {
+  color: var(--muted);
+  max-width: 55ch;
+}
+
+.moment {
+  color: var(--emerald);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+@media (min-width: 700px) {
+  main {
+    padding-top: 2.5rem;
+  }
+}
+
+/* ---------- Footer ---------- */
+.site-foot {
+  border-top: 1px solid var(--card-border);
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.site-foot nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+}
+
+.site-foot .note {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-family: var(--mono);
+  margin-top: 1rem;
+}
+

@@ -1,0 +1,64 @@
+{
+  "events": [
+    {
+      "id": "git-deep-dive",
+      "title": "Git & GitHub Deep Dive",
+      "tag": "workshop",
+      "date": "2026-11-02",
+      "time": "10:00 AM",
+      "venue": "Seminar Hall B",
+      "desc": "Hands-on session covering branching, rebasing, PR workflows and open-source contribution basics.",
+      "slots": 60
+    },
+    {
+      "id": "cp-kickoff",
+      "title": "Competitive Programming Kickoff",
+      "tag": "contest",
+      "date": "2026-11-09",
+      "time": "7:00 PM",
+      "venue": "Online / Lab 3",
+      "desc": "Inaugural rated-style contest. Problems for all levels — from div-4 to div-2 difficulty.",
+      "slots": 120
+    }
+  ],
+  "blogs": [
+    {
+      "id": "first-dev-env",
+      "title": "Setting Up Your First Dev Environment",
+      "author": "Advait K.",
+      "date": "2026-10-12",
+      "tag": "tooling",
+      "minutes": 6,
+      "excerpt": "Terminal, editor, compiler, dotfiles — the zero-to-one guide every member wishes they had in sem 1."
+    },
+    {
+      "id": "cp-report",
+      "title": "Workshop Report: Intro to CP",
+      "author": "Sarah D.",
+      "date": "2026-10-04",
+      "tag": "report",
+      "minutes": 4,
+      "excerpt": "How our first session went: 70 attendees, 3 problems solved live, and what we're changing next time."
+    }
+  ],
+  "team": [
+    {
+      "name": "Aarav Mehta",
+      "role": "President",
+      "domain": "Org",
+      "handle": "@aarav"
+    },
+    {
+      "name": "Nisha Rao",
+      "role": "Tech Lead",
+      "domain": "Web",
+      "handle": "@nisha"
+    },
+    {
+      "name": "Kabir Shah",
+      "role": "CP Lead",
+      "domain": "Algorithms",
+      "handle": "@kabir"
+    }
+  ]
+}
