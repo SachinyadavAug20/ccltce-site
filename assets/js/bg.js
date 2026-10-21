@@ -24,20 +24,20 @@ float ign(vec2 p){ return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.005
 void main(){
   vec2 uv = gl_FragCoord.xy / uRes;
   float aspect = uRes.x / uRes.y;
-  float t = uTime * 0.045;
+  float t = uTime * 0.03;
   vec2 cell = floor(gl_FragCoord.xy / 3.0);
   vec2 cellUv = (cell + 0.5) * 3.0 / uRes;
   vec2 md = (uv - uMouse) * vec2(aspect, 1.0);
-  vec2 p = cellUv * vec2(aspect, 1.0) * 2.2 + (md.x + md.y * 0.0) * 0.0;
-  float n = smoothstep(0.12, 0.9, fbm(p + uMouse * 0.25));
-  float glow = exp(-5.0 * length(md)) * 0.16;
-  float v = clamp(n + glow, 0.0, 1.0);
-  v = clamp(floor(v * 6.0 + (ign(cell) - 0.5) * 0.7) / 6.0, 0.0, 1.0);
-  vec3 col = mix(vec3(0.006, 0.012, 0.016), vec3(0.020, 0.055, 0.060), smoothstep(0.10, 0.34, v));
-  col = mix(col, vec3(0.065, 0.230, 0.205), smoothstep(0.38, 0.60, v));
-  col = mix(col, vec3(0.105, 0.360, 0.320), smoothstep(0.64, 0.84, v));
-  col = mix(col, vec3(0.190, 0.560, 0.490), smoothstep(0.90, 0.99, v));
-  col *= 1.0 - 0.45 * smoothstep(0.50, 1.02, length(uv - 0.5));
+  vec2 flow = vec2(t * 0.35, -t * 0.12) + uMouse * 0.18;
+  vec2 p = cellUv * vec2(aspect, 1.0) * 2.4;
+  vec2 warp = vec2(fbm(p * 1.4 + flow), fbm(p * 1.4 - flow + 3.7));
+  float n = fbm(p * 2.0 + warp * 1.8 + flow * 0.5);
+  n = n * n * (3.0 - 2.0 * n);
+  float v = clamp(floor(n * 7.0 + (ign(cell) - 0.5) * 0.8) / 7.0, 0.0, 1.0);
+  vec3 col = mix(vec3(0.010, 0.018, 0.022), vec3(0.055, 0.110, 0.115), smoothstep(0.00, 0.38, v));
+  col = mix(col, vec3(0.270, 0.360, 0.350), smoothstep(0.38, 0.72, v));
+  col = mix(col, vec3(0.520, 0.640, 0.620), smoothstep(0.80, 0.97, v));
+  col *= 1.0 - 0.30 * smoothstep(0.55, 1.02, length(uv - 0.5));
   gl_FragColor = vec4(col, 1.0);
 }`;
 
