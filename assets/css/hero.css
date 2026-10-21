@@ -91,5 +91,56 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero > *, .cursor, .scroll-cue { animation: none; }
+  .hero > *, .cursor, .scroll-cue, .marquee span { animation: none; }
+}
+
+/* ---------- below the fold ---------- */
+.below { margin-top: 13rem; }
+
+.stats-strip {
+  display: flex;
+  justify-content: center;
+  gap: clamp(2rem, 7vw, 4rem);
+  flex-wrap: wrap;
+  margin-bottom: 3.5rem;
+}
+
+.stat { text-align: center; }
+
+.stat strong {
+  display: block;
+  font-family: var(--mono);
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  color: var(--teal);
+  text-shadow: 0 0 18px rgba(45, 212, 191, 0.35);
+}
+
+.stat span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.marquee {
+  overflow: hidden;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 0.6rem 0;
+  margin-bottom: 7rem;
+}
+
+.marquee span {
+  display: inline-block;
+  white-space: nowrap;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  animation: slide 16s linear infinite;
+}
+
+@keyframes slide {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }

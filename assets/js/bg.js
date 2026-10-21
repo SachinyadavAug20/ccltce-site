@@ -21,22 +21,29 @@ if (cv) {
     for (int i = 0; i < 5; i++){ v += a * noise(p); p = p * 2.03 + vec2(17.0, 9.0); a *= 0.55; }
     return v;
   }
+  float ign(vec2 p){ return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715)))); }
   void main(){
     vec2 uv = gl_FragCoord.xy / uRes;
     float aspect = uRes.x / uRes.y;
-    vec2 p = uv * vec2(aspect, 1.0);
     float t = uTime * 0.045;
+
+    vec2 cell = floor(gl_FragCoord.xy / 3.0);
+    vec2 cellUv = (cell + 0.5) * 3.0 / uRes;
+    vec2 p = cellUv * vec2(aspect, 1.0) * (2.2 + 0.12 * sin(t * 0.7));
     vec2 warp = vec2(fbm(p * 1.6 + t), fbm(p * 1.6 - t + 4.0));
     float n = fbm(p * 2.2 + warp * 1.6 + uMouse * 0.25);
-    float glow = exp(-5.0 * length((uv - uMouse) * vec2(aspect, 1.0))) * 0.22;
-    float dither = hash(gl_FragCoord.xy) - 0.5;
-    float v = clamp(n + glow + dither * 0.13, 0.0, 1.0);
-    vec3 col = mix(vec3(0.008, 0.016, 0.020), vec3(0.030, 0.070, 0.075), smoothstep(0.16, 0.38, v));
-    col = mix(col, vec3(0.080, 0.270, 0.245), smoothstep(0.42, 0.62, v));
-    col = mix(col, vec3(0.180, 0.550, 0.500), smoothstep(0.66, 0.86, v));
-    col = mix(col, vec3(0.350, 0.800, 0.720), smoothstep(0.90, 0.99, v));
-    col *= 1.0 - 0.38 * smoothstep(0.55, 1.05, length(uv - 0.5));
-    col *= 0.94 + 0.06 * sin(gl_FragCoord.y * 3.14159);
+    float glow = exp(-5.0 * length((cellUv - uMouse) * vec2(aspect, 1.0))) * (0.20 + 0.06 * sin(uTime * 1.7));
+
+    float d = ign(cell) - 0.5;
+    float v = clamp(n + glow, 0.0, 1.0);
+    v = clamp(floor(v * 6.0 + d * 0.9) / 6.0, 0.0, 1.0);
+
+    vec3 col = mix(vec3(0.006, 0.012, 0.016), vec3(0.020, 0.055, 0.060), smoothstep(0.10, 0.34, v));
+    col = mix(col, vec3(0.065, 0.230, 0.205), smoothstep(0.38, 0.60, v));
+    col = mix(col, vec3(0.130, 0.450, 0.400), smoothstep(0.64, 0.84, v));
+    col = mix(col, vec3(0.240, 0.680, 0.600), smoothstep(0.90, 0.99, v));
+    col *= 1.0 - 0.55 * smoothstep(0.45, 1.02, length(cellUv - 0.5));
+    col *= 0.96 + 0.04 * sin(gl_FragCoord.y * 3.14159);
     gl_FragColor = vec4(col, 1.0);
   }`;
 

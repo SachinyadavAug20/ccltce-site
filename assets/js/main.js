@@ -50,6 +50,16 @@ async function init() {
 
   for (const el of document.querySelectorAll("[data-render]")) {
     const key = el.dataset.render;
+    if (key === "stats") {
+      el.innerHTML = [
+        ["core team", data.team.length],
+        ["learning tracks", data.resources.length],
+        ["milestones", data.achievements.length],
+      ]
+        .map(([label, n]) => `<div class="stat"><strong>${n}</strong><span>${label}</span></div>`)
+        .join("");
+      continue;
+    }
     if (TEMPLATES[key] && data[key]) {
       el.innerHTML = data[key].map(TEMPLATES[key]).join("");
     }
