@@ -27,40 +27,57 @@
     h1.appendChild(svg);
 
     fetch("assets/js/hero-script.json").then(function (r) { return r.json(); }).then(function (data) {
+      var letters = data.letters.filter(function (l) { return !l.space; });
       var items = [];
-      data.letters.forEach(function (l) {
+      letters.forEach(function (l) {
         var g = document.createElementNS(NS, "g");
         g.setAttribute("class", "ht-l");
         var common = { d: l.d, fill: "none", "stroke-linecap": "round", "stroke-linejoin": "round" };
-        g.appendChild(el("path", Object.assign({ stroke: DARK, "stroke-width": STROKE + 9, opacity: 0.7 }, common)));
-        var p = el("path", Object.assign({ stroke: TEAL, "stroke-width": STROKE }, common));
+        g.appendChild(el("path", Object.assign({ stroke: DARK, "stroke-width": STROKE + 9, opacity: 0.7 }, { d: l.d, fill: "none", "stroke-linecap": "round", "stroke-linejoin": "round" })));
+        var p = el("path", Object.assign({ stroke: TEAL, "stroke-width": STROKE }, { d: l.d, fill: "none", "stroke-linecap": "round", "stroke-linejoin": "round" }));
         g.appendChild(p);
         svg.appendChild(g);
-        // bbox will be measured after transform
-        items.push({ g: g, path: p });
+        items.push({ g: g, path: p, origX: l.x });
       });
 
-      var x = 40;
-      items.forEach(function (it) {
-        it.g.setAttribute("transform", "translate(" + x + " 215) scale(0.85)");
-        x += 70;
-      });
-      svg.setAttribute("viewBox", "0 0 " + (x + 40) + " 260");
-
-      items.forEach(function (it, i) {
-        var mid = el("mask", { id: "hm-" + i, maskUnits: "userSpaceOnUse", x: -200, y: -200, width: 2000, height: 2000 });
-        mid.appendChild(el("path", { d: it.path.getAttribute("d"), fill: "none", stroke: "#fff", "stroke-width": STROKE, "stroke-linecap": "round", "stroke-linejoin": "round" }));
-        defs.appendChild(mid);
-        var wrap = el("g", { mask: "url(#hm-" + i + ")" });
-        var rect = el("rect", { x: -400, y: -400, width: 1200, height: 800, fill: TEAL });
-        var surf = el("path", { d: "", fill: TEAL });
-        wrap.appendChild(rect); wrap.appendChild(surf);
-        it.g.appendChild(wrap);
-        it.wrap = wrap; it.rect = rect; it.surf = surf;
-      });
-
-      wire(svg, items);
+      layoutAndWire(svg, items);
     });
+  }
+
+  function layoutAndWire(svg, items) {
+    var defs = svg.querySelector("defs");
+
+    // Measure actual glyph widths to lay out proportionally
+    var totalOrigWidth = items.reduce(function (sum, it, i) {
+      return sum + (i < items.length - 1 ? 70 : 0);
+    }, 0);
+
+    var containerWidth = 780; // target content width
+    var scale = containerWidth / totalOrigWidth;
+    if (scale > 1) scale = 1;
+
+    var x = 40;
+    items.forEach(function (it) {
+      var s = 0.85 * scale;
+      it.g.setAttribute("transform", "translate(" + x + " 215) scale(" + s + ")");
+      x += 70 * scale;
+    });
+    svg.setAttribute("viewBox", "0 0 " + (x + 40) + " 260");
+
+    var defs = svg.querySelector("defs");
+    items.forEach(function (it, i) {
+      var mid = el("mask", { id: "hm-" + i, maskUnits: "userSpaceOnUse", x: -200, y: -200, width: 2000, height: 2000 });
+      mid.appendChild(el("path", { d: it.path.getAttribute("d"), fill: "none", stroke: "#fff", "stroke-width": STROKE, "stroke-linecap": "round", "stroke-linejoin": "round" }));
+      defs.appendChild(mid);
+      var wrap = el("g", { mask: "url(#hm-" + i + ")" });
+      var rect = el("rect", { x: -400, y: -400, width: 1200, height: 800, fill: TEAL });
+      var surf = el("path", { d: "", fill: TEAL });
+      wrap.appendChild(rect); wrap.appendChild(surf);
+      it.g.appendChild(wrap);
+      it.wrap = wrap; it.rect = rect; it.surf = surf;
+    });
+
+    wire(svg, items);
   }
 
   function wire(svg, items) {
