@@ -22,12 +22,22 @@
     }
   ],
   "team": [
-    { "name": "Aarav Mehta", "role": "President", "area": "Core" },
-    { "name": "Nisha Rao", "role": "Tech Lead", "area": "Web" },
-    { "name": "Kabir Shah", "role": "CP Lead", "area": "Algorithms" }
+    { "name": "Akash Gupta", "role": "President", "area": "Core", "twitter": "@akashg", "linkedin": "akash-gupta", "portfolio": "https://akashg.dev" },
+    { "name": "Sachin Yadav", "role": "Technical Head", "area": "Coding", "twitter": "@sachin_yadav", "linkedin": "sachin-yadav", "portfolio": "https://satyadvv.github.io" }
   ],
   "achievements": [
     { "year": "2026", "title": "First campus-wide CP contest", "detail": "120 participants across three divisions." },
     { "year": "2026", "title": "Git workshop series", "detail": "4 sessions, 200+ student registrations." }
+  ],
+  "events": [
+    { "title": "Orientation", "date": "Sep 18, 2025", "desc": "Welcome event for new batch. Overview of coding club activities, mentorship, and upcoming challenges.", "image": "event-orientation" },
+    { "title": "GitHub Session", "date": "Sep 25, 2025", "desc": "Hands‑on session on Git basics, workflow, and the GitHub cohort event coming soon.", "image": "event-github" }
+  ],
+  "notices": [
+    { "date": "Oct 1, 2025", "title": "GitHub Cohort Cohort", "body": "A 4‑week structured learning cohort starting Nov 1. Sessions every Thursday 6‑8 PM. Sign‑up via the button below.", "tag": "new" }
+  ],
+  "challenges": [
+    { "id": "w1", "prompt": "Build a responsive navbar with vanilla HTML/CSS that collapses into a hamburger menu on mobile.", "due": "Oct 8, 2025", "badge": "Beginner" },
+    { "id": "w2", "prompt": "Create a Three.js particle system that reacts to cursor position.", "due": "Oct 15, 2025", "badge": "Advanced" }
   ]
 }

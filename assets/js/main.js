@@ -25,6 +25,12 @@ const TEMPLATES = {
       <h3>${m.name}</h3>
       <p style="color:var(--muted)">${m.role}</p>
       <p class="meta">${m.area}</p>
+      <div class="socials">
+        <a href="https://x.com/${m.twitter}" target="_blank" rel="noopener" class="social social-twitter" aria-label="Twitter"></a>
+        <a href="https://linkedin.com/in/${m.linkedin}" target="_blank" rel="noopener" class="social social-linkedin" aria-label="LinkedIn"></a>
+        <a href="#" class="social other" aria-label="Other"></a>
+      </div>
+      <a href="${m.portfolio}" class="btn tiny" target="_blank" rel="noopener">My Portfolio</a>
     </article>`,
 
   achievements: (a) => `
@@ -33,11 +39,33 @@ const TEMPLATES = {
       <h3>${a.title}</h3>
       <p style="color:var(--muted);font-size:.92rem">${a.detail}</p>
     </article>`,
+
+  events: (e) => `
+    <details class="event">
+      <summary>
+        <img src="assets/img/event-placeholder.svg" alt="${e.title} poster" width="60" height="40" style="vertical-align:middle; margin-right:8px;">
+        ${e.title} – ${e.date}
+      </summary>
+      <p>${e.desc}</p>
+    </details>`,
+
+  notices: (n) => `
+    <div class="notice-item">
+      <span class="tag">${n.tag}</span>
+      <strong>${n.title}</strong>: ${n.body}
+    </div>`,
+
+  challenges: (c) => `
+    <article class="challenge">
+      <h3>${c.prompt}</h3>
+      <p>Due: ${c.due} <span class="badge">${c.badge}</span></p>
+    </article>`,
 };
 
 async function init() {
-  document.querySelectorAll(".nav-links a:not(.cta)").forEach((a) => {
-    const page = location.pathname.split("/").pop() || "index.html";
+  const page = location.pathname.split("/").pop() || "index.html";
+
+  document.querySelectorAll(".nav-links a").forEach((a) => {
     if (a.getAttribute("href") === page) a.classList.add("active");
   });
 
@@ -61,7 +89,8 @@ async function init() {
       continue;
     }
     if (TEMPLATES[key] && data[key]) {
-      el.innerHTML = data[key].map(TEMPLATES[key]).join("");
+      const items = Array.isArray(data[key]) ? data[key] : [data[key]];
+      el.innerHTML = items.map(TEMPLATES[key]).join("");
     }
   }
 }
