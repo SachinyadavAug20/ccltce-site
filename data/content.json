@@ -3,41 +3,74 @@
     {
       "id": "web-track",
       "icon": "❰❱",
-      "iconColor": "#3b82f6",
+      "iconColor": "#60a5fa",
       "title": "Web Development Track",
-      "author": "CCLTCE SDG",
-      "bullets": ["Web Development", "Frontend", "Backend"],
-      "tags": ["HTML", "CSS", "JavaScript", "React", "TypeScript", "Node.js", "Express", "MongoDB", "REST APIs", "Authentication"],
-      "link": "#"
+      "author": "CCLTCE Core",
+      "bullets": ["HTML, CSS & modern layout", "JavaScript fundamentals", "React + TypeScript", "Node, Express & REST APIs", "Auth, sessions & databases"],
+      "tags": ["HTML", "CSS", "JavaScript", "React", "TypeScript", "Node.js", "Express", "MongoDB", "REST", "Auth"],
+      "link": "challenges.html"
     },
     {
       "id": "systems-track",
       "icon": "⑃",
-      "iconColor": "#ef4444",
+      "iconColor": "#fb7185",
       "title": "Systems & CP Track",
-      "author": "CCLTCE SDG",
-      "bullets": ["Blockchain", "DSA", "Competitive Programming"],
+      "author": "CCLTCE Core",
+      "bullets": ["C++ & the STL", "Data structures & graphs", "Dynamic programming", "Linux, Git & open source", "System design & contests"],
       "tags": ["Git", "Linux", "C++", "STL", "Graphs", "DP", "System Design", "Open Source"],
-      "link": "#"
+      "link": "challenges.html"
+    },
+    {
+      "id": "ai-track",
+      "icon": "✦",
+      "iconColor": "#2dd4bf",
+      "title": "AI & Automation Track",
+      "author": "CCLTCE Core",
+      "bullets": ["Python from scratch", "Data wrangling & pandas", "Prompting & LLM tooling", "Small models & evaluation", "Automation scripts & bots"],
+      "tags": ["Python", "NumPy", "pandas", "PyTorch", "LLMs", "Agents", "Automation"],
+      "link": "challenges.html"
     }
   ],
   "team": [
-    { "name": "Akash Gupta", "role": "President", "area": "Core", "twitter": "@akashg", "linkedin": "akash-gupta", "portfolio": "https://akashg.dev" },
-    { "name": "Sachin Yadav", "role": "Technical Head", "area": "Coding", "twitter": "@sachin_yadav", "linkedin": "sachin-yadav", "portfolio": "https://satyadvv.github.io" }
+    {
+      "name": "Akash Gupta",
+      "role": "President",
+      "area": "Leadership & Outreach",
+      "twitter": "akashgupta",
+      "linkedin": "akash-gupta",
+      "other": "https://github.com/akashgupta",
+      "portfolio": "https://akashgupta.dev"
+    },
+    {
+      "name": "Sachin Yadav",
+      "role": "Technical Head",
+      "area": "Systems, Web & Infra",
+      "twitter": "sachin_yadav",
+      "linkedin": "sachin-yadav",
+      "other": "https://github.com/satyadvv",
+      "portfolio": "https://satyadvv.github.io"
+    }
   ],
   "achievements": [
-    { "year": "2026", "title": "First campus-wide CP contest", "detail": "120 participants across three divisions." },
-    { "year": "2026", "title": "Git workshop series", "detail": "4 sessions, 200+ student registrations." }
+    { "year": "2026", "title": "First campus-wide CP contest", "detail": "120 participants across three divisions, with live problem discussions." },
+    { "year": "2026", "title": "Git workshop series", "detail": "4 sessions, 200+ student registrations, zero-to-first-commit in 90 minutes." },
+    { "year": "2026", "title": "Open source starter pack", "detail": "Curated repos and templates so every member lands their first merged PR." }
   ],
   "events": [
-    { "title": "Orientation", "date": "Sep 18, 2025", "desc": "Welcome event for new batch. Overview of coding club activities, mentorship, and upcoming challenges.", "image": "event-orientation" },
-    { "title": "GitHub Session", "date": "Sep 25, 2025", "desc": "Hands‑on session on Git basics, workflow, and the GitHub cohort event coming soon.", "image": "event-github" }
+    { "title": "Orientation 2026", "date": "Sep 18, 2026", "desc": "Welcome event for the new batch — club roadmap, track selection, mentor pairing and a live demo of the Web and Systems tracks.", "image": "event-orientation" },
+    { "title": "GitHub Session", "date": "Sep 25, 2026", "desc": "Hands-on Git basics, branching workflow, and how to open your first pull request. Laptops required, no prior experience needed.", "image": "event-github" },
+    { "title": "DSA Bootcamp", "date": "Oct 09, 2026", "desc": "Six-week competitive programming bootcamp covering arrays, graphs, DP and weekly rated contests on Codeforces.", "image": "event-orientation" },
+    { "title": "AI Build Jam", "date": "Oct 23, 2026", "desc": "48-hour jam to ship a small agent or automation using Python and LLM APIs. Teams of three, mentors on site.", "image": "event-github" }
   ],
   "notices": [
-    { "date": "Oct 1, 2025", "title": "GitHub Cohort Cohort", "body": "A 4‑week structured learning cohort starting Nov 1. Sessions every Thursday 6‑8 PM. Sign‑up via the button below.", "tag": "new" }
+    { "date": "Oct 1, 2026", "tag": "new", "title": "GitHub Cohort", "body": "A 4-week structured cohort starting Nov 1. Sessions every Thursday 6-8 PM, in the LTCOE computer lab." },
+    { "date": "Oct 5, 2026", "tag": "urgent", "title": "Lab slot booking", "body": "Members who want a dedicated slot for the DSA bootcamp must register before Oct 12." },
+    { "date": "Sep 30, 2026", "tag": "won", "title": "Regional round cleared", "body": "CCLTCE qualified for the inter-college round with two teams in the top 12." }
   ],
   "challenges": [
-    { "id": "w1", "prompt": "Build a responsive navbar with vanilla HTML/CSS that collapses into a hamburger menu on mobile.", "due": "Oct 8, 2025", "badge": "Beginner" },
-    { "id": "w2", "prompt": "Create a Three.js particle system that reacts to cursor position.", "due": "Oct 15, 2025", "badge": "Advanced" }
+    { "id": "w1", "prompt": "Build a responsive navbar with vanilla HTML/CSS that collapses into a hamburger menu on mobile.", "due": "Oct 8, 2026", "badge": "Beginner" },
+    { "id": "w2", "prompt": "Create a Three.js particle system that reacts to cursor position.", "due": "Oct 15, 2026", "badge": "Advanced" },
+    { "id": "w3", "prompt": "Write a CLI that renames a folder of images and writes a Markdown index.", "due": "Oct 18, 2026", "badge": "Beginner" },
+    { "id": "w4", "prompt": "Implement a rate limiter backed by Redis and benchmark it under load.", "due": "Oct 22, 2026", "badge": "Advanced" }
   ]
 }

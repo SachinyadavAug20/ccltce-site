@@ -1,70 +1,101 @@
+const escape = (s) =>
+  String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const initials = (name) =>
+  name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+
+const handle = (h) => String(h || "").replace(/^@/, "");
+
+const ICON = {
+  x: '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-6.77 7.74L22.8 22h-6.5l-5.1-6.66L5.4 22H2.3l7.25-8.29L1.6 2h6.67l4.6 6.1L18.9 2Zm-1.1 18.1h1.7L6.3 3.8H4.5L17.8 20.1Z"/></svg>',
+  li: '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm7 0h3.8v1.64h.05c.53-.95 1.83-1.96 3.77-1.96 4.03 0 4.78 2.5 4.78 5.76V21h-4v-5.6c0-1.34-.03-3.07-1.9-3.07-1.9 0-2.2 1.46-2.2 2.97V21h-4V9Z"/></svg>',
+  gh: '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49 0-.24-.01-.89-.01-1.74-2.78.62-3.37-1.37-3.37-1.37-.46-1.19-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.35 4.8-4.58 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.6.69.49A10.03 10.03 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/></svg>',
+  link: '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.6 13.4a1 1 0 0 1 0-1.4l1.4-1.4a1 1 0 0 1 1.4 1.4l-1.4 1.4a1 1 0 0 1-1.4 0Zm-.8 2.6a4 4 0 0 1 0-5.7l2.1-2a4 4 0 0 1 5.7 5.7l-1 1-1.4-1.4 1-1a2 2 0 0 0-2.9-2.9l-2.1 2a2 2 0 0 0 0 2.9l-1.4 1.4a4 4 0 0 1 0 .6Zm8.6-8a4 4 0 0 0-5.7 0l-1 1 1.4 1.4 1-1a2 2 0 0 1 2.9 2.9l-2.1 2a2 2 0 0 1-2.9 0 1 1 0 0 0-1.4 1.4 4 4 0 0 0 5.7 0l2.1-2.1a4 4 0 0 0 0-5.6Z"/></svg>',
+};
+
+const TEMPLATES = {
+  resources: (r) => `
+    <article class="res-card">
+      <div class="icon-ring" style="color:${escape(r.iconColor)}">${escape(r.icon)}</div>
+      <h2>${escape(r.title)}</h2>
+      <p class="author"><strong>Author:</strong> ${escape(r.author)}</p>
+      <ul class="bullets">${r.bullets.map((b) => `<li>${escape(b)}</li>`).join("")}</ul>
+      <div class="tags">${r.tags.map((t) => `<span class="tag">${escape(t)}</span>`).join("")}</div>
+      <a class="btn btn-primary" href="${escape(r.link)}">Start Exploring</a>
+    </article>`,
+
+  team: (m) => `
+    <article class="person">
+      <div class="avatar">${escape(initials(m.name))}</div>
+      <h3>${escape(m.name)}</h3>
+      <p class="role">${escape(m.role)}</p>
+      <p class="meta">${escape(m.area)}</p>
+      <div class="socials">
+        <a class="social twitter" href="https://x.com/${escape(handle(m.twitter))}" target="_blank" rel="noopener" aria-label="X / Twitter">${ICON.x}</a>
+        <a class="social linkedin" href="https://linkedin.com/in/${escape(handle(m.linkedin))}" target="_blank" rel="noopener" aria-label="LinkedIn">${ICON.li}</a>
+        <a class="social other" href="${escape(m.other || m.portfolio)}" target="_blank" rel="noopener" aria-label="Other link">${ICON.link}</a>
+      </div>
+      <a class="btn btn-ghost" href="${escape(m.portfolio)}" target="_blank" rel="noopener">Portfolio</a>
+    </article>`,
+
+  achievements: (a) => `
+    <article class="ach">
+      <span class="year">${escape(a.year)}</span>
+      <h3>${escape(a.title)}</h3>
+      <p>${escape(a.detail)}</p>
+    </article>`,
+
+  events: (e) => `
+    <details class="event">
+      <summary>
+        <img src="assets/img/${escape(e.image)}.svg" alt="${escape(e.title)} poster" width="56" height="38" />
+        <span class="ev-title">${escape(e.title)}<span class="ev-date">${escape(e.date)}</span></span>
+        <span class="ev-toggle" aria-hidden="true">+</span>
+      </summary>
+      <p class="ev-body">${escape(e.desc)}</p>
+    </details>`,
+
+  notices: (n) => `
+    <div class="notice-item">
+      <span class="tag">${escape(n.tag)}</span>
+      <div><strong>${escape(n.title)}</strong> <span class="n-body">${escape(n.body)}</span></div>
+    </div>`,
+
+  challenges: (c) => `
+    <article class="challenge">
+      <div class="ch-top">
+        <h3>${escape(c.prompt)}</h3>
+        <span class="badge ${escape((c.badge || "").toLowerCase())}">${escape(c.badge)}</span>
+      </div>
+      <p>Due ${escape(c.due)}</p>
+    </article>`,
+};
+
+const STATS = [
+  ["core team", "team"],
+  ["learning tracks", "resources"],
+  ["milestones", "achievements"],
+  ["events hosted", "events"],
+];
+
 async function loadData() {
   const res = await fetch("data/content.json");
   if (!res.ok) throw new Error("content unavailable");
   return res.json();
 }
 
-function initials(name) {
-  return name.split(" ").map((w) => w[0]).slice(0, 2).join("");
+function renderStats(data) {
+  return STATS.map(([label, key]) => {
+    const v = data[key];
+    const n = Array.isArray(v) ? v.length : v ? 1 : 0;
+    return `<div class="stat"><strong>${n}</strong><span>${label}</span></div>`;
+  }).join("");
 }
 
-const TEMPLATES = {
-  resources: (r) => `
-    <article class="res-card">
-      <div class="icon-ring" style="color:${r.iconColor}">${r.icon}</div>
-      <h2>${r.title}</h2>
-      <p class="author"><strong>Author:</strong> ${r.author}</p>
-      <ul class="bullets">${r.bullets.map((b) => `<li>${b}</li>`).join("")}</ul>
-      <div class="tags">${r.tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>
-      <a class="btn" href="${r.link}">Start Exploring</a>
-    </article>`,
-
-  team: (m) => `
-    <article class="person">
-      <div class="avatar">${initials(m.name)}</div>
-      <h3>${m.name}</h3>
-      <p style="color:var(--muted)">${m.role}</p>
-      <p class="meta">${m.area}</p>
-      <div class="socials">
-        <a href="https://x.com/${m.twitter}" target="_blank" rel="noopener" class="social social-twitter" aria-label="Twitter"></a>
-        <a href="https://linkedin.com/in/${m.linkedin}" target="_blank" rel="noopener" class="social social-linkedin" aria-label="LinkedIn"></a>
-        <a href="#" class="social other" aria-label="Other"></a>
-      </div>
-      <a href="${m.portfolio}" class="btn tiny" target="_blank" rel="noopener">My Portfolio</a>
-    </article>`,
-
-  achievements: (a) => `
-    <article class="ach">
-      <span class="year">${a.year}</span>
-      <h3>${a.title}</h3>
-      <p style="color:var(--muted);font-size:.92rem">${a.detail}</p>
-    </article>`,
-
-  events: (e) => `
-    <details class="event">
-      <summary>
-        <img src="assets/img/event-placeholder.svg" alt="${e.title} poster" width="48" height="32" style="vertical-align:middle;margin-right:8px;">
-        ${e.title} – ${e.date}
-      </summary>
-      <p>${e.desc}</p>
-    </details>`,
-
-  notices: (n) => `
-    <div class="notice-item">
-      <span class="tag">${n.tag}</span>
-      <strong>${n.title}</strong>: ${n.body}
-    </div>`,
-
-  challenges: (c) => `
-    <article class="challenge">
-      <h3>${c.prompt}</h3>
-      <p>Due: ${c.due} <span class="badge">${c.badge}</span></p>
-    </article>`,
-};
-
 async function init() {
-  const page = location.pathname.split("/").pop() || "index.html";
+  if (window.CCLTCE) window.CCLTCE.mount();
 
+  const page = location.pathname.split("/").pop() || "index.html";
   document.querySelectorAll(".nav-links a").forEach((a) => {
     if (a.getAttribute("href") === page) a.classList.add("active");
   });
@@ -79,13 +110,7 @@ async function init() {
   for (const el of document.querySelectorAll("[data-render]")) {
     const key = el.dataset.render;
     if (key === "stats") {
-      el.innerHTML = [
-        ["core team", data.team.length],
-        ["learning tracks", data.resources.length],
-        ["milestones", data.achievements.length],
-      ]
-        .map(([label, n]) => `<div class="stat"><strong>${n}</strong><span>${label}</span></div>`)
-        .join("");
+      el.innerHTML = renderStats(data);
       continue;
     }
     if (TEMPLATES[key] && data[key]) {

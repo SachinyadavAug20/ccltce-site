@@ -1,0 +1,133 @@
+/* ---------- events ---------- */
+.events { display: grid; gap: 0.25rem; }
+
+.event {
+  border-top: 1px solid var(--line);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.event:last-child { border-bottom: 1px solid var(--line); }
+.event:hover { border-color: rgba(45, 212, 191, 0.4); }
+.event[open] { border-color: rgba(45, 212, 191, 0.5); }
+
+.event summary {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem 0.15rem;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+}
+
+.event summary::-webkit-details-marker { display: none; }
+
+.event summary img {
+  width: 3.5rem;
+  height: 2.4rem;
+  flex: none;
+  border-radius: var(--r-sm);
+  object-fit: cover;
+}
+
+.event .ev-title { flex: 1; }
+
+.event .ev-date {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--teal-dim);
+}
+
+.event .ev-toggle {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 1rem;
+  color: var(--muted);
+  transition: transform 0.2s, color 0.2s;
+}
+
+.event[open] .ev-toggle { transform: rotate(45deg); color: var(--teal); }
+
+.event .ev-body {
+  font-size: 0.9rem;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  padding: 0.9rem 0.15rem 1.2rem;
+}
+
+/* ---------- notices ---------- */
+.notices { display: grid; gap: 0.2rem; }
+
+.notice-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 0.9rem 0.15rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.9rem;
+}
+
+.notice-item:last-child { border-bottom: 1px solid var(--line); }
+
+.notice-item .tag {
+  flex: none;
+  color: var(--rose);
+  text-transform: uppercase;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  margin-top: 0.15rem;
+}
+
+.notice-item strong { font-weight: 600; }
+.notice-item .n-body { color: var(--muted); }
+
+/* ---------- challenges ---------- */
+.challenges { display: grid; gap: 0.25rem; }
+
+.challenge {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.1rem 0.15rem 1.3rem;
+  border-top: 1px solid var(--line);
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.challenge:last-child { border-bottom: 1px solid var(--line); }
+.challenge:hover { transform: translateX(4px); border-color: rgba(167, 139, 250, 0.5); }
+
+.challenge .ch-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.challenge h3 { font-size: 1rem; font-weight: 600; }
+.challenge p { font-size: 0.88rem; color: var(--muted); }
+
+.badge {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+.badge.advanced { color: var(--rose); }
+.badge.beginner { color: var(--green); }
+
+/* ---------- ascii marquee block ---------- */
+.ascii-note {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: rgba(104, 217, 217, 0.55);
+  white-space: pre;
+  overflow: hidden;
+  letter-spacing: 0.08em;
+}

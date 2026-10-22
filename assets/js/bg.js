@@ -1,56 +1,108 @@
-import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
-import { FRAG, VERT } from "./ocean.frag.js";
+import * as THREE from "../vendor/three.module.js";
+import { ASCII_VERT, ASCII_FRAG } from "./glsl/ascii.js";
+import { buildGlyphAtlas, GLYPH_COLS, GLYPH_ROWS } from "./glyphs.js";
+import { initAudio, AUDIO_BINS } from "./audio.js";
 
-const cv = document.getElementById("bg");
+// One WebGL pass: a calm ASCII ocean with fish / shark / whale drawn as ASCII art.
+(async function () {
+  const cv = document.getElementById("bg");
+  if (!cv) return;
 
-if (cv) {
-  const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: false, powerPreference: "low-power" });
-  const scene = new THREE.Scene();
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const renderer = new THREE.WebGLRenderer({
+    canvas: cv,
+    antialias: false,
+    powerPreference: "low-power",
+  });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+
   const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const quad = new THREE.PlaneGeometry(2, 2);
+
   const uni = {
-    uTime: { value: 0 },
     uRes: { value: new THREE.Vector2(1, 1) },
-    uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-    uVel: { value: new THREE.Vector2(0, 0) },
+    uTime: { value: 0 },
+    uCellW: { value: 9 },
+    uCellH: { value: 14 },
+    uCols: { value: GLYPH_COLS },
+    uRows: { value: GLYPH_ROWS },
+    uSceneH: { value: 60 },
+    uSceneW: { value: 100 },
+    uAtlas: { value: null },
+    uSkyCol: { value: new THREE.Color(0.052, 0.030, 0.022) },
+    uMidCol: { value: new THREE.Color(0.015, 0.075, 0.055) },
+    uDeepCol: { value: new THREE.Color(0.008, 0.035, 0.028) },
+    uInk: { value: new THREE.Color(0.30, 0.95, 0.68) },
+    uHot: { value: new THREE.Color(1.0, 0.78, 0.32) },
+    uSpec: { value: new Float32Array(AUDIO_BINS) },
   };
-  const material = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms: uni });
-  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
 
-  const fit = () => {
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+  const scene = new THREE.Scene();
+  scene.add(
+    new THREE.Mesh(
+      quad,
+      new THREE.ShaderMaterial({
+        vertexShader: ASCII_VERT,
+        fragmentShader: ASCII_FRAG,
+        uniforms: uni,
+        depthTest: false,
+        depthWrite: false,
+      })
+    )
+  );
+
+  const tex = new THREE.CanvasTexture(document.createElement("canvas"));
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.LinearFilter;
+  tex.generateMipmaps = false;
+  tex.colorSpace = THREE.NoColorSpace;
+  uni.uAtlas.value = tex;
+  window.CCLTCE_BG = { renderer, scene, cam, uni };
+
+  let cellW = 0;
+  let cellH = 0;
+
+  const fit = async () => {
     renderer.setSize(innerWidth, innerHeight, false);
-    renderer.getDrawingBufferSize(uni.uRes.value);
+    const d = renderer.getDrawingBufferSize(new THREE.Vector2());
+    uni.uRes.value.copy(d);
+    uni.uCellH.value = Math.max(8, Math.round(14 * renderer.getPixelRatio()));
+    uni.uCellW.value = Math.max(5, Math.round(uni.uCellH.value * 0.64));
+    uni.uSceneH.value = d.y / uni.uCellH.value;
+    uni.uSceneW.value = d.x / uni.uCellH.value;
+    if (uni.uCellW.value !== cellW || uni.uCellH.value !== cellH) {
+      cellW = uni.uCellW.value;
+      cellH = uni.uCellH.value;
+      tex.image = await buildGlyphAtlas(cellW, cellH);
+      tex.needsUpdate = true;
+    }
   };
-  addEventListener("resize", fit);
-  fit();
 
-  const mouse = new THREE.Vector2(0.5, 0.5);
-  addEventListener("pointermove", (e) => {
-    const nx = e.clientX / innerWidth, ny = 1 - e.clientY / innerHeight;
-    const v = uni.uVel.value;
-    v.x = Math.max(-0.3, Math.min(0.3, v.x + (nx - mouse.x) * 1.6));
-    v.y = Math.max(-0.3, Math.min(0.3, v.y + (ny - mouse.y) * 1.6));
-    mouse.set(nx, ny);
+  await fit();
+  let timer = 0;
+  addEventListener("resize", () => {
+    clearTimeout(timer);
+    timer = setTimeout(fit, 180);
   });
 
-  // initial render test
-  uni.uTime.value = 1;
-  renderer.render(scene, cam);
+  const audio = initAudio();
+  const spec = uni.uSpec.value;
 
-  const clock = new THREE.Clock();
-  const tick = () => {
-    requestAnimationFrame(tick);
-    if (document.hidden) return;
-    uni.uTime.value += Math.min(clock.getDelta(), 0.05);
-    uni.uMouse.value.lerp(mouse, 0.1);
-    uni.uVel.value.multiplyScalar(0.95);
+  const draw = (t) => {
+    uni.uTime.value = t;
+    audio.bars(spec);
     renderer.render(scene, cam);
   };
 
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    uni.uTime.value = 30;
-    renderer.render(scene, cam);
+  if (reduced) {
+    draw(24);
   } else {
+    const clock = new THREE.Clock();
+    const tick = () => {
+      requestAnimationFrame(tick);
+      if (document.hidden) return;
+      draw(clock.getElapsedTime());
+    };
     tick();
   }
-}
+})().catch((err) => console.error("[bg]", err));

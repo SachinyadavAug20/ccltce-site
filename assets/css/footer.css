@@ -1,0 +1,64 @@
+/* ---------- simple footer ---------- */
+footer {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  background: #000;
+  border-top: 1px solid var(--line);
+  padding: 1.75rem 1rem 1.25rem;
+}
+
+.foot-row {
+  width: var(--shell);
+  margin-inline: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem 1.5rem;
+}
+
+.foot-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--disp);
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.foot-logo { width: 1.9rem; height: auto; opacity: 0.85; }
+
+.foot-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1rem;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.foot-links a { transition: color 0.18s; }
+.foot-links a:hover { color: #fff; }
+
+.foot-social { display: flex; gap: 0.45rem; }
+
+.foot-social a {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-sm);
+  transition: filter 0.2s, transform 0.2s;
+}
+
+.foot-social a:hover { filter: brightness(1.35); transform: translateY(-2px); }
+
+.foot-copy {
+  width: var(--shell);
+  margin: 1.1rem auto 0;
+  text-align: center;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.42);
+}
