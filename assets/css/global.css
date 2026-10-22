@@ -53,6 +53,26 @@ body {
 /* main content containment */
 main { position: relative; width: 100%; max-width: 960px; margin: 0 auto; padding: 80px 1.5rem 4rem; }
 
+/* ---------- navbar brand logo ---------- */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 1rem;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  transition: transform 0.25s;
+}
+
 /* ---------- mobile: bottom nav ---------- */
 @media (max-width: 679px) {
   .nav-wrap { top: auto; bottom: 10px; left: 10px; right: 10px; }
