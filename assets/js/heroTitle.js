@@ -45,25 +45,40 @@
   }
 
   function layoutAndWire(svg, items) {
-    var defs = svg.querySelector("defs");
+    // Target viewBox width (fixed, no overflow)
+    var TARGET_WIDTH = 740;
+    var HEIGHT = 260;
 
-    // Measure actual glyph widths to lay out proportionally
-    var totalOrigWidth = items.reduce(function (sum, it, i) {
-      return sum + (i < items.length - 1 ? 70 : 0);
-    }, 0);
+    // Measure actual glyph widths at base scale
+    var bboxes = items.map(function (it) {
+      return it.g.getBBox();
+    });
 
-    var containerWidth = 780; // target content width
-    var scale = containerWidth / totalOrigWidth;
+    // Find min/max of glyph bounds at base scale (1.0, no translate)
+    var minX = Math.min.apply(null, bboxes.map(function (b) { return b.x; }));
+    var maxX = Math.max.apply(null, bboxes.map(function (b) { return b.x + b.width; }));
+    var glyphSpan = maxX - minX;
+
+    // Scale to fit TARGET_WIDTH with padding
+    var PADDING = 60;
+    var availableWidth = TARGET_WIDTH - PADDING * 2;
+    var scale = availableWidth / glyphSpan;
     if (scale > 1) scale = 1;
 
-    var x = 40;
-    items.forEach(function (it) {
-      var s = 0.85 * scale;
-      it.g.setAttribute("transform", "translate(" + x + " 215) scale(" + s + ")");
-      x += 70 * scale;
-    });
-    svg.setAttribute("viewBox", "0 0 " + (x + 40) + " 260");
+    // Apply transform: center the glyphs horizontally
+    var totalWidth = glyphSpan * scale;
+    var startX = (TARGET_WIDTH - totalWidth) / 2 - minX * scale;
+    var yOffset = 215;
 
+    items.forEach(function (it, i) {
+      var bb = bboxes[i];
+      var tx = startX + (bb.x - minX) * scale;
+      it.g.setAttribute("transform", "translate(" + tx.toFixed(2) + " " + yOffset + ") scale(" + scale.toFixed(4) + ")");
+    });
+
+    svg.setAttribute("viewBox", "0 0 " + TARGET_WIDTH + " " + HEIGHT);
+
+    // Create masks and water fills
     var defs = svg.querySelector("defs");
     items.forEach(function (it, i) {
       var mid = el("mask", { id: "hm-" + i, maskUnits: "userSpaceOnUse", x: -200, y: -200, width: 2000, height: 2000 });
@@ -123,11 +138,11 @@
     var tween = null, last = -1;
     svg.addEventListener("mousemove", function (e) {
       var box = svg.getBoundingClientRect();
-      var mx = ((e.clientX - box.left) / box.width) * Number(svg.getAttribute("viewBox").split(" ")[2]);
+      var mx = ((e.clientX - box.left) / box.width) * 780; // TARGET_WIDTH
       var idx = 0, best = 1e9;
       items.forEach(function (it, j) {
-        var b = it.g.getBBox ? it.g.getBBox() : { x: j * 70 + 40, width: 56 };
-        var cx = (it.g.transform.baseVal.numberOfItems ? it.g.transform.baseVal.getItem(0).matrix.e : 40) + b.width / 2;
+        var bb = it.g.getBBox ? it.g.getBBox() : { x: j * 70, width: 80 };
+        var cx = bb.x + bb.width / 2;
         var dd = Math.abs(cx - mx);
         if (dd < best) { best = dd; idx = j; }
       });
@@ -138,6 +153,12 @@
       tween = gsap.to(wave, { t: 6.2, duration: 2.0, ease: "none", onUpdate: paint });
     });
     svg.addEventListener("mouseleave", function () { last = -1; wave.from = -1; paint(); });
+  }
+
+  function el(tag, attrs) {
+    var n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount);
