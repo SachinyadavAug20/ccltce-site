@@ -5,14 +5,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   text-align: center;
   gap: 1rem;
-  padding: 8rem 1.25rem 3rem;
+  padding: 11rem 1.25rem 4rem;
 }
 
 .hero-logo {
-  width: clamp(84px, 11vw, 132px);
+  width: clamp(170px, 22vw, 280px);
   height: auto;
 }
 
@@ -31,13 +31,14 @@
 .hero h1 em { font-style: normal; color: var(--teal); }
 
 /* custom SVG letterforms for the hero title */
-.hero-title { width: 100%; }
+.hero-title { width: 100%; max-width: 100%; overflow: visible; }
 
 .hero-title-svg {
-  width: min(94%, 1000px);
+  width: min(86%, 800px);
   height: auto;
   margin-inline: auto;
   overflow: visible;
+  display: block;
 }
 
 .sr-only {
@@ -69,42 +70,11 @@
 
 .hero-sub small.loc { color: rgba(255, 255, 255, 0.82); }
 
-.hero-cta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.75rem;
-  margin-top: 1.4rem;
-}
-
-/* ---------- buttons ---------- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1.3rem;
-  border-radius: 999px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border: 1px solid transparent;
-  transition: transform 0.18s, background 0.18s, border-color 0.18s;
-}
-
-.btn:hover { transform: translateY(-2px); }
-
-.btn-primary {
-  background: var(--teal);
-  color: #04231f;
-}
-
-.btn-ghost { background: rgba(255, 255, 255, 0.08); border-color: var(--line); color: #e6f2f0; }
-.btn-ghost:hover { background: rgba(255, 255, 255, 0.16); }
-
 /* ---------- stats strip ---------- */
 .stats-strip {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: center
   gap: clamp(1.2rem, 5vw, 3rem);
   margin: 3rem 0 2rem;
 }

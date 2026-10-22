@@ -4,7 +4,7 @@ import { VIZ_GLSL } from "./viz.js";
 import { PALETTE_GLSL } from "./palette.js";
 import { SWIM_GLSL } from "./swim.js";
 
-// One fullscreen pass: an ASCII aquarium — fish up top, music visualiser below.
+// One fullscreen pass: an ASCII aquarium — fish in the top 80%, music visualiser in bottom 20%.
 export const ASCII_VERT = `
 varying vec2 vUv;
 void main() {
@@ -32,9 +32,7 @@ uniform vec3 uHot;
 uniform float uSpec[32];
 varying vec2 vUv;
 
-const float HY = 0.16;
-const float SDEPTH = 0.30;
-const float VIZH = 0.45;
+const float VIZH = 0.20;   // music visualiser: bottom 20% of the page
 
 ${NOISE_GLSL}
 ${CREATURES_GLSL}
@@ -55,45 +53,36 @@ void main() {
 
   float t = uTime;
   vec2 p = (cUv - 0.5) * uRes / uCellH;
-  float hy = HY * uSceneH;
+  float surf = 0.5 * uSceneH;                       // water surface at top of page
+  float vFloor = -0.5 * uSceneH + VIZH * uSceneH;   // visualiser zone: bottom 20%
+  float span = surf - vFloor;
 
-  // ---------- sky / water gradient ----------
-  vec3 col = mix(uDeepCol, uMidCol, smoothstep(-0.5 * uSceneH, hy, p.y));
-  col = mix(col, uSkyCol, smoothstep(hy, 0.5 * uSceneH, p.y));
+  // ---------- water gradient ----------
+  vec3 col = mix(uDeepCol, uMidCol, smoothstep(vFloor, 0.10 * uSceneH, p.y));
+  col = mix(col, uSkyCol, smoothstep(0.14 * uSceneH, surf, p.y));
 
   // ---------- wave lines ----------
-  float sea = 1.0 - smoothstep(hy - 0.7, hy + 0.7, p.y);
-  float depth = max(0.0, hy - p.y);
+  float depth = clamp((surf - p.y) / span, 0.0, 1.0);
+  float sea = 1.0 - smoothstep(0.84, 1.04, depth);
   float w1 = sin(p.x * 0.30 + t * 0.9) * 0.55;
   float w2 = sin(p.x * 0.11 - t * 0.6) * 1.10;
   float w3 = fbm(vec2(p.x * 0.05 + t * 0.03, 11.3), 3) * 1.4;
-  float yw = depth * 0.55 + (w1 * 0.18 + w2 * 0.10 + w3 * 0.06);
+  float yw = depth * 4.2 + (w1 * 0.18 + w2 * 0.10 + w3 * 0.06);
   float f = fract(yw);
   float dl = min(f, 1.0 - f);
   float stripe = 1.0 - smoothstep(0.06, 0.30, dl);
   float wob = 0.42 + 0.58 * (fbm(vec2(p.x * 0.06, floor(yw) * 5.1 + t * 0.1), 2) * 0.5 + 0.5);
   float density = stripe * wob * sea;
 
-  // ---------- stars ----------
-  float sh = hash21(cell + 0.5);
-  float star = step(0.9935, sh) * smoothstep(hy + 0.5, 0.42 * uSceneH, p.y);
-  density += star * 0.9;
-
-  // ---------- sky aurora: the top of the tank drifts too ----------
-  float curtain = fbm(vec2(p.x * 0.09 + t * 0.04, p.y * 0.06 - t * 0.06), 3) * 0.5 + 0.5;
-  float skyMask = smoothstep(hy - 0.6, hy + 1.4, p.y);
-  float skyA = skyMask * smoothstep(0.50, 0.90, curtain);
-  density = max(density, skyA * 0.45);
-
-  // ---------- creatures (upper water) ----------
+  // ---------- creatures: eight swimmers across the water ----------
   vec3 cr = sceneCrit(p, t);
-  float halo = 0.035 * (SDEPTH * uSceneH);
+  float halo = 0.035 * span;
   float isCrit = 0.0;
   if (cr.x < 0.0) { density = 1.0; isCrit = 1.0; }
   else if (cr.x < halo) { density = 0.0; }
   if (isCrit > 0.5 && cr.y > 0.45) density = 0.0;
 
-  // ---------- visualiser bars + aurora (lower tank) ----------
+  // ---------- visualiser bars + aurora (bottom 20%) ----------
   float vBase = -0.5 * uSceneH + 0.35;
   float bval = vizBandValue(p, uSceneW);
   float vTop = vBase + bval * uSceneH * VIZH;
@@ -110,18 +99,14 @@ void main() {
   if (isCrit > 0.5 || viz > 0.5) setF = 0.0;
   else if (rnd > 0.72) setF = 2.0 + floor(rnd2 * (uRows - 2.0));
   float idx = floor(clamp(density, 0.0, 0.999) * uCols);
+  if (isCrit > 0.5 || viz > 0.5) idx = floor(hash21(cell * 1.7 + 21.3) * uCols);
   vec2 gUv = vec2((idx + local.x) / uCols, (uRows - setF - 1.0 + local.y) / uRows);
   float cov = texture2D(uAtlas, gUv).r;
 
   // ---------- compose ----------
   vec3 ink = ramp3(fract(floor(yw) * 0.11 + p.x * 0.012 + t * 0.02));
   float alpha = cov * 0.62;
-  if (skyA > 0.03) {
-    ink = mix(vec3(0.86, 0.95, 0.90), vec3(0.99, 0.88, 0.80), curtain);
-    alpha = cov * skyA * 0.55;
-  }
-  if (star > 0.01) { ink = mix(uHot, vec3(1.0, 0.97, 0.88), 0.5); alpha = cov * 0.85; }
-  if (isCrit > 0.5) { ink = critColor(cr.z); alpha = cov * 0.95; }
+  if (isCrit > 0.5) { ink = critColor(mod(cr.z, 5.0)); alpha = cov; }
   if (viz > 0.5) {
     ink = ramp3(clamp((p.y - vBase) / max(0.001, vTop - vBase), 0.0, 1.0));
     alpha = cov * 0.95;
@@ -130,12 +115,11 @@ void main() {
     alpha = cov * aur * 0.9;
   }
   col = mix(col, ink, alpha);
-  col += ink * density * 0.035;
+  col += ink * (density * 0.035 + (isCrit > 0.5 ? 0.10 : 0.0));
 
-  // aurora glow + horizon ember
+  // aurora glow + warm surface light
   col += mix(uInk, ramp3(clamp(bval, 0.0, 1.0)), 0.6) * aur * 0.18;
-  col += vec3(0.52, 0.64, 0.58) * skyA * 0.05;
-  col += uHot * 0.06 * exp(-abs(p.y - hy) * 26.0);
+  col += uHot * 0.07 * exp(-abs(p.y - surf) * 26.0);
 
   // vignette
   vec2 v = vUv - 0.5;

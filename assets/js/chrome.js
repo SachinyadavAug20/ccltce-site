@@ -94,9 +94,9 @@
     '<p class="foot-copy">&copy; ' + new Date().getFullYear() + " CCLTCE &middot; Lokmanya Tilak College of Engineering, Koparkhana, Navi Mumbai</p>";
 
   function markActive() {
-    var here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
+    var here = (location.pathname.split("/").pop() || "index").toLowerCase().replace(/\.html$/, "");
     document.querySelectorAll(".nav-links a, .mobile-menu a").forEach(function (a) {
-      var href = (a.getAttribute("href") || "").split("/").pop().toLowerCase();
+      var href = (a.getAttribute("href") || "").split("/").pop().toLowerCase().replace(/\.html$/, "");
       if (href && href === here) {
         a.classList.add("active");
         a.setAttribute("aria-current", "page");

@@ -15,10 +15,10 @@ vec3 ramp3(float t) {
 
 // creature colour by kind: fish, fish, shark, whale, jelly
 vec3 critColor(float id) {
-  if (id < 0.5) return vec3(0.55, 0.95, 0.62);
-  if (id < 1.5) return vec3(0.75, 0.97, 0.45);
-  if (id < 2.5) return vec3(1.00, 0.80, 0.35);
-  if (id < 3.5) return vec3(1.00, 0.55, 0.58);
-  return vec3(1.00, 0.66, 0.50);
+  if (id < 0.5) return vec3(0.42, 1.00, 0.52);
+  if (id < 1.5) return vec3(0.80, 1.00, 0.35);
+  if (id < 2.5) return vec3(1.00, 0.84, 0.28);
+  if (id < 3.5) return vec3(1.00, 0.45, 0.50);
+  return vec3(1.00, 0.60, 0.40);
 }
 `;
