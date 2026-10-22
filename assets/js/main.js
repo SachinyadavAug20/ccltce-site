@@ -43,7 +43,7 @@ const TEMPLATES = {
   events: (e) => `
     <details class="event">
       <summary>
-        <img src="assets/img/event-placeholder.svg" alt="${e.title} poster" width="60" height="40" style="vertical-align:middle; margin-right:8px;">
+        <img src="assets/img/event-placeholder.svg" alt="${e.title} poster" width="48" height="32" style="vertical-align:middle;margin-right:8px;">
         ${e.title} – ${e.date}
       </summary>
       <p>${e.desc}</p>

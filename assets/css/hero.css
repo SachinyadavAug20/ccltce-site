@@ -6,7 +6,6 @@
   text-align: center;
   gap: 1rem;
   background: var(--bg);
-  position: relative;
 }
 
 /* wordmark animation (reduced‑motion friendly) */
@@ -113,3 +112,10 @@
   .hero > *, .marquee span, .wordmark { animation: none; }
   .wordmark { transition: none; }
 }
+
+/* ---------- event accordion ---------- */
+.event details { margin-bottom: 0.8rem; }
+.event summary { cursor: pointer; user-select: none; font-weight: 600; }
+.event summary img { vertical-align: middle; margin-right: 0.5rem; width: 48px; height: 32px; border-radius: 4px; }
+.event summary::-webkit-details-marker { display: none; }
+.event p { margin: 0.4rem 0 0; font-size: 0.87rem; color: var(--muted); }
