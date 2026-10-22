@@ -1,8 +1,9 @@
-/* fonts + tokens */
+/* ---------- fonts + tokens ---------- */
 @import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;600&display=swap");
 
 :root {
   --bg: #04070a;
+  --bg-subtle: #0a0e13;
   --txt: #eef3f3;
   --muted: #9fb3af;
   --teal: #2dd4bf;
@@ -10,22 +11,33 @@
   --blue: #2563eb;
   --amber: #f59e0b;
   --cyan: #67e8f9;
-  --line: rgba(255, 255, 255, 0.08);
+  --rose: #ff5d73;
+  --line: rgba(255, 255, 255, 0.07);
   --mono: "JetBrains Mono", monospace;
   --disp: "Silkscreen", monospace;
+  --radius: 12px;
 }
 
+/* ---------- reset ---------- */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
 
-::selection { background: #ff5d73; color: #140b0e; }
+/* selection colour */
+::selection {
+  background: var(--rose);
+  color: #140b0e;
+}
 
+/* focus-visible (accessible) */
 a:focus-visible, button:focus-visible {
   outline: 2px solid var(--teal);
   outline-offset: 2px;
-  border-radius: 10px;
+  border-radius: var(--radius);
 }
+
+/* skip link (if needed) */
+.skip-link { position: absolute; left: -999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
 
 body {
   background: var(--bg);
@@ -34,115 +46,19 @@ body {
   min-height: 100svh;
 }
 
-#bg {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  z-index: -1;
-}
+/* fixed layers */
+#bg { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: -1; }
+#sea { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: -1; pointer-events: none; }
 
-#sea {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  z-index: -1;
-  pointer-events: none;
-}
+/* main content containment */
+main { position: relative; width: 100%; max-width: 960px; margin: 0 auto; padding: 80px 1.5rem 4rem; }
 
-main { position: relative; max-width: 900px; margin: 0 auto; padding: 130px 1rem 6rem; }
-
-/* ---------- glass pill nav ---------- */
-.nav-wrap { position: fixed; top: 12px; left: 16px; right: 16px; z-index: 50; }
-
-.nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.45rem 0.55rem 0.45rem 1.4rem;
-  border-radius: 20px;
-  border: 1px solid var(--line);
-  background: linear-gradient(100deg, rgba(78, 102, 100, 0.5), rgba(24, 33, 36, 0.38));
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-family: var(--disp);
-  font-weight: 700;
-  font-size: 1.25rem;
-  color: #fff;
-  text-decoration: none;
-  letter-spacing: 0.04em;
-}
-
-.brand-mark {
-  width: 30px;
-  height: 30px;
-  transition: transform 0.25s;
-}
-
-.brand:hover .brand-mark { transform: rotate(-8deg) scale(1.06); }
-
-.caret {
-  color: var(--teal);
-  animation: blink 1.2s steps(1) infinite;
-}
-
-@keyframes blink { 50% { opacity: 0; } }
-
-.nav-links { display: flex; align-items: center; gap: 0.35rem; list-style: none; }
-
-.nav-links a {
-  display: block;
-  padding: 0.55rem 1.1rem;
-  color: #d4e2df;
-  font-size: 0.92rem;
-  text-decoration: none;
-  border-radius: 12px;
-}
-
-.nav-links a:hover { color: #fff; }
-
-.nav-links a.active { background: rgba(255, 255, 255, 0.1); color: #fff; }
-
-.cta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #0b0f12;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #fff !important;
-  text-decoration: none;
-  padding: 0.6rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.9rem;
-}
-
-.cta em {
-  font-style: normal;
-  background: #2a3236;
-  border-radius: 999px;
-  padding: 0.15rem 0.45rem;
-  font-size: 0.8rem;
-}
-
-/* ---------- mobile: bottom bar ---------- */
+/* ---------- mobile: bottom nav ---------- */
 @media (max-width: 679px) {
-  .nav-wrap { top: auto; bottom: 12px; }
-  .nav { padding: 0.45rem; }
-  .nav-links {
-    flex: 1;
-    justify-content: space-around;
-  }
-  .nav-links a { padding: 0.55rem 0.5rem; font-size: 0.85rem; }
+  .nav-wrap { top: auto; bottom: 10px; left: 10px; right: 10px; }
+  .nav { padding: 0.4rem; }
+  .nav-links { flex-wrap: wrap; gap: 0.2rem; }
+  .nav-links a { padding: 0.45rem 0.4rem; font-size: 0.8rem; }
   .cta em { display: none; }
-  main { padding: 110px 1rem 8rem; }
+  main { padding: 90px 1rem 6rem; }
 }
