@@ -12,7 +12,7 @@
 /* wordmark animation (reduced‑motion friendly) */
 .wordmark {
   width: min(92vw, 680px);
-  overflow: visible;
+  overflow: hidden;
   filter: drop-shadow(0 10px 22px rgba(0,0,0,.45));
   animation: bob 5s ease-in-out infinite;
 }
