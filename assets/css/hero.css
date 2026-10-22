@@ -5,7 +5,8 @@
   place-content: center;
   text-align: center;
   gap: 1rem;
-  background-color: var(--bg);
+  background: var(--bg);
+  position: relative;
 }
 
 /* wordmark animation (reduced‑motion friendly) */
@@ -109,6 +110,6 @@
 
 /* reduced‑motion turn‑off */
 @media (prefers-reduced-motion: reduce) {
-  .hero > *, .scroll-cue, .marquee span, .wordmark { animation: none; }
+  .hero > *, .marquee span, .wordmark { animation: none; }
   .wordmark { transition: none; }
 }
