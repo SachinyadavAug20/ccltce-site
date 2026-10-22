@@ -1,9 +1,6 @@
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 import { FRAG, VERT } from "./ocean.frag.js";
 
-let gsap = null;
-try { ({ gsap } = await import("https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.module.js")); } catch {}
-
 const cv = document.getElementById("bg");
 
 if (cv) {
@@ -31,8 +28,8 @@ if (cv) {
   addEventListener("pointermove", (e) => {
     const nx = e.clientX / innerWidth, ny = 1 - e.clientY / innerHeight;
     const v = uni.uVel.value;
-    v.x = Math.max(-0.2, Math.min(0.2, v.x + (nx - mouse.x) * 1.0));
-    v.y = Math.max(-0.2, Math.min(0.2, v.y + (ny - mouse.y) * 1.0));
+    v.x = Math.max(-0.3, Math.min(0.3, v.x + (nx - mouse.x) * 1.6));
+    v.y = Math.max(-0.3, Math.min(0.3, v.y + (ny - mouse.y) * 1.6));
     mouse.set(nx, ny);
   });
 
