@@ -39,6 +39,18 @@
 .golf-board h4 { font-size: 0.5rem; color: var(--gold); margin-bottom: 0.5rem; }
 .golf-list { list-style: none; font-family: var(--mono); font-size: 1rem; color: #aaa; }
 .golf-fx { position: fixed; inset: 0; z-index: 95; pointer-events: none; }
+/* code editor overlay */
+.ce-wrap { position: relative; border: 3px solid #000; background: #121212; margin-bottom: 0; }
+.ce-gut { position: absolute; left: 0; top: 0; bottom: 0; width: 2.6rem; padding: 0.6rem 0; background: #0c0c0c; border-right: 2px solid #000; color: #555; font-family: var(--mono); font-size: 1.05rem; line-height: 1.45; text-align: right; padding-right: 0.45rem; overflow: hidden; user-select: none; pointer-events: none; white-space: pre; }
+.ce-hl { position: absolute; left: 2.6rem; right: 0; top: 0; bottom: 0; margin: 0; padding: 0.6rem; font-family: var(--mono); font-size: 1.05rem; line-height: 1.45; color: #e0e0e0; white-space: pre; overflow: hidden; pointer-events: none; tab-size: 2; }
+.ce-input { position: relative; z-index: 2; display: block; width: 100%; min-height: 10rem; box-sizing: border-box; background: transparent; border: 0; outline: 0; color: transparent; caret-color: #ffff55; font-family: var(--mono); font-size: 1.05rem; line-height: 1.45; padding: 0.6rem 0.6rem 0.6rem 3.2rem; resize: vertical; tab-size: 2; white-space: pre; overflow-wrap: normal; overflow-x: auto; user-select: text; -webkit-user-select: text; }
+.ce-k { color: #ff6ac1; } .ce-s { color: #6aff6a; } .ce-n { color: #ffaa00; } .ce-c { color: #6a6a6a; } .ce-f { color: #55c2ff; }
+.golf-lang-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; }
+.golf-lang-lbl { font-size: 0.48rem; color: var(--muted); }
+.golf-lang { display: flex; gap: 4px; }
+.golf-lang-btn { font-family: var(--disp); font-size: 0.5rem; padding: 0.4rem 0.7rem; background: #3c3c3c; border: 2px solid #000; box-shadow: inset -2px -2px 0 #1a1a1a, inset 2px 2px 0 #5a5a5a; color: #ccc; cursor: pointer; transition: background 0.1s steps(2); }
+.golf-lang-btn:hover { background: #4a4a4a; }
+.golf-lang-btn.active { background: var(--emerald); color: #000; box-shadow: inset 2px 2px 0 #55ee8c, inset -2px -2px 0 #0c7a37; }
 
 /* matrix runes + hud fx */
 .matrix-runes, .hud-fx { position: fixed; inset: 0; z-index: 88; pointer-events: none; }

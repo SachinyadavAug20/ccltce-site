@@ -1,30 +1,19 @@
-// Minimal audio analyser for the ASCII background visualizer.
-// Browsers block AudioContext until a user gesture; until then we feed zeros.
+// Audio analyser for the ASCII background visualizer — real frequency data.
 var AUDIO_BINS = 24;
 
 function initAudio() {
-  var ctx = null;
-  var analyser = null;
-  var data = null;
-  var ready = false;
+  var analyser = null, data = null, ready = false;
 
   function unlock() {
-    if (ctx) return;
+    if (ready) return;
     try {
-      ctx = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = ctx.createAnalyser();
-      analyser.fftSize = 128;
-      data = new Uint8Array(analyser.frequencyBinCount);
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      gain.gain.value = 0;
-      osc.connect(gain).connect(analyser);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.01);
-      ready = true;
-    } catch (e) {
-      /* ignore */
-    }
+      var sfx = window.CCLTCE_SFX;
+      if (sfx && sfx.getAnalyser) {
+        analyser = sfx.getAnalyser();
+        data = new Uint8Array(analyser.frequencyBinCount);
+        ready = true;
+      }
+    } catch (e) { /* ignore */ }
   }
   window.addEventListener("pointerdown", unlock, { once: true, passive: true });
 
