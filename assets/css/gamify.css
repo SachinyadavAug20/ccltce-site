@@ -72,4 +72,6 @@
 .hotbar i { display: grid; place-items: center; width: 30px; height: 30px; background: #222; border: 3px solid #000; box-shadow: inset -2px -2px 0 #111, inset 2px 2px 0 #444; font-style: normal; font-size: 0.85rem; color: var(--gold); cursor: pointer; }
 .hotbar i.sel { outline: 3px solid #fff; outline-offset: 0; background: #333; }
 .hotbar i.filled { color: var(--gold); }
+.hotbar i.quick { color: #c8c8c8; font-family: var(--disp); font-size: 0.5rem; }
+.hotbar i.quick:hover { color: var(--gold); background: #2c2c2c; }
 .hud-fx { z-index: 71; }
