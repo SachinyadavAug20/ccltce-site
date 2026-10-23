@@ -1,0 +1,42 @@
+/* ---------- team modal: Minecraft character sheet ---------- */
+.tf-overlay {
+  position: fixed; inset: 0; z-index: 80; display: grid; place-items: center;
+  padding: 1rem; background: rgba(8, 8, 10, 0.82);
+}
+.tf-overlay[hidden] { display: none; }
+.tf-panel {
+  position: relative; width: min(560px, 100%); padding: 2.2rem 1.8rem 1.6rem;
+  background: #262626; border: 4px solid #000; text-align: center;
+  box-shadow: inset 4px 4px 0 #404040, inset -4px -4px 0 #151515, 0 12px 0 rgba(0, 0, 0, 0.5);
+  font-family: "Press Start 2P", monospace; will-change: transform;
+}
+.tf-strip { position: absolute; left: 0; right: 0; top: 0; height: 10px; background: #17dd62; border-bottom: 3px solid #000; }
+.tf-close {
+  position: absolute; top: 16px; right: 12px; width: 36px; height: 36px;
+  display: grid; place-items: center; font-family: inherit; font-size: 0.85rem;
+  color: #e0e0e0; background: #3c3c3c; border: 2px solid #000;
+  box-shadow: inset -2px -2px 0 #1a1a1a, inset 2px 2px 0 #5a5a5a; cursor: pointer;
+}
+.tf-close:hover { background: #ff2222; color: #000; }
+.tf-head { width: 160px; height: 160px; margin: 0.5rem auto 1rem; image-rendering: pixelated; will-change: transform; }
+.tf-head img { width: 100%; height: 100%; display: block; }
+.tf-badge {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+  background: #17dd62; border: 2px solid #000; font-size: 0.58rem;
+  color: #000; text-transform: uppercase; will-change: transform;
+}
+.tf-badge i { width: 10px; height: 10px; background: #000; }
+.tf-name { margin: 1.1rem 0 0; font-size: 1.1rem; font-weight: 400; line-height: 1.5; color: #ffff55; text-shadow: 2px 2px 0 #000; }
+.tf-area { margin: 0.7rem 0 0; font-size: 0.58rem; line-height: 1.7; color: #e0e0e0; }
+/* plain readable bio box — no tiny lore header */
+.tf-lore { margin: 1.2rem auto 0; padding: 1rem 1.1rem; max-width: 44ch; background: #100010; border: 2px solid #2c0959; text-align: left; }
+.tf-lore-b { margin: 0; font-size: 0.55rem; line-height: 2; color: #e0e0e0; }
+.tf-item { margin: 1.1rem 0 0; font-size: 0.55rem; line-height: 1.7; color: #e0e0e0; }
+.tf-item b { color: #ffaa00; font-weight: 400; }
+.tf-links { display: flex; justify-content: center; gap: 8px; margin-top: 1.2rem; }
+.tf-btn {
+  font-family: inherit; font-size: 0.55rem; color: #fff; background: #3c3c3c;
+  border: 2px solid #000; box-shadow: inset -2px -2px 0 #1a1a1a, inset 2px 2px 0 #5a5a5a;
+  padding: 10px 13px; text-decoration: none; will-change: transform;
+}
+.tf-btn:hover { background: #ffaa00; color: #000; }

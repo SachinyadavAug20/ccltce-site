@@ -1,36 +1,54 @@
-/* ---------- fonts + design tokens ---------- */
-@import url("https://fonts.googleapis.com/css2?family=Agency+FB&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap");
+/* ---------- Minecraft design system ---------- */
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap");
 
 :root {
-  --bg: #05080a;
-  --panel: rgba(255, 255, 255, 0.06);
-  --panel-strong: rgba(255, 255, 255, 0.1);
-  --line: rgba(255, 255, 255, 0.12);
-  --txt: #ffffff;
-  --muted: #9ca3af;
-  --teal: #2dd4bf;
-  --teal-dim: #68d9d9;
-  --violet: #a78bfa;
-  --blue: #60a5fa;
-  --amber: #fbbf24;
-  --rose: #fb7185;
-  --green: #4ade80;
-  --title-ink: #2dd4bf;
-  --title-hot: #ff6b5a;
-  --mono: "JetBrains Mono", ui-monospace, monospace;
-  --disp: "Agency FB", "Arial Narrow", sans-serif;
-  --r-sm: 8px;
-  --r: 12px;
-  --r-lg: 16px;
+  --bg: #141414;
+  --panel: #262626;
+  --panel-strong: #2b2b2b;
+  --line: #000;
+  --txt: #e0e0e0;
+  --muted: #aaaaaa;
+  --emerald: #17dd62;
+  --redstone: #ff2222;
+  --gold: #ffaa00;
+  --amethyst: #aa00aa;
+  --oak: #bc7b44;
+  --yellow: #ffff55;
+  --title-ink: #d8d8d8;
+  --title-hot: #ffaa00;
+  --mono: "VT323", monospace;
+  --disp: "Press Start 2P", monospace;
+  --r-sm: 0;
+  --r: 0;
+  --r-lg: 0;
   --shell: min(1280px, 100% - 2rem);
+  --bevel: inset 4px 4px 0 #5a5a5a, inset -4px -4px 0 #222222;
+  --bevel-in: inset 4px 4px 0 #222222, inset -4px -4px 0 #5a5a5a;
 }
 
-/* ---------- reset ---------- */
-*,
-*::before,
-*::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; border-radius: 0 !important; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+/* no text selection anywhere except real input surfaces */
+body { user-select: none; -webkit-user-select: none; }
+input, textarea, select, .term-out, .golf-code { user-select: text; -webkit-user-select: text; }
+
+/* Minecraft tool cursors — 64px enchanted vanilla pixel art, zero blue */
+*, *::before, *::after {
+  cursor: url("../cursors/iron-sword.svg") 0 0, default !important;
+}
+a, button, [role="button"], .clickable, summary, label, select, .nav-links a, .btn, .t-btn, .foot-links a, .foot-social a, .nav-cta a, .mobile-menu a, .sound-toggle, .nav-burger, .brand {
+  cursor: url("../cursors/gold-pickaxe.svg") 8 12, pointer !important;
+}
+a:active, button:active, [role="button"]:active, summary:active, .btn:active, .t-btn:active, .nav-cta a:active {
+  cursor: url("../cursors/netherite-axe.svg") 20 4, pointer !important;
+}
+p, span, h1, h2, h3, h4, h5, h6, input, textarea, label, li, td, th, .notice-item, .event summary, .res-card p, .ach p, .t-lore, .t-info, .ev-title, .ch-top, .section-title, .page-head, .page-head h1, .page-head p {
+  cursor: url("../cursors/redstone-torch.svg") 32 20, text !important;
+}
+[disabled], .disabled, .blocked, [aria-disabled="true"] {
+  cursor: url("../cursors/shield.svg") 32 32, not-allowed !important;
+}
 
 body {
   min-height: 100svh;
@@ -38,121 +56,60 @@ body {
   flex-direction: column;
   background: var(--bg);
   color: var(--txt);
-  font-family: Inter, system-ui, sans-serif;
+  font-family: var(--mono);
+  font-size: 1.15rem;
   overflow-x: clip;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 img, svg { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
 ul { list-style: none; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+::selection { background: var(--yellow); color: #000; }
+:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 
-::selection { background: var(--violet); color: #0b0f12; }
+#bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -2; pointer-events: none; }
 
-:focus-visible {
-  outline: 2px solid var(--teal);
-  outline-offset: 3px;
-  border-radius: var(--r-sm);
-}
+main { position: relative; z-index: 1; flex: 1 0 auto; width: var(--shell); margin-inline: auto; padding-block: 0 4rem; }
 
-/* ---------- canvas layer ---------- */
-#bg {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -2;
-  pointer-events: none;
-}
-
-/* ---------- layout shell ---------- */
-main {
-  position: relative;
-  z-index: 1;
-  flex: 1 0 auto;
-  width: var(--shell);
-  margin-inline: auto;
-  padding-block: 0 4rem;
-}
-
-/* readability scrim between the ASCII canvas and the copy */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(circle at 50% 40%, rgba(3, 7, 12, 0.12) 0%, rgba(3, 7, 12, 0.38) 100%);
+  background: rgba(0, 0, 0, 0.35);
 }
 
-/* ---------- skip link ---------- */
 .skip {
-  position: absolute;
-  top: 0.6rem;
-  left: 50%;
-  z-index: 60;
-  padding: 0.6rem 1.1rem;
-  border-radius: var(--r-sm);
-  background: var(--teal);
-  color: #04231f;
-  font-weight: 600;
-  transform: translate(-50%, -250%);
-  transition: transform 0.18s;
+  position: absolute; top: 0.6rem; left: 50%; z-index: 60;
+  padding: 0.6rem 1.1rem; background: var(--yellow); color: #000;
+  font-family: var(--disp); font-size: 0.6rem;
+  border: 3px solid #000; box-shadow: var(--bevel);
+  transform: translate(-50%, -250%); transition: transform 0.15s steps(2);
 }
-
 .skip:focus { transform: translate(-50%, 0); }
 
-.page-head {
-  text-align: center;
-  padding-top: 8.5rem;
-  margin-bottom: 3.5rem;
-  position: relative;
-  z-index: 10;
-}
-
+.page-head { text-align: center; padding-top: 7.5rem; margin-bottom: 3rem; position: relative; z-index: 10; }
 .page-head h1 {
-  font-size: clamp(2.2rem, 6vw, 3.5rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.6rem;
-  color: #ffffff;
-  text-shadow: 
-    0 1px 0 rgba(255, 255, 255, 0.3),
-    0 2px 6px rgba(0, 0, 0, 0.95),
-    0 0 20px rgba(56, 189, 248, 0.45);
+  font-family: var(--disp); font-size: clamp(1.2rem, 4vw, 2.2rem);
+  color: #fff; text-shadow: 3px 3px 0 #000; margin-bottom: 0.8rem;
 }
-
 .page-head p {
-  font-family: var(--mono);
-  color: #68d9d9;
-  font-size: clamp(0.85rem, 2.4vw, 1.1rem);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 10px rgba(45, 212, 191, 0.3);
+  font-family: var(--mono); color: var(--gold);
+  font-size: clamp(1rem, 2.4vw, 1.3rem); text-shadow: 1px 1px 0 #000;
 }
 
 .section-title {
-  font-family: var(--disp);
-  font-size: clamp(2.4rem, 8vw, 5rem);
-  line-height: 1;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #ffffff;
-  text-shadow: 
-    0 1px 0 rgba(255, 255, 255, 0.3),
-    0 3px 8px rgba(0, 0, 0, 0.95),
-    0 0 24px rgba(45, 212, 191, 0.4);
+  font-family: var(--disp); font-size: clamp(1rem, 4vw, 1.8rem);
+  text-transform: uppercase; color: #fff; text-shadow: 3px 3px 0 #000;
 }
 
-/* ---------- social icons (plain, no coloured chips) ---------- */
 .ic-gh, .ic-x, .ic-li, .ic-ig, .ic-mail, .ic-pin { color: var(--muted); }
-.ic-gh:hover, .ic-x:hover, .ic-li:hover, .ic-ig:hover, .ic-mail:hover, .ic-pin:hover { color: var(--teal); }
+.ic-gh:hover, .ic-x:hover, .ic-li:hover, .ic-ig:hover, .ic-mail:hover, .ic-pin:hover { color: var(--yellow); }
 
-/* ---------- motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-  }
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }

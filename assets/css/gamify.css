@@ -1,0 +1,75 @@
+/* ---------- gamification suite ---------- */
+/* terminal HUD */
+.term-hud {
+  position: fixed; inset: 0; z-index: 90; display: flex; flex-direction: column;
+  background: rgba(22, 22, 22, 0.96); border: 4px solid #000;
+  box-shadow: inset 3px 3px 0 #3a3a3a, inset -3px -3px 0 #000;
+  font-family: var(--mono); font-size: 1.15rem; color: #e0e0e0;
+}
+.term-hud[hidden] { display: none; }
+.term-bar { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.8rem; background: #0e0e0e; border-bottom: 3px solid #000; font-family: var(--disp); font-size: 0.55rem; color: var(--gold); }
+.term-x { background: #3c3c3c; border: 2px solid #000; color: #e0e0e0; padding: 0.3rem 0.55rem; font-family: var(--disp); font-size: 0.55rem; }
+.term-x:hover { background: var(--redstone); color: #000; }
+.term-out { flex: 1; overflow-y: auto; padding: 0.8rem 1rem; line-height: 1.45; user-select: text; -webkit-user-select: text; }
+.term-line { white-space: pre-wrap; word-break: break-word; }
+.term-in { color: var(--emerald); }
+.term-err { color: var(--redstone); }
+.term-gold { color: var(--gold); }
+.term-green { color: var(--emerald); }
+.term-row { display: flex; gap: 0.5rem; align-items: center; padding: 0.6rem 1rem; border-top: 2px solid #000; background: #101010; }
+.term-prompt { color: var(--emerald); }
+.term-in-line { flex: 1; background: transparent; border: 0; outline: 0; color: #fff; font-family: var(--mono); font-size: 1.15rem; user-select: text; -webkit-user-select: text; }
+
+/* math canvas mount */
+[data-math-canvas] { position: relative; min-height: 320px; border: 4px solid #000; box-shadow: var(--bevel); background: #121212; overflow: hidden; }
+.math-canvas { display: block; }
+
+/* code golf */
+.golf-card { border: 4px solid #000; background: #262626; box-shadow: inset 3px 3px 0 #404040, inset -3px -3px 0 #151515; padding: 1.1rem; font-family: var(--disp); }
+.golf-title { font-size: 0.62rem; color: var(--gold); line-height: 1.6; margin-bottom: 0.7rem; }
+.golf-prompt { font-family: var(--mono); font-size: 1.1rem; color: #e0e0e0; margin-bottom: 0.7rem; }
+.golf-tests { font-family: var(--mono); font-size: 1rem; color: var(--emerald); background: #121212; border: 2px solid #000; padding: 0.5rem 0.7rem; margin-bottom: 0.7rem; overflow-x: auto; }
+.golf-code { width: 100%; box-sizing: border-box; background: #121212; border: 3px solid #000; color: #ffff55; font-family: var(--mono); font-size: 1.05rem; padding: 0.6rem; resize: vertical; outline: 0; tab-size: 2; user-select: text; -webkit-user-select: text; }
+.golf-row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem; }
+.golf-bytes { font-size: 0.5rem; color: var(--muted); }
+.golf-log { font-family: var(--mono); font-size: 1rem; margin-top: 0.6rem; min-height: 1.2em; color: #e0e0e0; white-space: pre-wrap; }
+.golf-log.golf-ok { color: var(--emerald); }
+.golf-log.golf-err { color: var(--redstone); }
+.golf-board { margin-top: 0.9rem; border-top: 2px solid #000; padding-top: 0.7rem; }
+.golf-board h4 { font-size: 0.5rem; color: var(--gold); margin-bottom: 0.5rem; }
+.golf-list { list-style: none; font-family: var(--mono); font-size: 1rem; color: #aaa; }
+.golf-fx { position: fixed; inset: 0; z-index: 95; pointer-events: none; }
+
+/* matrix runes + hud fx */
+.matrix-runes, .hud-fx { position: fixed; inset: 0; z-index: 88; pointer-events: none; }
+
+/* repair world */
+.repair-btn {
+  position: fixed; left: 50%; top: 40%; transform: translate(-50%, -50%); z-index: 86;
+  padding: 1rem 1.6rem; font-family: var(--disp); font-size: 0.8rem;
+  background: var(--emerald); color: #000; border: 4px solid #000;
+  box-shadow: inset 3px 3px 0 #55ee8c, inset -3px -3px 0 #0c7a37, 0 6px 0 #000; cursor: pointer;
+}
+.repair-btn:hover { background: #35f07e; }
+
+/* voxel inspector */
+.vox-overlay { position: fixed; inset: 0; z-index: 85; display: grid; place-items: center; background: rgba(8, 8, 10, 0.85); }
+.vox-overlay[hidden] { display: none; }
+.vox-panel { position: relative; background: #262626; border: 4px solid #000; box-shadow: inset 3px 3px 0 #404040, inset -3px -3px 0 #151515; padding: 1.2rem; text-align: center; }
+.vox-close { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; background: #3c3c3c; border: 2px solid #000; color: #e0e0e0; font-family: var(--disp); cursor: pointer; }
+.vox-close:hover { background: var(--redstone); color: #000; }
+.vox-canvas { display: block; image-rendering: pixelated; touch-action: none; }
+.vox-cap { margin-top: 0.7rem; font-family: var(--disp); font-size: 0.48rem; color: var(--muted); line-height: 1.8; }
+
+/* XP rail — slim right-edge progress, not a centerpiece */
+.xp-rail { position: fixed; right: 6px; top: 50%; transform: translateY(-50%); z-index: 70; width: 10px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.xp-rail-track { position: relative; width: 8px; height: min(180px, 32vh); background: #1a1a1a; border: 2px solid #000; box-shadow: inset 1px 1px 0 #000; overflow: hidden; }
+.xp-rail-fill { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: var(--emerald); transition: height 0.3s steps(8); }
+.xp-tip { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 190px; padding: 0.55rem 0.65rem; background: #1c1c1c; border: 2px solid #000; box-shadow: inset 2px 2px 0 #3a3a3a, inset -2px -2px 0 #0e0e0e, 3px 3px 0 rgba(0,0,0,0.5); font-family: var(--mono); font-size: 0.92rem; line-height: 1.35; color: #e0e0e0; white-space: pre-line; pointer-events: none; }
+.xp-toast { position: fixed; right: 28px; top: 18%; z-index: 95; padding: 0.7rem 1rem; background: #1a1a1a; border: 3px solid #000; box-shadow: inset 2px 2px 0 #3a3a3a, inset -2px -2px 0 #0e0e0e, 0 4px 0 rgba(0,0,0,0.5); font-family: var(--disp); font-size: 0.55rem; color: var(--gold); opacity: 0; transition: opacity 0.25s steps(4); pointer-events: none; }
+.xp-toast.on { opacity: 1; }
+.hotbar { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 70; display: flex; gap: 3px; pointer-events: auto; }
+.hotbar i { display: grid; place-items: center; width: 30px; height: 30px; background: #222; border: 3px solid #000; box-shadow: inset -2px -2px 0 #111, inset 2px 2px 0 #444; font-style: normal; font-size: 0.85rem; color: var(--gold); cursor: pointer; }
+.hotbar i.sel { outline: 3px solid #fff; outline-offset: 0; background: #333; }
+.hotbar i.filled { color: var(--gold); }
+.hud-fx { z-index: 71; }

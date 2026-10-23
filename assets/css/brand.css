@@ -1,73 +1,55 @@
-/* ---------- SVG wordmark (Coding Club) ----------
-   style guide
-   grid    30x30 mark, rounded 9, 1.8 stroke, round caps
-   type    mono, uppercase, single line, 0.66em tracking
-   motion  none — the mark and wordmark stay still
---------------------------------------------------------- */
+/* ---------- pixel wordmark ---------- */
 .brand-logo {
-  width: 2.4rem;
-  height: auto;
+  width: 2.7rem;
+  height: 2.7rem;
   flex: none;
-  transition: transform 0.3s;
+  object-fit: contain;
+  image-rendering: auto;
+  /* mini item-frame: light plate so the dark emblem reads on the dark nav */
+  padding: 2px;
+  background: #d9d2c0;
+  border: 2px solid #000;
+  box-shadow: inset 2px 2px 0 #f2ecdd, inset -2px -2px 0 #9a917c;
 }
 
-.wordmark {
-  width: clamp(96px, 22vw, 124px);
-  height: auto;
-  overflow: visible;
-}
+.wordmark { width: clamp(96px, 22vw, 124px); height: auto; overflow: visible; }
 
 .wm-l2 text {
-  font-family: var(--mono);
-  font-weight: 700;
+  font-family: var(--disp);
+  font-weight: 400;
   text-anchor: middle;
   transform-box: fill-box;
   transform-origin: center bottom;
-  transition: fill 0.22s ease;
-  font-size: 13px;
-  fill: #ffffff;
+  /* gold letters + heavy black outline read cleanly on the dark speckled nav */
+  fill: var(--gold);
+  stroke: #000;
+  stroke-width: 2.6px;
+  paint-order: stroke fill;
 }
 
-.brand:hover .wm-l2 text { fill: var(--teal); }
-
-.wm-c:hover { fill: var(--amber) !important; }
+.brand:hover .wm-l2 text { fill: #ffffff; }
 
 /* ---------- sound toggle ---------- */
 .sound-toggle {
   display: grid;
   place-items: center;
   position: relative;
-  width: 2.4rem;
-  height: 2.4rem;
-  border-radius: 999px;
-  color: rgba(255, 255, 255, 0.8);
-  transition: background 0.18s, color 0.18s;
+  width: 2.2rem;
+  height: 2.2rem;
+  color: #e0e0e0;
+  background: #3c3c3c;
+  border: 2px solid #000;
+  box-shadow: inset -2px -2px 0 #1a1a1a, inset 2px 2px 0 #5a5a5a;
 }
-
-.sound-toggle:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+.sound-toggle:hover { background: #4a4a4a; color: var(--yellow); }
 .sound-toggle svg { display: none; }
 
-.eq {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 14px;
-}
+.eq { display: flex; align-items: flex-end; gap: 2px; height: 12px; }
+.eq i { width: 3px; height: 40%; background: currentColor; transition: height 0.2s; }
 
-.eq i {
-  width: 3px;
-  height: 40%;
-  border-radius: 2px;
-  background: currentColor;
-  transition: height 0.2s;
-}
-
-.sound-toggle.is-on { color: var(--teal); }
-.sound-toggle.is-on .eq i { animation: eqBounce 0.9s ease-in-out infinite; }
+.sound-toggle.is-on { color: var(--emerald); }
+.sound-toggle.is-on .eq i { animation: eqBounce 0.9s steps(2) infinite; }
 .sound-toggle.is-on .eq i:nth-child(2) { animation-delay: 0.18s; }
 .sound-toggle.is-on .eq i:nth-child(3) { animation-delay: 0.36s; }
 
-@keyframes eqBounce {
-  0%, 100% { height: 25%; }
-  50% { height: 100%; }
-}
+@keyframes eqBounce { 0%, 100% { height: 25%; } 50% { height: 100%; } }

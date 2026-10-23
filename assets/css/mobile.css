@@ -1,0 +1,65 @@
+/* ---------- mobile app shell: bottom tab bar (mobile only) ---------- */
+.tabbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 80;
+  display: none;
+  grid-template-columns: repeat(5, 1fr);
+  background: #1a1a1a;
+  border-top: 3px solid #000;
+  box-shadow: 0 -2px 0 #3a3a3a, 0 -4px 12px rgba(0, 0, 0, 0.55);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 52px;
+  padding: 6px 2px 5px;
+  color: #888;
+  text-decoration: none;
+  font-family: var(--disp);
+  font-size: 0.38rem;
+  letter-spacing: 0.02em;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.12s steps(2), background 0.12s steps(2);
+}
+.tab svg { width: 20px; height: 20px; display: block; fill: currentColor; }
+.tab:active { background: #262626; }
+.tab.active { color: var(--gold); }
+
+@media (max-width: 899px) {
+  .tabbar { display: grid; }
+  .hotbar { bottom: 58px; gap: 2px; }
+  .hotbar i { width: 26px; height: 26px; font-size: 0.72rem; }
+  .xp-rail { right: 4px; width: 8px; }
+  .xp-rail-track { height: min(140px, 24vh); width: 6px; }
+  .xp-tip { width: 150px; right: 14px; font-size: 0.8rem; }
+  .xp-toast { right: 14px; top: 14%; font-size: 0.48rem; }
+  .term-hud { bottom: 0; }
+  .vox-panel { max-width: calc(100vw - 1.5rem); }
+  main { padding-bottom: 6.5rem; }
+  .page-head { padding-top: 5.5rem; }
+  .nav-wrap { top: 0.6rem; }
+  .nav { padding: 0.5rem 0.7rem; border-width: 3px; }
+  .brand .wordmark { height: 1.45rem; }
+  .nav-burger { width: 2.2rem; height: 2.2rem; }
+}
+
+@media (pointer: coarse) {
+  .btn, .t-btn, .nav-cta a { min-height: 44px; }
+  .t-card { min-height: 44px; }
+  .sound-toggle { width: 44px; height: 44px; }
+  .term-x, .vox-close { min-width: 44px; min-height: 44px; }
+  .golf-btn, .repair-btn { min-height: 44px; }
+  .tab { min-height: 52px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-rail-fill, .xp-toast { transition: none; }
+}

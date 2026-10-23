@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /server/
+
+Sitemap: https://ccltce.github.io/sitemap.xml

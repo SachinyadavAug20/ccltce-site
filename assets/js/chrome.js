@@ -22,7 +22,7 @@
 
   // --- wordmark -------------------------------------------------------------
   function wordLine(text, x, y, size, cls) {
-    const adv = size * 0.66;
+    const adv = size * 1.14; // >1em glyph advance so Press Start 2P letters never touch
     let out = '<g class="' + cls + '">';
     for (let i = 0; i < text.length; i++) {
       const ch = text[i];
@@ -30,26 +30,20 @@
         out += '<text class="wm-c" style="--i:' + i + '" x="' + (x + adv * i) + '" y="' + y + '"> </text>';
         continue;
       }
-      out += '<text class="wm-c" style="--i:' + i + '" x="' + (x + adv * i) + '" y="' + y + '">' + ch + "</text>";
+      out += '<text class="wm-c" style="--i:' + i + '" font-size="' + size + '" x="' + (x + adv * i) + '" y="' + y + '">' + ch + "</text>";
     }
     return out + "</g>";
   }
 
-  // Real emblem on the left, SVG type on the right — one brand, everywhere.
-  const LOGO = '<img class="brand-logo" src="assets/img/ccltce-logo.png" alt="" width="256" height="256" />';
-  const FOOT_LOGO = '<img class="brand-logo foot-logo" src="assets/img/ccltce-logo.png" alt="" width="256" height="256" />';
-
-  // Single stacked line: the emblem already carries the "central" identity.
-  const WORDMARK =
-    '<svg class="wordmark" viewBox="0 0 100 24" role="img" aria-label="Coding Club">' +
-    wordLine("CODING CLUB", 5, 18, 13, "wm-l2") +
-    "</svg>";
+  const LOGO = '<img class="brand-logo" src="assets/img/ccltce-logo.png" alt="" width="400" height="400" />';
+  const FOOT_LOGO = '<img class="brand-logo foot-logo" src="assets/img/ccltce-logo.png" alt="" width="400" height="400" />';
+  const WORDMARK = '<svg class="wordmark" viewBox="0 0 146 24" role="img" aria-label="Coding Club">' + wordLine("CODING CLUB", 5, 18, 11, "wm-l2") + "</svg>";
 
   const LINKS = [
     ["events.html", "Events"],
     ["team.html", "Team"],
     ["notices.html", "Notices"],
-    ["challenges.html", "Challenges"],
+    ["resources.html", "Resources"],
   ];
 
   const NAV =
@@ -59,17 +53,18 @@
     LINKS.map(function (l) { return '<li><a href="' + l[0] + '">' + l[1] + "</a></li>"; }).join("") +
     "</ul>" +
     '<span class="nav-cta"><a href="challenges.html">CCLTCE Week ' + svg("star", 13) + "</a></span>" +
+    '<span class="nav-tools">' +
     '<button class="sound-toggle" type="button" aria-pressed="false" aria-label="Play ambient sound" title="Play ambience">' +
     '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6Z"/></svg>' +
     '<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span></button>' +
     '<button class="nav-burger" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">' +
-    "<span></span><span></span><span></span></button></nav>";
+    "<span></span><span></span><span></span></button></span></nav>";
 
   const MOBILE =
     '<div class="mobile-menu" id="mobile-menu" hidden>' +
     '<a href="index.html">Home</a>' +
     LINKS.map(function (l) { return '<a href="' + l[0] + '">' + l[1] + "</a>"; }).join("") +
-    '<a href="resources.html">Resources</a><a href="achievements.html">Achievements</a></div>';
+    '<a href="challenges.html">Challenges</a><a href="achievements.html">Achievements</a></div>';
 
   const SOCIALS = [
     ["github", "https://github.com/CCLTCE", "GitHub", "ic-gh"],

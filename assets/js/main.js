@@ -22,19 +22,26 @@ const TEMPLATES = {
     </article>`,
 
   team: (m) => `
-    <article class="t-card" style="--accent:${escape(m.accent || "#2dd4bf")}">
+    <article class="t-card" tabindex="0" style="--accent:${escape(m.accent || "#17DD62")}"
+      data-name="${escape(m.name)}" data-role="${escape(m.role)}" data-area="${escape(m.area)}"
+      data-bio="${escape(m.bio || "")}" data-item="${escape(m.item || "")}" data-accent="${escape(m.accent || "#17DD62")}"
+      data-portfolio="${escape(m.portfolio)}" data-github="${escape(handle(m.github))}"
+      data-twitter="${escape(handle(m.twitter))}" data-linkedin="${escape(handle(m.linkedin))}">
+      <div class="t-head"><img src="assets/img/${escape(m.image)}" alt="" width="96" height="96" /></div>
       <span class="t-badge"><i></i>${escape(m.role)}</span>
-      <div class="t-photo"><img src="assets/img/${escape(m.image)}.svg" alt="${escape(m.name)}" loading="lazy" /></div>
       <div class="t-info">
         <h3>${escape(m.name)}</h3>
         <p class="t-spec">${escape(m.area)}</p>
-        <p class="t-bio">${escape(m.bio || "")}</p>
-        <div class="t-links">
-          <a class="t-port" href="${escape(m.portfolio)}" target="_blank" rel="noopener">Portfolio ↗</a>
-          <a href="https://github.com/${escape(handle(m.github))}" target="_blank" rel="noopener" aria-label="GitHub">${ICON.gh}</a>
-          <a href="https://x.com/${escape(handle(m.twitter))}" target="_blank" rel="noopener" aria-label="X / Twitter">${ICON.x}</a>
-          <a href="https://linkedin.com/in/${escape(handle(m.linkedin))}" target="_blank" rel="noopener" aria-label="LinkedIn">${ICON.li}</a>
-        </div>
+      </div>
+      <div class="t-lore">
+        <p class="t-lore-h">Item Lore:</p>
+        <p class="t-lore-b">${escape(m.bio || "")}</p>
+      </div>
+      <div class="t-links">
+        <a class="t-btn" href="${escape(m.portfolio)}" target="_blank" rel="noopener">PORT</a>
+        <a class="t-btn" href="https://github.com/${escape(handle(m.github))}" target="_blank" rel="noopener" aria-label="GitHub">GH</a>
+        <a class="t-btn" href="https://x.com/${escape(handle(m.twitter))}" target="_blank" rel="noopener" aria-label="X">X</a>
+        <a class="t-btn" href="https://linkedin.com/in/${escape(handle(m.linkedin))}" target="_blank" rel="noopener" aria-label="LinkedIn">LI</a>
       </div>
     </article>`,
 
