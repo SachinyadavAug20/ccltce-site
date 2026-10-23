@@ -1,9 +1,6 @@
 const escape = (s) =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-const initials = (name) =>
-  name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
-
 const handle = (h) => String(h || "").replace(/^@/, "");
 
 const ICON = {
@@ -25,17 +22,20 @@ const TEMPLATES = {
     </article>`,
 
   team: (m) => `
-    <article class="person">
-      <div class="avatar">${escape(initials(m.name))}</div>
-      <h3>${escape(m.name)}</h3>
-      <p class="role">${escape(m.role)}</p>
-      <p class="meta">${escape(m.area)}</p>
-      <div class="socials">
-        <a class="social twitter" href="https://x.com/${escape(handle(m.twitter))}" target="_blank" rel="noopener" aria-label="X / Twitter">${ICON.x}</a>
-        <a class="social linkedin" href="https://linkedin.com/in/${escape(handle(m.linkedin))}" target="_blank" rel="noopener" aria-label="LinkedIn">${ICON.li}</a>
-        <a class="social other" href="${escape(m.other || m.portfolio)}" target="_blank" rel="noopener" aria-label="Other link">${ICON.link}</a>
+    <article class="t-card" style="--accent:${escape(m.accent || "#2dd4bf")}">
+      <span class="t-badge"><i></i>${escape(m.role)}</span>
+      <div class="t-photo"><img src="assets/img/${escape(m.image)}.svg" alt="${escape(m.name)}" loading="lazy" /></div>
+      <div class="t-info">
+        <h3>${escape(m.name)}</h3>
+        <p class="t-spec">${escape(m.area)}</p>
+        <p class="t-bio">${escape(m.bio || "")}</p>
+        <div class="t-links">
+          <a class="t-port" href="${escape(m.portfolio)}" target="_blank" rel="noopener">Portfolio ↗</a>
+          <a href="https://github.com/${escape(handle(m.github))}" target="_blank" rel="noopener" aria-label="GitHub">${ICON.gh}</a>
+          <a href="https://x.com/${escape(handle(m.twitter))}" target="_blank" rel="noopener" aria-label="X / Twitter">${ICON.x}</a>
+          <a href="https://linkedin.com/in/${escape(handle(m.linkedin))}" target="_blank" rel="noopener" aria-label="LinkedIn">${ICON.li}</a>
+        </div>
       </div>
-      <a class="btn btn-ghost" href="${escape(m.portfolio)}" target="_blank" rel="noopener">Portfolio</a>
     </article>`,
 
   achievements: (a) => `

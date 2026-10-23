@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" role="img" aria-label="Stylized portrait placeholder">
+  <defs>
+    <linearGradient id="p1bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2dd4bf" stop-opacity=".45"/>
+      <stop offset=".6" stop-color="#0d1a1e" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#070c0f"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="260" fill="#070c0f"/>
+  <rect width="200" height="260" fill="url(#p1bg)"/>
+  <!-- shoulders / collar -->
+  <path d="M30 260c4-48 30-72 70-72s66 24 70 72" fill="#0e2a28" stroke="#2dd4bf" stroke-opacity=".5" stroke-width="1.5"/>
+  <path d="M78 192l22 28 22-28" fill="none" stroke="#2dd4bf" stroke-opacity=".7" stroke-width="2"/>
+  <!-- neck -->
+  <rect x="88" y="150" width="24" height="30" rx="8" fill="#1a3a36"/>
+  <!-- head -->
+  <ellipse cx="100" cy="112" rx="36" ry="42" fill="#1a3a36" stroke="#2dd4bf" stroke-opacity=".7" stroke-width="1.5"/>
+  <!-- hair (short, neat) -->
+  <path d="M64 108c0-30 16-48 36-48s36 18 36 48c0-14-8-22-16-26-6 8-30 10-40 2-8 4-16 10-16 24z" fill="#0f2824" stroke="#2dd4bf" stroke-opacity=".6"/>
+  <!-- eyes -->
+  <ellipse cx="86" cy="112" rx="4" ry="3" fill="#2dd4bf"/>
+  <ellipse cx="114" cy="112" rx="4" ry="3" fill="#2dd4bf"/>
+  <!-- brow -->
+  <path d="M78 104q8-4 16 0M106 104q8-4 16 0" fill="none" stroke="#2dd4bf" stroke-opacity=".8" stroke-width="1.5"/>
+  <!-- nose -->
+  <path d="M100 116v10q-4 2-6 0" fill="none" stroke="#2dd4bf" stroke-opacity=".6" stroke-width="1.5"/>
+  <!-- mouth (slight smile) -->
+  <path d="M88 136q12 8 24 0" fill="none" stroke="#2dd4bf" stroke-opacity=".8" stroke-width="1.5"/>
+</svg>

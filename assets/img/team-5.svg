@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" role="img" aria-label="Stylized portrait placeholder">
+  <defs>
+    <linearGradient id="p5bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e879f9" stop-opacity=".45"/>
+      <stop offset=".6" stop-color="#170c1a" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#0d070f"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="260" fill="#0d070f"/>
+  <rect width="200" height="260" fill="url(#p5bg)"/>
+  <!-- sweater shoulders -->
+  <path d="M28 260c5-50 32-74 72-74s67 24 72 74" fill="#1e0e24" stroke="#e879f9" stroke-opacity=".5" stroke-width="1.5"/>
+  <path d="M76 194q24 16 48 0" fill="none" stroke="#e879f9" stroke-opacity=".6" stroke-width="1.5"/>
+  <!-- neck -->
+  <rect x="88" y="150" width="24" height="28" rx="8" fill="#2a1430"/>
+  <!-- head -->
+  <ellipse cx="100" cy="112" rx="34" ry="40" fill="#2a1430" stroke="#e879f9" stroke-opacity=".7" stroke-width="1.5"/>
+  <!-- curly / voluminous hair -->
+  <circle cx="72" cy="88" r="18" fill="#1a0c20" stroke="#e879f9" stroke-opacity=".55"/>
+  <circle cx="100" cy="78" r="20" fill="#1a0c20" stroke="#e879f9" stroke-opacity=".55"/>
+  <circle cx="128" cy="88" r="18" fill="#1a0c20" stroke="#e879f9" stroke-opacity=".55"/>
+  <circle cx="66" cy="106" r="14" fill="#1a0c20" stroke="#e879f9" stroke-opacity=".5"/>
+  <circle cx="134" cy="106" r="14" fill="#1a0c20" stroke="#e879f9" stroke-opacity=".5"/>
+  <!-- eyes -->
+  <ellipse cx="88" cy="112" rx="3.5" ry="3" fill="#e879f9"/>
+  <ellipse cx="112" cy="112" rx="3.5" ry="3" fill="#e879f9"/>
+  <!-- brows -->
+  <path d="M81 105q7-3 14 0M105 105q7-3 14 0" fill="none" stroke="#e879f9" stroke-opacity=".8" stroke-width="1.5"/>
+  <!-- nose -->
+  <path d="M100 116v8q-3 2-5 0" fill="none" stroke="#e879f9" stroke-opacity=".6" stroke-width="1.5"/>
+  <!-- smile -->
+  <path d="M90 132q10 7 20 0" fill="none" stroke="#e879f9" stroke-opacity=".85" stroke-width="1.5"/>
+  <!-- earring hint -->
+  <circle cx="66" cy="120" r="2" fill="#e879f9" opacity=".8"/>
+</svg>

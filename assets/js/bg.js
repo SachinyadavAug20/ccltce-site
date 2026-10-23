@@ -66,8 +66,11 @@ import { initAudio, AUDIO_BINS } from "./audio.js";
     renderer.setSize(innerWidth, innerHeight, false);
     const d = renderer.getDrawingBufferSize(new THREE.Vector2());
     uni.uRes.value.copy(d);
-    uni.uCellH.value = Math.max(8, Math.round(14 * renderer.getPixelRatio()));
-    uni.uCellW.value = Math.max(5, Math.round(uni.uCellH.value * 0.64));
+    // Fine high-density micro-ASCII character grid (small text characters)
+    const dpr = Math.min(renderer.getPixelRatio(), 1.25);
+    const targetCellH = 7.5;
+    uni.uCellH.value = Math.max(6, Math.round(targetCellH * dpr));
+    uni.uCellW.value = Math.max(4, Math.round(uni.uCellH.value * 0.54));
     uni.uSceneH.value = d.y / uni.uCellH.value;
     uni.uSceneW.value = d.x / uni.uCellH.value;
     if (uni.uCellW.value !== cellW || uni.uCellH.value !== cellH) {

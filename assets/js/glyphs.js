@@ -11,12 +11,12 @@ const spread = (s, n) =>
   Array.from({ length: n }, (_, i) => s[Math.round((i * (s.length - 1)) / (n - 1))]).join("");
 
 export const SETS = [
-  " " + "@".repeat(GLYPH_COLS - 1),
-  spread(RAMP, GLYPH_COLS),
-  "0123456789$#@%&*+-=/\\|<>^",
-  "░▒▓█▄▀▌▐─│┌┐└┘├┤┬┴┼",
-  "αβγδεζηθικλμνξοπρστυφχψω",
-  "λ∆Σ√π∞≈≠≤≥±÷×°·•—…‰",
+  "  .':;~=-+*sSoOX#%8&@$WM", // Row 0: 24-char 3D shading density ramp
+  spread(RAMP, GLYPH_COLS),       // Row 1: Extended standard ramp
+  "  ·  .  ·  :  ·  .  ·   ",     // Row 2: Ambient water caustics
+  "01<>{}/[]();:=+*#!~_&$#?",     // Row 3: Tech / code accents
+  "░▒▓█▄▀▌▐─│┌┐└┘├┤┬┴┼═║",        // Row 4: Block / pipe characters
+  "   .  ·  °  o  O  0  @  ",     // Row 5: 3D Bubble / bioluminescence set
 ].map((s) => (s + " ".repeat(GLYPH_COLS)).slice(0, GLYPH_COLS));
 
 export const GLYPH_ROWS = SETS.length;
@@ -42,7 +42,7 @@ export async function buildGlyphAtlas(cellW, cellH) {
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = `500 ${Math.round(cellH * 0.86)}px "JetBrains Mono", "DejaVu Sans Mono", monospace`;
+  ctx.font = `600 ${Math.round(cellH * 0.92)}px "JetBrains Mono", "DejaVu Sans Mono", monospace`;
 
   for (let r = 0; r < GLYPH_ROWS; r++) {
     for (let c = 0; c < GLYPH_COLS; c++) {

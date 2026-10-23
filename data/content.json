@@ -36,19 +36,61 @@
       "name": "Akash Gupta",
       "role": "President",
       "area": "Leadership & Outreach",
+      "bio": "Runs the club vision, partnerships and weekly standups.",
+      "accent": "#2dd4bf",
+      "image": "team-1",
       "twitter": "akashgupta",
       "linkedin": "akash-gupta",
-      "other": "https://github.com/akashgupta",
+      "github": "akashgupta",
       "portfolio": "https://akashgupta.dev"
     },
     {
       "name": "Sachin Yadav",
       "role": "Technical Head",
       "area": "Systems, Web & Infra",
+      "bio": "Keeps servers, sites and the CP problemset running.",
+      "accent": "#38bdf8",
+      "image": "team-2",
       "twitter": "sachin_yadav",
       "linkedin": "sachin-yadav",
-      "other": "https://github.com/satyadvv",
+      "github": "satyadvv",
       "portfolio": "https://satyadvv.github.io"
+    },
+    {
+      "name": "Priya Sharma",
+      "role": "Events Lead",
+      "area": "Workshops & Hackathons",
+      "bio": "Plans bootcamps, lab bookings and demo days.",
+      "accent": "#fb7185",
+      "image": "team-3",
+      "twitter": "priya_codes",
+      "linkedin": "priya-sharma",
+      "github": "priyacodes",
+      "portfolio": "https://priya.dev"
+    },
+    {
+      "name": "Rahul Mehta",
+      "role": "Design Head",
+      "area": "UI, Brand & Visuals",
+      "bio": "Draws the posters, icons and this site's look.",
+      "accent": "#fbbf24",
+      "image": "team-4",
+      "twitter": "rahul_designs",
+      "linkedin": "rahul-mehta",
+      "github": "rahulm",
+      "portfolio": "https://rahulmehta.design"
+    },
+    {
+      "name": "Ananya Iyer",
+      "role": "Community Lead",
+      "area": "Members & Media",
+      "bio": "Onboards juniors, runs the Discord and captures events.",
+      "accent": "#e879f9",
+      "image": "team-5",
+      "twitter": "ananya_iyer",
+      "linkedin": "ananya-iyer",
+      "github": "ananyai",
+      "portfolio": "https://ananya.codes"
     }
   ],
   "achievements": [

@@ -83,7 +83,7 @@ body::before {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: rgba(4, 7, 9, 0.52);
+  background: radial-gradient(circle at 50% 40%, rgba(3, 7, 12, 0.12) 0%, rgba(3, 7, 12, 0.38) 100%);
 }
 
 /* ---------- skip link ---------- */
@@ -107,6 +107,8 @@ body::before {
   text-align: center;
   padding-top: 8.5rem;
   margin-bottom: 3.5rem;
+  position: relative;
+  z-index: 10;
 }
 
 .page-head h1 {
@@ -114,12 +116,18 @@ body::before {
   font-weight: 700;
   letter-spacing: -0.02em;
   margin-bottom: 0.6rem;
+  color: #ffffff;
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.95),
+    0 0 20px rgba(56, 189, 248, 0.45);
 }
 
 .page-head p {
   font-family: var(--mono);
-  color: var(--teal-dim);
+  color: #68d9d9;
   font-size: clamp(0.85rem, 2.4vw, 1.1rem);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 10px rgba(45, 212, 191, 0.3);
 }
 
 .section-title {
@@ -128,7 +136,11 @@ body::before {
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #e6f2f0;
+  color: #ffffff;
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 3px 8px rgba(0, 0, 0, 0.95),
+    0 0 24px rgba(45, 212, 191, 0.4);
 }
 
 /* ---------- social icons (plain, no coloured chips) ---------- */

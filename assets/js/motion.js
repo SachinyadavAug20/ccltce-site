@@ -11,12 +11,12 @@
 
     var hero = document.querySelector(".hero");
     if (!hero) return;
-    var intro = [".hero-logo", ".hero h1", ".hero-sub", ".hero-cta"]
+    var intro = [".hero-logo", ".hero-sub", ".hero-cta"]
       .map(function (sel) { return hero.querySelector(sel); })
       .filter(Boolean);
     gsap.fromTo(intro,
-      { opacity: 0, y: 22 },
-      { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.12, clearProps: "opacity" });
+      { opacity: 0.4, y: 14 },
+      { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", stagger: 0.08, clearProps: "all" });
   }
 
   if (document.readyState === "loading") {
