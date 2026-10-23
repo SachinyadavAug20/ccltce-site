@@ -91,10 +91,10 @@ body::before {
 }
 .skip:focus { transform: translate(-50%, 0); }
 
-.page-head { text-align: center; padding-top: 7.5rem; margin-bottom: 3rem; position: relative; z-index: 10; }
+.page-head { text-align: center; padding-top: 7.5rem; margin-bottom: 2.2rem; position: relative; z-index: 10; }
 .page-head h1 {
   font-family: var(--disp); font-size: clamp(1.2rem, 4vw, 2.2rem);
-  color: #fff; text-shadow: 3px 3px 0 #000; margin-bottom: 0.8rem;
+  color: #fff; text-shadow: 3px 3px 0 #000; margin-bottom: 0.7rem;
 }
 .page-head p {
   font-family: var(--mono); color: var(--gold);

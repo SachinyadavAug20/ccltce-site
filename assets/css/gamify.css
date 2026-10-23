@@ -68,10 +68,11 @@
 .xp-tip { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 190px; padding: 0.55rem 0.65rem; background: #1c1c1c; border: 2px solid #000; box-shadow: inset 2px 2px 0 #3a3a3a, inset -2px -2px 0 #0e0e0e, 3px 3px 0 rgba(0,0,0,0.5); font-family: var(--mono); font-size: 0.92rem; line-height: 1.35; color: #e0e0e0; white-space: pre-line; pointer-events: none; }
 .xp-toast { position: fixed; right: 28px; top: 18%; z-index: 95; padding: 0.7rem 1rem; background: #1a1a1a; border: 3px solid #000; box-shadow: inset 2px 2px 0 #3a3a3a, inset -2px -2px 0 #0e0e0e, 0 4px 0 rgba(0,0,0,0.5); font-family: var(--disp); font-size: 0.55rem; color: var(--gold); opacity: 0; transition: opacity 0.25s steps(4); pointer-events: none; }
 .xp-toast.on { opacity: 1; }
-.hotbar { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 70; display: flex; gap: 3px; pointer-events: auto; }
-.hotbar i { display: grid; place-items: center; width: 30px; height: 30px; background: #222; border: 3px solid #000; box-shadow: inset -2px -2px 0 #111, inset 2px 2px 0 #444; font-style: normal; font-size: 0.85rem; color: var(--gold); cursor: pointer; }
+.hotbar { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 70; display: flex; gap: 4px; pointer-events: auto; }
+.hotbar i { display: grid; place-items: center; width: 32px; height: 32px; background: #222; border: 3px solid #000; box-shadow: inset -2px -2px 0 #111, inset 2px 2px 0 #444; font-style: normal; font-size: 0.85rem; color: var(--gold); cursor: pointer; transition: background 0.1s steps(2), transform 0.1s steps(2); }
 .hotbar i.sel { outline: 3px solid #fff; outline-offset: 0; background: #333; }
 .hotbar i.filled { color: var(--gold); }
-.hotbar i.quick { color: #c8c8c8; font-family: var(--disp); font-size: 0.5rem; }
-.hotbar i.quick:hover { color: var(--gold); background: #2c2c2c; }
+.hotbar i.quick { color: #b0b0b0; font-family: var(--disp); font-size: 0.5rem; }
+.hotbar i.quick:hover { color: var(--gold); background: #2e2e2e; transform: translateY(-2px); }
+.hotbar i:active { transform: translateY(1px); }
 .hud-fx { z-index: 71; }

@@ -29,14 +29,14 @@
 .tag + .tag::before { content: "/"; margin-right: 0.6rem; color: #555; }
 
 .btn {
-  display: inline-block; padding: 0.55rem 1rem;
+  display: inline-block; padding: 0.6rem 1.1rem;
   font-family: var(--disp); font-size: 0.55rem;
   color: #fff; background: #3c3c3c;
   border: 3px solid #000; box-shadow: inset -2px -2px 0 #1a1a1a, inset 2px 2px 0 #5a5a5a;
   text-shadow: 1px 1px 0 #000; align-self: flex-start;
-  transition: none;
+  transition: background 0.1s steps(2), transform 0.1s steps(2);
 }
-.btn:hover { background: #4a4a4a; }
+.btn:hover { background: #4a4a4a; transform: translateY(-2px); }
 .btn:active { box-shadow: var(--bevel-in); transform: translateY(2px); }
 .btn-primary { background: var(--emerald); color: #000; border-color: #064e1f; box-shadow: inset -2px -2px 0 #0d8a3e, inset 2px 2px 0 #4ade80; text-shadow: none; }
 .btn-primary:hover { background: #22c55e; }
