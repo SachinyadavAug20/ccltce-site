@@ -11,9 +11,9 @@ export function createCameraPath() {
     new THREE.Vector3(120, 8, 22),    // station 2 — nether algorithms
     new THREE.Vector3(160, 5, 26),    // nether fortress pass (clear of pillar beams)
     new THREE.Vector3(200, 8, 26),    // station 3 — end intelligence
-    new THREE.Vector3(214, -2, 46),   // rise over the pillar ring → end sky
-    new THREE.Vector3(232, -6, 56),   // wide sweep outside the ring
-    new THREE.Vector3(216, -4, 58),   // finale — high + wide, dragon framed below centre
+    new THREE.Vector3(224, -34, 46),  // dive through the nether's open face → void below
+    new THREE.Vector3(246, -84, 58),  // long fall outside the pillar ring
+    new THREE.Vector3(216, -70, 58),  // finale — overview high above the sunken island (top -126)
   ], false, "catmullrom", 0.5);
 }
 
@@ -23,25 +23,26 @@ export function updateCamera(camera, curve, t, look) {
   camera.lookAt(look || curve.getPointAt(Math.min(t + 0.04, 1)));
 }
 
+// anchors from arc length 448: x=40 @0.318, x=160 @0.587, x=200 @0.679, y=-5 @0.720, z=46 @0.797 (x=224), dive -80 @0.913
 export var PHASES = {
-  surface: [0, 0.26],
-  station1: [0.26, 0.47],
-  station2: [0.47, 0.68],
-  station3: [0.68, 0.87],
-  bedrock: [0.87, 1.0],
+  surface: [0, 0.25],
+  station1: [0.25, 0.46],
+  station2: [0.46, 0.575],
+  station3: [0.575, 0.7],
+  bedrock: [0.7, 1.0],
 };
 
 export function phaseAt(t) {
-  if (t < 0.26) return "surface";
-  if (t < 0.47) return "station1";
-  if (t < 0.68) return "station2";
-  if (t < 0.87) return "station3";
+  if (t < 0.25) return "surface";
+  if (t < 0.46) return "station1";
+  if (t < 0.575) return "station2";
+  if (t < 0.7) return "station3";
   return "bedrock";
 }
 
-// dimension for fog + bg: overworld → nether → end (finale stays lit for the fight)
+// dimension for fog + bg: overworld → nether (flip just inside the entry wall) → end (flip just before the open face)
 export function dimAt(t) {
-  if (t < 0.39) return "overworld";
-  if (t < 0.79) return "nether";
+  if (t < 0.33) return "overworld";
+  if (t < 0.67) return "nether";
   return "end";
 }

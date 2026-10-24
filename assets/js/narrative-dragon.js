@@ -2,7 +2,7 @@
 // freeze+shake → rise+spin with core/halo beams → white flash + ground shockwave → XP orbs → end portal reveal.
 import * as THREE from "../vendor/three.module.js";
 
-var C = new THREE.Vector3(200, -14, 20); // orbit centre — above island, below nether floor
+var C = new THREE.Vector3(200, -105, 20); // orbit centre — island top (-126) far below the nether floor (-5)
 var ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 
 export function initDragon(scene, camera, host) {
@@ -35,7 +35,7 @@ export function initDragon(scene, camera, host) {
       new THREE.MeshBasicMaterial({ color: pb[1], transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
     pbeam.add(m); pbm.push([m.material, pb[2]]);
   });
-  pbeam.position.set(200, -24, 20); scene.add(pbeam);
+  pbeam.position.set(200, -124, 20); scene.add(pbeam);
   for (var n = 0; n < 40; n++) {
     var m = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4),
       new THREE.MeshBasicMaterial({ color: n % 3 ? 0xffaa00 : 0x17dd62 }));
@@ -54,18 +54,18 @@ export function initDragon(scene, camera, host) {
     for (var i = 0; i < orbs.length; i++) {
       var o = orbs[i]; if (o.life <= 0) continue;
       o.life -= dt; o.m.position.addScaledVector(o.v, dt); o.v.y -= 15 * dt;
-      if (o.m.position.y < -26.3) { o.m.position.y = -26.3; o.v.set(0, 0, 0); }
+      if (o.m.position.y < -126.3) { o.m.position.y = -126.3; o.v.set(0, 0, 0); }
       if (o.life <= 0) o.m.visible = false; else if (o.life < 0.5) o.m.scale.setScalar(Math.max(0.05, o.life * 2));
     }
   }
   function boom() {
     state = "flash"; tBoom = prev; root.visible = false; beams.visible = false;
-    flash.position.set(200, -7, 20); flash.visible = true;
-    ring.position.set(200, -25.4, 20); ring.visible = true;
+    flash.position.set(200, -107, 20); flash.visible = true;
+    ring.position.set(200, -125.4, 20); ring.visible = true;
     for (var k = 0; k < orbs.length; k++) {
       var o = orbs[k], ang = Math.random() * Math.PI * 2, sp = 6 + Math.random() * 9;
       o.m.visible = true; o.m.scale.setScalar(1);
-      o.m.position.set(200 + (Math.random() - 0.5) * 6, -8 + Math.random() * 4, 20 + (Math.random() - 0.5) * 6);
+      o.m.position.set(200 + (Math.random() - 0.5) * 6, -108 + Math.random() * 4, 20 + (Math.random() - 0.5) * 6);
       o.v.set(Math.cos(ang) * sp, 4 + Math.random() * 7, Math.sin(ang) * sp);
       o.life = 2.2 + Math.random() * 1.6;
     }
@@ -93,7 +93,7 @@ export function initDragon(scene, camera, host) {
           root.rotation.z = (Math.random() - 0.5) * 0.5; beams.visible = true;
         } else if (d < 3.4) {
           var k = (d - 0.6) / 2.8; k = k * k * (3 - 2 * k);   // MC death: rise + fast spin, wings held open
-          root.position.set(C.x, C.y + (-7 - C.y) * k, C.z);
+          root.position.set(C.x, C.y + (-107 - C.y) * k, C.z);
           root.rotation.set(0, -a + d * 6, 0); beams.rotation.y = d * 4;
           for (var b2 = 0; b2 < beams.children.length; b2++) beams.children[b2].scale.z = 1 + k * 2.4;
         } else boom();
@@ -106,7 +106,7 @@ export function initDragon(scene, camera, host) {
         if (db > 0.4) { flash.visible = false; ring.visible = false; state = "orbs"; tOrb = el; }
       } else {
         var ko = state === "orbs" ? Math.min(1, (el - tOrb) / 1.2) : 1;
-        pbeam.scale.y = Math.max(0.01, ko); pbeam.position.y = -24 + 17 * ko;
+        pbeam.scale.y = Math.max(0.01, ko); pbeam.position.y = -124 + 17 * ko;
         for (var pm = 0; pm < pbm.length; pm++) pbm[pm][0].opacity = pbm[pm][1] * ko;
         if (portal) { portal.scale.set(1 + 1.3 * ko, 1 + 1.3 * ko, 1); portal.material.emissiveIntensity = 0.9 + 1.2 * ko; }
         if (ko >= 1) state = "dead";
@@ -125,9 +125,9 @@ export function initDragon(scene, camera, host) {
       if (state === "dying") {
         var k = Math.min(1, Math.max(0, (prev - tDie - 0.6) / 2.8));
         k = k * k * (3 - 2 * k);
-        return out.set(C.x, C.y + (-7 - C.y) * k, C.z);
+        return out.set(C.x, C.y + (-107 - C.y) * k, C.z);
       }
-      if (state !== "alive") return out.set(200, -7 - 13 * Math.min(1, (prev - tBoom) / 1.6), 20);
+      if (state !== "alive") return out.set(200, -107 - 13 * Math.min(1, (prev - tBoom) / 1.6), 20);
       return head ? head.getWorldPosition(out) : out.copy(root.position);
     },
     shake: function () {

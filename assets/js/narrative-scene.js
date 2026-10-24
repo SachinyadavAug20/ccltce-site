@@ -57,14 +57,14 @@ function buildTrack(g) {
 }
 
 function buildBedrock(g) {
-  P(g, box(40, 3, 40, 0x1a1a1e), 200, -58, 20);
-  P(g, box(40, 14, 3, DEEP), 200, -52, 3); P(g, box(3, 14, 40, DEEP), 182, -52, 20);
-  P(g, box(12, 8, 0.8, STONE2), 200, -50, 5); P(g, box(10, 6, 0.5, 0x0a1a0a, EMER, 0.35), 200, -50, 5.6);
-  P(g, box(13, 0.8, 1, GOLD, GOLD, 0.4), 200, -54, 5.5); P(g, box(13, 0.8, 1, GOLD, GOLD, 0.4), 200, -46, 5.5);
-  [-8, 8].forEach(function (tx) { torch(g, 200 + tx, -51, 6); });
-  g.add(glowLight(EMER, 2.5, 30, 200, -48, 12));
+  P(g, box(40, 3, 40, 0x1a1a1e), 200, -158, 20);
+  P(g, box(40, 14, 3, DEEP), 200, -152, 3); P(g, box(3, 14, 40, DEEP), 182, -152, 20);
+  P(g, box(12, 8, 0.8, STONE2), 200, -150, 5); P(g, box(10, 6, 0.5, 0x0a1a0a, EMER, 0.35), 200, -150, 5.6);
+  P(g, box(13, 0.8, 1, GOLD, GOLD, 0.4), 200, -154, 5.5); P(g, box(13, 0.8, 1, GOLD, GOLD, 0.4), 200, -146, 5.5);
+  [-8, 8].forEach(function (tx) { torch(g, 200 + tx, -151, 6); });
+  g.add(glowLight(EMER, 2.5, 30, 200, -148, 12));
   for (var e = 0; e < 15; e++) {
-    var ember = P(g, box(0.3, 0.3, 0.3, e % 2 ? EMER : GOLD, e % 2 ? EMER : GOLD, 1), 200 + (Math.random() - 0.5) * 25, -55 + Math.random() * 10, 10 + Math.random() * 15);
+    var ember = P(g, box(0.3, 0.3, 0.3, e % 2 ? EMER : GOLD, e % 2 ? EMER : GOLD, 1), 200 + (Math.random() - 0.5) * 25, -155 + Math.random() * 10, 10 + Math.random() * 15);
     ember.userData.float = Math.random() * Math.PI * 2;
   }
 }

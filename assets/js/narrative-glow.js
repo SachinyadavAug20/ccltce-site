@@ -1,6 +1,6 @@
 // Wiki-accurate detail pass: shroomlights, soul fire, ores, hanging lanterns, glow squids, chorus.
 import {
-  GLOWSTONE, END_ROD, AMETH, PURPUR, box, glowLight,
+  END_ROD, AMETH, PURPUR, box, glowLight,
 } from "./narrative-blocks.js";
 
 function P(g, m, x, y, z) { m.position.set(x, y, z); g.add(m); return m; }
@@ -56,19 +56,19 @@ function netherGlow(g) {
 }
 
 function endGlow(g) {
-  for (var i = 0; i < 6; i++) glowSquid(g, 176 + (i * 9) % 46, -16 + (i % 3) * 5, 2 + (i * 13) % 40);
-  var beds = [[184, 44], [190, 8], [195, 44], [213, 28], [217, 41], [206, 6], [199, 50]];
-  beds.forEach(function (b) { chorus(g, b[0], b[1] > 37.5 ? -27.9 : -26.5, b[1], 1 + (b[0] % 3) * 0.2); });
-  for (var r = 0; r < 8; r++) {        // end rod clusters low on the island
-    var rx = 178 + (r * 7) % 44, rz = -6 + (r * 11) % 52;
-    P(g, box(0.3, 1.8, 0.3, END_ROD, END_ROD, 1), rx, -25.6, rz);
-    P(g, box(0.7, 0.7, 0.7, END_ROD, END_ROD, 1), rx, -24.4, rz);
-    if (r % 2) g.add(glowLight(END_ROD, 9, 15, rx, -24.4, rz));
-  }
-  [[160, -18, -8], [158, -10, 46], [240, -16, -6], [244, -8, 44], [236, -20, 20]].forEach(function (s) {
-    P(g, box(1.6, 1.6, 1.6, GLOWSTONE, GLOWSTONE, 0.9), s[0], s[1], s[2]);
-    g.add(glowLight(GLOWSTONE, 10, 18, s[0], s[1], s[2]));
+  var D = 100;
+  // 4 glow squids just outside the dragon ring (was 6 scattered + void glowstone)
+  [[176, 10], [224, 4], [182, 40], [228, 34]].forEach(function (s) { glowSquid(g, s[0], -14 - D, s[1]); });
+  // compact chorus cluster on the top tier
+  [[184, 0], [190, 0], [196, 0], [184, 6], [190, 6]].forEach(function (b) {
+    chorus(g, b[0], -26 - D, b[1], 1 + (b[0] % 3) * 0.2);
   });
+  for (var r = 0; r < 5; r++) {        // end rod clusters low on the island
+    var rx = 178 + (r * 7) % 44, rz = 2 + (r * 9) % 38;
+    P(g, box(0.3, 1.8, 0.3, END_ROD, END_ROD, 1), rx, -25.6 - D, rz);
+    P(g, box(0.7, 0.7, 0.7, END_ROD, END_ROD, 1), rx, -24.4 - D, rz);
+    if (r % 2) g.add(glowLight(END_ROD, 9, 15, rx, -24.4 - D, rz));
+  }
 }
 
 export function buildGlow(g) { netherGlow(g); endGlow(g); }

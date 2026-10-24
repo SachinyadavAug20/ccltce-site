@@ -85,60 +85,50 @@ export function buildNether(g) {
 }
 
 export function buildEnd(g) {
-  // Main island: jagged base + top
-  P(g, box(70, 4, 70, ENDSTONE), 200, -30, 20);
-  for (var j = 0; j < 20; j++) { var ch = P(g, box(4 + Math.random() * 4, 2, 4 + Math.random() * 4, ENDSTONE), 200 + (Math.random() - 0.5) * 75, -31, 20 + (Math.random() - 0.5) * 75); ch.rotation.y = Math.random(); }
-  P(g, box(35, 2, 35, ENDSTONE), 200, -27.5, 20);
-  // Outer islands
-  for (var oi = 0; oi < 6; oi++) {
-    var oa = oi * Math.PI / 3;
-    var is = P(g, box(12, 3, 12, ENDSTONE), 200 + Math.cos(oa) * 55, -28 + (oi % 3) * 2, 20 + Math.sin(oa) * 55);
-    is.rotation.y = oa;
+  var D = 100;   // the End sits far below the nether — the dive drops the full height
+  // two-tier island: clean slab + smaller top tier (rubble chunks / outer islands removed)
+  P(g, box(64, 4, 64, ENDSTONE), 200, -30 - D, 20);
+  P(g, box(44, 3, 44, ENDSTONE), 200, -27.5 - D, 20);
+  // tidy rim: 16 slabs ring the top edge, angularly offset from the pillar ring
+  for (var rm = 0; rm < 16; rm++) {
+    var ra = rm * Math.PI / 8 + Math.PI / 16;
+    P(g, box(3, 2, 3, ENDSTONE), 200 + Math.cos(ra) * 33, -27 - D, 20 + Math.sin(ra) * 33);
   }
   // Obsidian pillars + iron cages + end crystals + beacon beams
   var pillars = [[-22, -22], [22, -22], [-22, 22], [22, 22], [0, -28], [0, 28], [-28, 0], [28, 0]];
   pillars.forEach(function (pp, pi) {
     var h = 18 + pi * 2;
-    P(g, box(3.5, h, 3.5, OBSIDIAN), 200 + pp[0], -28 + h / 2, 20 + pp[1]);
-    for (var cage = 0; cage < 4; cage++) { var ca = cage * Math.PI / 2; P(g, box(0.15, 3, 0.15, 0x8a8a8a), 200 + pp[0] + Math.cos(ca) * 1.2, -25 + h, 20 + pp[1] + Math.sin(ca) * 1.2); }
-    var crystal = P(g, box(1.8, 2.5, 1.8, END_ROD, END_ROD, 1), 200 + pp[0], -25.5 + h, 20 + pp[1]);
+    P(g, box(3.5, h, 3.5, OBSIDIAN), 200 + pp[0], -28 - D + h / 2, 20 + pp[1]);
+    for (var cage = 0; cage < 4; cage++) { var ca = cage * Math.PI / 2; P(g, box(0.15, 3, 0.15, 0x8a8a8a), 200 + pp[0] + Math.cos(ca) * 1.2, -25 - D + h, 20 + pp[1] + Math.sin(ca) * 1.2); }
+    var crystal = P(g, box(1.8, 2.5, 1.8, END_ROD, END_ROD, 1), 200 + pp[0], -25.5 - D + h, 20 + pp[1]);
     crystal.userData.pulse = pi * 0.9;
-    P(g, box(0.3, 40, 0.3, END_ROD, END_ROD, 0.6), 200 + pp[0], -5 + h / 2, 20 + pp[1]);
-    g.add(glowLight(END_ROD, 2.5, 30, 200 + pp[0], -24 + h, 20 + pp[1]));
+    P(g, box(0.3, 40, 0.3, END_ROD, END_ROD, 0.6), 200 + pp[0], -5 - D + h / 2, 20 + pp[1]);
+    g.add(glowLight(END_ROD, 2.5, 30, 200 + pp[0], -24 - D + h, 20 + pp[1]));
   });
-  // Chorus plants + forest
-  fx(g, END_ROD, 16, 180, 40, 15, 30);
-  for (var ch2 = 0; ch2 < 10; ch2++) {
-    var cx = 182 + ch2 * 4, cz = 8 + (ch2 % 3) * 12;
-    P(g, box(0.7, 2 + (ch2 % 3), 0.7, PURPUR), cx, -26 + (ch2 % 3) / 2, cz);
-    P(g, box(1.3, 1.3, 1.3, AMETH, AMETH, 0.3), cx, -24.5 + (ch2 % 3), cz);
-  }
-  // End city towers + end ship
+  // End city towers (compact) + the ship moored off the island edge
   for (var pp2 = 0; pp2 < 4; pp2++) {
     var ppx = 190 + pp2 * 7;
-    P(g, box(2, 10 + pp2 * 2, 2, PURPUR), ppx, -22 + pp2, 35);
-    P(g, box(2.5, 1, 2.5, 0xc4b4d4), ppx, -16.5 + pp2 * 3, 35);
+    P(g, box(2, 10 + pp2 * 2, 2, PURPUR), ppx, -22 - D + pp2, 35);
+    P(g, box(2.5, 1, 2.5, 0xc4b4d4), ppx, -16.5 - D + pp2 * 3, 35);
   }
-  // End ship (floating purpur hull with end rod mast) — moored off the island edge, clear of the fight camera
-  P(g, box(8, 2, 4, PURPUR), 214, -15, 70); P(g, box(6, 1.5, 3, 0xc4b4d4), 214, -13.5, 70);
-  P(g, box(0.4, 6, 0.4, END_ROD, END_ROD, 0.8), 214, -10, 70); P(g, box(3, 2, 0.2, END_ROD, END_ROD, 0.6), 214, -8, 70);
-  P(g, box(1.5, 1.5, 1.5, AMETH, AMETH, 0.5), 218, -15, 70);
-  g.add(glowLight(AMETH, 1.5, 25, 218, -14, 70));
+  P(g, box(8, 2, 4, PURPUR), 214, -15 - D, 70); P(g, box(6, 1.5, 3, 0xc4b4d4), 214, -13.5 - D, 70);
+  P(g, box(0.4, 6, 0.4, END_ROD, END_ROD, 0.8), 214, -10 - D, 70); P(g, box(3, 2, 0.2, END_ROD, END_ROD, 0.6), 214, -8 - D, 70);
+  P(g, box(1.5, 1.5, 1.5, AMETH, AMETH, 0.5), 218, -15 - D, 70);
+  g.add(glowLight(AMETH, 1.5, 25, 218, -14 - D, 70));
   // End gateway portal frame (obsidian mini-pillars)
-  P(g, box(5, 0.5, 5, OBSIDIAN), 200, -26.5, 20);
+  P(g, box(5, 0.5, 5, OBSIDIAN), 200, -26.5 - D, 20);
   [[-2, -2], [2, -2], [-2, 2], [2, 2]].forEach(function (gp) {
-    P(g, box(0.5, 4, 0.5, OBSIDIAN), 200 + gp[0], -24.5, 20 + gp[1]);
+    P(g, box(0.5, 4, 0.5, OBSIDIAN), 200 + gp[0], -24.5 - D, 20 + gp[1]);
   });
-  var portal = P(g, box(3, 3, 0.3, AMETH, AMETH, 0.9), 200, -24, 20);
+  var portal = P(g, box(3, 3, 0.3, AMETH, AMETH, 0.9), 200, -24 - D, 20);
   portal.userData.pulse = 1; portal.userData.endPortal = true;
-  // Endermites + endermen + shulkers + dragon
-  fx(g, AMETH, 30, 175, 50, 20, 40);
-  enderman(g, 190, -26, 32); enderman(g, 210, -26, 32); enderman(g, 195, -26, 8);
-  enderman(g, 205, -26, 8); enderman(g, 215, -26, 25);
-  endermite(g, 197, -26, 30); endermite(g, 203, -26, 12);
-  shulker(g, 193, -26, 35); shulker(g, 207, -26, 35); shulker(g, 200, -26, 10);
-  enderDragon(g, 200, -5, 20);
-  g.add(glowLight(AMETH, 2, 80, 200, -15, 20));
-  g.add(glowLight(END_ROD, 1.5, 50, 200, -10, 20));
-  g.add(glowLight(0x6a0dad, 1, 40, 200, -25, 20));
+  // trimmed population: 4 endermen, 1 endermite, 2 shulkers + the dragon
+  enderman(g, 190, -26 - D, 32); enderman(g, 210, -26 - D, 32);
+  enderman(g, 195, -26 - D, 8); enderman(g, 215, -26 - D, 25);
+  endermite(g, 197, -26 - D, 30);
+  shulker(g, 193, -26 - D, 35); shulker(g, 207, -26 - D, 35);
+  enderDragon(g, 200, -5 - D, 20);
+  g.add(glowLight(AMETH, 2, 80, 200, -15 - D, 20));
+  g.add(glowLight(END_ROD, 1.5, 50, 200, -10 - D, 20));
+  g.add(glowLight(0x6a0dad, 1, 40, 200, -25 - D, 20));
 }
