@@ -50,8 +50,8 @@ import { initCrystals } from "./narrative-crystals.js";
     for (var key in overlays) { var el = overlays[key]; if (el) el.classList.toggle("on", key === phase); }
     if (heroOverlay) {
       var hf = clamp01(t / 0.12);
-      heroOverlay.style.opacity = 1 - hf;
-      heroOverlay.style.transform = "translateY(" + (-60 * hf) + "px)";
+      heroOverlay.style.opacity = 1 - hf; heroOverlay.style.transform = "translateY(" + (-60 * hf) + "px)";
+      heroOverlay.style.display = hf >= 1 ? "none" : "";
     }
     if (hint) hint.style.opacity = t > 0.06 ? "0" : "1";
   }
