@@ -33,7 +33,8 @@ import { initCrystals } from "./narrative-crystals.js";
   var hint = wrapper.querySelector(".narrative-hint");
   var lookV = new THREE.Vector3(), lookA = new THREE.Vector3();
   var light = createLighting(scene, L);
-  var progress = { t: 0, s: 0, dim: "overworld" };
+  var progress = { raw: 0, t: 0, s: 0, dim: "overworld" };
+  var GLOW = 0.85, lastHud = -1;   // max progress units/second + last HUD-synced t
   var overlays = {
     surface: wrapper.querySelector(".narrative-overlay.surface"),
     station1: wrapper.querySelector(".narrative-overlay.station-1"),
@@ -61,6 +62,13 @@ import { initCrystals } from "./narrative-crystals.js";
     requestAnimationFrame(animate);
     var el = clock.getElapsedTime(), dt = Math.min(0.1, Math.max(0.001, el - lastEl));
     lastEl = el;
+    // forced slow-motion: the raw scroll position may teleport, but the story can only
+    // advance GLOW per second — then the camera eases the rest of the way (keeps working off-screen)
+    var diff = progress.raw - progress.t, cap = GLOW * dt;
+    progress.t += diff > cap ? cap : diff < -cap ? -cap : diff;
+    progress.s += (progress.t - progress.s) * (1 - Math.pow(0.0004, dt));
+    if (Math.abs(progress.t - progress.s) < 0.0002) progress.s = progress.t;
+    syncHud(progress.t);
     if (document.hidden || !perf.visible()) return;   // off-screen: no draw, no light work
     perf.frame(dt);
     if (stations.s1) stations.s1.rotation.y = Math.sin(el * 0.3) * 0.12;
@@ -80,8 +88,6 @@ import { initCrystals } from "./narrative-crystals.js";
       if (u.cloud !== undefined) o.position.x = u.baseX + Math.sin(el * 0.02 + u.cloud) * 10;
     }
     // damped scroll follow — the frame loop owns the camera so nothing drifts off-screen
-    progress.s += (progress.t - progress.s) * (1 - Math.pow(0.0004, dt));
-    if (Math.abs(progress.t - progress.s) < 0.0002) progress.s = progress.t;
     var u = Math.min(Math.max(progress.s, 0), 1);
     camera.position.copy(curve.getPointAt(u));
     var look = lookA.copy(curve.getPointAt(Math.min(u + 0.04, 1))), shake = 0;
@@ -103,11 +109,12 @@ import { initCrystals } from "./narrative-crystals.js";
     light.tick(progress.dim, camera);
     renderer.render(scene, camera);
   }
-  function onScroll() {
-    var rect = wrapper.getBoundingClientRect();
-    progress.t = clamp01(-rect.top / (wrapper.offsetHeight - innerHeight));
-    updateOverlays(progress.t);
-    var dim = dimAt(progress.t);
+  // HUD (overlays + dimension) is synced from the frame loop, and only when the glide actually moved
+  function syncHud(t) {
+    if (t === lastHud) return;
+    lastHud = t;
+    updateOverlays(t);
+    var dim = dimAt(t);
     if (dim !== lastDim) {
       lastDim = dim; progress.dim = dim; light.sky(dim); light.lights(dim);
       if (dragon) dragon.armed = dim === "end";
@@ -116,6 +123,10 @@ import { initCrystals } from "./narrative-crystals.js";
       document.documentElement.setAttribute("data-dim", dim);
       if (window.CCLTCE_SFX && window.CCLTCE_SFX.setPhase) window.CCLTCE_SFX.setPhase(dim);
     }
+  }
+  function onScroll() {
+    var rect = wrapper.getBoundingClientRect();
+    progress.raw = clamp01(-rect.top / (wrapper.offsetHeight - innerHeight));
   }
   addEventListener("scroll", onScroll, { passive: true });
   viewport.addEventListener("pointermove", function (e) {
@@ -134,6 +145,6 @@ import { initCrystals } from "./narrative-crystals.js";
     perf.resize();
   });
   light.sky("overworld"); light.lights("overworld");
-  updateOverlays(0);
-  animate(); onScroll();
+  updateOverlays(0); animate(); onScroll();
+  window.CCLTCE_PROGRESS = progress;   // live scroll glide { raw, t, s } — tests + debug console
 })();
