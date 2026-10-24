@@ -84,8 +84,8 @@ function clouds(g) {
 }
 
 export function buildCampus(g) {
-  P(g, box(110, 2, 100, GRASS), -15, -2, -10);   // ends at x=40 where the nether floor begins
-  P(g, box(110, 4, 100, DIRT), -15, -5, -10);
+  P(g, box(110, 2, 170, GRASS), -15, -2, 25);   // z -60..110 (covers the start camera; x still ends at 40 — nether floor)
+  P(g, box(110, 4, 170, DIRT), -15, -5, 25);
   for (var gp = 0; gp < 15; gp++) P(g, box(2, 0.15, 2, PATH), gp % 2 ? 1.5 : -1.5, -0.9, 5 - gp * 3);
   P(g, box(5, 11, 5, STONE), -12, 4.5, -8); P(g, box(5, 11, 5, STONE), 12, 4.5, -8);
   P(g, box(32, 4, 5, STONE), 0, 12, -8); P(g, box(36, 1.5, 8, DARKOAK), 0, 14.75, -8);
