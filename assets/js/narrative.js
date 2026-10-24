@@ -2,6 +2,7 @@
 import * as THREE from "../vendor/three.module.js";
 import { buildScene } from "./narrative-scene.js";
 import { createCameraPath, updateCamera, phaseAt, dimAt } from "./narrative-camera.js";
+import { initDragon } from "./narrative-dragon.js";
 
 var TOD = {
   night:   { sky: 0x0a0e1a, fog: 0x0a0e1a, d: 0.0035, sun: 0x8899cc, sunI: 0.35, amb: 0x253044, ambI: 0.42, hemiS: 0x334466, hemiG: 0x111122, pos: [-40, 50, 20] },
@@ -41,6 +42,10 @@ function getTOD() {
   var camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 500);
   var built = buildScene(), scene = built.scene, L = built.lights;
   var curve = createCameraPath(), stations = built.stations;
+  var viewport = wrapper.querySelector(".narrative-viewport");
+  var dragon = initDragon(scene, camera, viewport);
+  window.CCLTCE_DRAGON = dragon;
+  var hint = wrapper.querySelector(".narrative-hint"), lookV = new THREE.Vector3(), lookA = new THREE.Vector3();
   var skyPresets = scene.userData.skyPresets || {};
   var progress = { t: 0, dim: "overworld" };
   var overlays = {
@@ -74,6 +79,7 @@ function getTOD() {
       heroOverlay.style.opacity = 1 - hf;
       heroOverlay.style.transform = "translateY(" + (-60 * hf) + "px)";
     }
+    if (hint) hint.style.opacity = t > 0.06 ? "0" : "1";
   }
   var clock = new THREE.Clock();
   function animate() {
@@ -94,19 +100,21 @@ function getTOD() {
       }
       if (u.cart) { o.position.x = 40 + ((el * 6) % 160); o.position.y = 5.5 + Math.sin(el * 3) * 0.1; }
       if (u.cloud !== undefined) o.position.x = u.baseX + Math.sin(el * 0.02 + u.cloud) * 10;
-      if (u.dragonOrbit) {
-        var da = el * 0.15;
-        o.position.x = 200 + Math.cos(da) * 35; o.position.z = 20 + Math.sin(da) * 35;
-        o.position.y = -5 + Math.sin(el * 0.4) * 4; o.rotation.y = -da + Math.PI / 2;
-      }
     });
+    if (dragon) {
+      dragon.update(el);
+      if (progress.t > 0.84) {  // finale — keep the boss framed even when scroll stops
+        camera.lookAt(lookA.copy(curve.getPointAt(Math.min(progress.t + 0.04, 1)))
+          .lerp(dragon.look(lookV), clamp01((progress.t - 0.84) / 0.08)));
+      }
+    }
     var hr = new Date().getHours();
     if (hr !== lastHour) { lastHour = hr; tod = getTOD(); updateSky(progress.dim); updateLights(); }
     if (scene.fog) {
-      scene.fog.color.lerp(skyTarget.fog, 0.05);
-      scene.fog.density += (skyTarget.d - scene.fog.density) * 0.05;
+      scene.fog.color.lerp(skyTarget.fog, 0.09);
+      scene.fog.density += (skyTarget.d - scene.fog.density) * 0.09;
     }
-    if (scene.background && scene.background.isColor) scene.background.lerp(skyTarget.sky, 0.05);
+    if (scene.background && scene.background.isColor) scene.background.lerp(skyTarget.sky, 0.09);
     renderer.render(scene, camera);
   }
   function onScroll() {
@@ -117,12 +125,15 @@ function getTOD() {
     var dim = dimAt(progress.t);
     if (dim !== lastDim) {
       lastDim = dim; progress.dim = dim; updateSky(dim); updateLights();
+      if (dragon) dragon.armed = dim === "end";
       window.CCLTCE_DIM = dim;
       document.documentElement.setAttribute("data-dim", dim);
       if (window.CCLTCE_SFX && window.CCLTCE_SFX.setPhase) window.CCLTCE_SFX.setPhase(dim);
     }
   }
   addEventListener("scroll", onScroll, { passive: true });
+  viewport.addEventListener("pointermove", function (e) { if (dragon) dragon.hover(e); }, { passive: true });
+  viewport.addEventListener("click", function (e) { if (dragon) dragon.click(e); });
   addEventListener("resize", function () {
     camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
     renderer.setSize(innerWidth, innerHeight, false);

@@ -18,15 +18,22 @@
 }
 .hero-logo:hover { transform: translateY(-4px); }
 
-/* block lettering — stepped 3D drop shadow */
+/* dark scrim so copy stays readable over any 3D scene */
+.hero-overlay::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 62% 54% at 50% 46%, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.18) 58%, transparent 76%);
+  pointer-events: none;
+}
+
+/* block lettering — stepped 3D drop shadow + hard dark halo */
 .hero-title {
   font-family: var(--disp); font-weight: 400;
   font-size: clamp(2rem, 7.6vw, 5rem); line-height: 1.22;
-  text-transform: uppercase; color: #e4e4e7;
-  text-shadow: 4px 4px 0 #27272a, 7px 7px 0 #09090b;
+  text-transform: uppercase; color: #f4f4f7;
+  text-shadow: 4px 4px 0 #27272a, 7px 7px 0 #09090b, 0 0 16px rgba(0, 0, 0, 0.9), 0 3px 9px rgba(0, 0, 0, 0.8);
   margin: 0.2rem 0 0.6rem;
 }
-.hero-title em { font-style: normal; color: var(--gold); text-shadow: 4px 4px 0 #713f12, 7px 7px 0 #09090b; }
+.hero-title em { font-style: normal; color: var(--gold); text-shadow: 4px 4px 0 #713f12, 7px 7px 0 #09090b, 0 0 16px rgba(0, 0, 0, 0.9), 0 3px 9px rgba(0, 0, 0, 0.8); }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
@@ -36,14 +43,16 @@
   margin: 0.5rem auto 1rem;
   font-family: var(--mono); font-size: clamp(13px, 2vw, 15px);
   letter-spacing: 0.14em; text-transform: uppercase;
-  color: #d4d4d8; text-shadow: 1px 1px 0 rgba(0,0,0,0.85);
+  color: #f4f4f7;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.95), 1px 1px 0 #000, 0 2px 5px rgba(0, 0, 0, 0.85);
   z-index: 10;
 }
 .hero-sub small {
   display: inline-flex; align-items: center; gap: 0.6rem;
   font-family: var(--mono); font-size: 12px;
   letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--gold); margin-top: 0.7rem; text-shadow: 1px 1px 0 #000;
+  color: var(--gold); margin-top: 0.7rem;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.95), 1px 1px 0 #000;
 }
 .hero-sub small::before, .hero-sub small::after { content: "———"; color: #713f12; letter-spacing: 0.05em; }
 

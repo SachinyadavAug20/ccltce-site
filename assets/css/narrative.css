@@ -65,6 +65,12 @@
 .n-dim.nether { color: #ff4400; border-color: #ff4400; background: rgba(255, 68, 0, 0.12); }
 .n-dim.end { color: #c026d3; border-color: #c026d3; background: rgba(192, 38, 211, 0.12); }
 .n-dim.bedrock { color: #eab308; border-color: #eab308; background: rgba(234, 179, 8, 0.1); }
+.narrative-overlay .n-hp {
+  display: inline-block; margin-left: 0.35rem; padding: 0.15rem 0.5rem;
+  font-family: var(--disp); font-size: 0.4rem; letter-spacing: 0.06em;
+  color: #ff5555; border: 1px solid #ff2222; background: rgba(255, 34, 34, 0.12);
+  text-shadow: 1px 1px 0 #000;
+}
 .narrative-overlay .n-accent {
   display: inline-block; width: 8px; height: 8px;
   margin-right: 6px; background: var(--gold); vertical-align: middle;
@@ -82,6 +88,7 @@
   font-family: var(--disp); font-size: 0.45rem;
   color: var(--muted); letter-spacing: 0.1em;
   z-index: 7; animation: hintBob 2s ease-in-out infinite; pointer-events: none;
+  transition: opacity 0.4s ease;
 }
 @keyframes hintBob { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
 

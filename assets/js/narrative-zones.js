@@ -19,7 +19,7 @@ export function buildNether(g) {
   P(g, box(160, 24, 4, NETHERRACK), 120, 9, -28); P(g, box(160, 24, 4, NETHERRACK), 120, 9, 48);
   // Basalt delta pillars
   var B = 0x3a3a3e;
-  for (var bp = 0; bp < 10; bp++) { var bx = 48 + bp * 15, bz = (bp % 2 ? -18 : 18); P(g, box(3 + (bp % 3), 12 + (bp % 4) * 3, 3 + (bp % 3), B), bx, 4 + (bp % 4) * 1.5, bz); }
+  for (var bp = 0; bp < 10; bp++) { var bx = 48 + bp * 15, bz = (bp % 2 ? -18 : 32); P(g, box(3 + (bp % 3), 12 + (bp % 4) * 3, 3 + (bp % 3), B), bx, 4 + (bp % 4) * 1.5, bz); }
   // Blackstone boulders + ancient debris
   for (var bl = 0; bl < 8; bl++) P(g, box(2, 1.5 + (bl % 3), 2, 0x1a1a1e), 52 + bl * 15, 0.5, (bl % 3 - 1) * 14);
   P(g, box(1.2, 1.2, 1.2, 0x6a3a2a, 0x6a3a2a, 0.2), 92, 2, -6); P(g, box(1.2, 1.2, 1.2, 0x6a3a2a, 0x6a3a2a, 0.2), 148, 2, 14);
@@ -41,7 +41,7 @@ export function buildNether(g) {
   P(g, box(8, 0.5, 4, 0x5a1a1a), 90, 0.3, 8);
   for (var w2 = 0; w2 < 6; w2++) P(g, box(0.5, 0.8 + (w2 % 3) * 0.4, 0.5, 0xaa1111), 87 + w2 * 1.2, 0.8, 8);
   for (var w = 0; w < 10; w++) {
-    var wz = w % 2 ? -16 : 16;
+    var wz = w % 2 ? -16 : 34;
     P(g, box(0.7, 4 + (w % 3), 0.7, WARP), 55 + w * 15, 2, wz);
     P(g, box(3, 1.2, 3, SOUL, SOUL, 0.25), 55 + w * 15, 4.5 + (w % 3), wz);
   }
@@ -60,12 +60,12 @@ export function buildNether(g) {
   }
   P(g, box(170, 1.5, 5, FB), 120, 3.5, 0);
   for (var ss = 0; ss < 5; ss++) P(g, box(4, 0.5, 4, 0x4a3a2a), 70 + ss * 25, -0.5, ss % 2 ? -12 : 12);
-  // Bastion remnant (blackstone)
+  // Bastion remnant (blackstone) — kept at z -18, clear of the camera path
   var BK = 0x2a2a2e;
-  for (var bb = 0; bb < 4; bb++) P(g, box(4, 8 + bb * 2, 4, BK), 155, 3 + bb, 14);
-  P(g, box(18, 2, 12, BK), 155, 12, 14); P(g, box(12, 3, 8, 0x1a1a1e), 155, 14.5, 14);
-  P(g, box(6, 5, 6, GOLD, GOLD, 0.3), 155, 17, 14);
-  g.add(glowLight(GOLD, 2, 30, 155, 18, 14));
+  for (var bb = 0; bb < 4; bb++) P(g, box(4, 8 + bb * 2, 4, BK), 168, 3 + bb, -18);
+  P(g, box(18, 2, 12, BK), 168, 12, -18); P(g, box(12, 3, 8, 0x1a1a1e), 168, 14.5, -18);
+  P(g, box(6, 5, 6, GOLD, GOLD, 0.3), 168, 17, -18);
+  g.add(glowLight(GOLD, 2, 30, 168, 18, -18));
   // Mobs
   piglin(g, 55, 4, -4); piglin(g, 95, 4, 5); piglin(g, 140, 4, -3);
   piglinBrute(g, 152, 4, 14); piglinBrute(g, 110, 4, 0);
@@ -125,7 +125,8 @@ export function buildEnd(g) {
   [[-2, -2], [2, -2], [-2, 2], [2, 2]].forEach(function (gp) {
     P(g, box(0.5, 4, 0.5, OBSIDIAN), 200 + gp[0], -24.5, 20 + gp[1]);
   });
-  var portal = P(g, box(3, 3, 0.3, AMETH, AMETH, 0.9), 200, -24, 20); portal.userData.pulse = 1;
+  var portal = P(g, box(3, 3, 0.3, AMETH, AMETH, 0.9), 200, -24, 20);
+  portal.userData.pulse = 1; portal.userData.endPortal = true;
   // Endermites + endermen + shulkers + dragon
   fx(g, AMETH, 30, 175, 50, 20, 40);
   enderman(g, 190, -26, 32); enderman(g, 210, -26, 32); enderman(g, 195, -26, 8);

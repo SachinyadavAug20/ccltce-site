@@ -84,8 +84,8 @@ function clouds(g) {
 }
 
 export function buildCampus(g) {
-  P(g, box(140, 2, 100, GRASS), 0, -2, -10);
-  P(g, box(140, 4, 100, DIRT), 0, -5, -10);
+  P(g, box(110, 2, 100, GRASS), -15, -2, -10);   // ends at x=40 where the nether floor begins
+  P(g, box(110, 4, 100, DIRT), -15, -5, -10);
   for (var gp = 0; gp < 15; gp++) P(g, box(2, 0.15, 2, PATH), gp % 2 ? 1.5 : -1.5, -0.9, 5 - gp * 3);
   P(g, box(5, 11, 5, STONE), -12, 4.5, -8); P(g, box(5, 11, 5, STONE), 12, 4.5, -8);
   P(g, box(32, 4, 5, STONE), 0, 12, -8); P(g, box(36, 1.5, 8, DARKOAK), 0, 14.75, -8);
@@ -123,6 +123,9 @@ export function buildCampus(g) {
   chicken(g, 12, 0, -5); chicken(g, -14, 0, -8); chicken(g, 8, 0, -18);
   villager(g, -5, 0, -18); villager(g, 8, 0, -22);
   wolf(g, -20, 0, -24); wolf(g, 24, 0, -16); cat(g, -12, 0, -32); horse(g, 20, 0, -40);
+  // wolf pack + roof cats (colour variants)
+  wolf(g, -27, 0, -26, 0x8a7355, true); wolf(g, -24, 0, -29); wolf(g, -31, 0, -28, 0x9a9a9a, true);
+  cat(g, -34, 7.95, -16); cat(g, 33, 8.7, -12, 0xd48030); cat(g, -30, 7.15, -40, 0xf0e0c8); cat(g, 28, 0, -40, 0x2a2a2a);
   rabbit(g, -30, 0, -22); fox(g, 16, 0, -32); bee(g, -8, 4, -16); bee(g, 6, 5, -20);
   mooshroom(g, 30, 0, -28); turtle(g, 0, -1, -44); panda(g, -35, 0, -25); polarBear(g, 35, 0, -22);
   goat(g, -26, 0, -40); llama(g, 26, 0, -42); bat(g, -10, 8, -26); bat(g, 10, 9, -24);
