@@ -1,7 +1,7 @@
 // Day/night presets, dimension light damping, camera follow-light, fog/sky lerp.
 import * as THREE from "../vendor/three.module.js";
 
-export var DIM_L = { overworld: 1, nether: 0.42, end: 0.4, bedrock: 0.3 };
+export var DIM_L = { overworld: 1, nether: 0.5, end: 0.66, bedrock: 0.42 };
 
 var TOD = {
   night:   { sky: 0x0a0e1a, fog: 0x0a0e1a, d: 0.0035, sun: 0x8899cc, sunI: 0.5,  amb: 0x2c3a52, ambI: 0.52, hemiS: 0x334466, hemiG: 0x141422, pos: [-40, 50, 20] },

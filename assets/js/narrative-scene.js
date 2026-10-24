@@ -14,7 +14,7 @@ function buildTrack(g) {
   P(g, box(2, 1.5, 2, GOLD, GOLD, 0.3), 80, 7, 0);
   for (var a = 0; a < 6; a++) {
     var ax = 50 + a * 28;
-    P(g, box(2, 12, 2, STONE2), ax, 9, -5); P(g, box(2, 12, 2, STONE2), ax, 9, 5);
+    P(g, box(2, 11, 2, STONE2), ax, 8.5, -5); P(g, box(2, 11, 2, STONE2), ax, 8.5, 5);
     P(g, box(2, 2, 12, STONE2), ax, 15, 0); P(g, box(1, 1, 1, GOLD, GOLD, 0.9), ax, 13, 0);
     g.add(glowLight(GOLD, 1, 15, ax, 13, 0));
   }
@@ -58,7 +58,7 @@ function buildTrack(g) {
 
 function buildBedrock(g) {
   P(g, box(40, 3, 40, 0x1a1a1e), 200, -158, 20);
-  P(g, box(40, 14, 3, DEEP), 200, -152, 3); P(g, box(3, 14, 40, DEEP), 182, -152, 20);
+  P(g, box(40, 14, 3, DEEP), 200, -152, 3); P(g, box(3, 14, 40, DEEP), 182, -152.5, 20);
   P(g, box(12, 8, 0.8, STONE2), 200, -150, 5); P(g, box(10, 6, 0.5, 0x0a1a0a, EMER, 0.35), 200, -150, 5.6);
   P(g, box(13, 0.8, 1, GOLD, GOLD, 0.4), 200, -154, 5.5); P(g, box(13, 0.8, 1, GOLD, GOLD, 0.4), 200, -146, 5.5);
   [-8, 8].forEach(function (tx) { torch(g, 200 + tx, -151, 6); });
@@ -84,7 +84,7 @@ export function buildScene() {
   scene.userData.skyPresets = {
     overworld: { sky: 0x78a7ff, fog: 0xbdd5ff, d: 0.0028 },
     nether: { sky: 0x4a1010, fog: 0x5e1e1e, d: 0.0085 },
-    end: { sky: 0x120a22, fog: 0x1e1233, d: 0.0045 },
+    end: { sky: 0x2a1c4e, fog: 0x3a2866, d: 0.0032 },
     bedrock: { sky: 0x0a0a12, fog: 0x12121c, d: 0.010 },
   };
   return { scene: scene, stations: stations, lights: { amb: amb, sun: sun, fill: fill, hemi: hemi } };

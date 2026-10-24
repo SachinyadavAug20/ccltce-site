@@ -11,9 +11,9 @@ export function createCameraPath() {
     new THREE.Vector3(120, 8, 22),    // station 2 — nether algorithms
     new THREE.Vector3(160, 5, 26),    // nether fortress pass (clear of pillar beams)
     new THREE.Vector3(200, 8, 26),    // station 3 — end intelligence
-    new THREE.Vector3(224, -34, 46),  // dive through the nether's open face → void below
+    new THREE.Vector3(224, -34, 46),  // dive through the nether's exit doorway → void below
     new THREE.Vector3(246, -84, 58),  // long fall outside the pillar ring
-    new THREE.Vector3(216, -70, 58),  // finale — overview high above the sunken island (top -126)
+    new THREE.Vector3(214, -80, 50),  // finale — close enough to the dragon to click its head
   ], false, "catmullrom", 0.5);
 }
 

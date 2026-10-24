@@ -58,7 +58,7 @@ export function enderDragon(g, x, y, z) {
     add(w, M(0.35, 2.6, 0.35, D), 5.0 * s, -1.3, 1.4);
     grp.add(w); w.userData[s < 0 ? "wingL" : "wingR"] = true;
   });
-  var hit = new THREE.Mesh(new THREE.BoxGeometry(3.5, 3.5, 4.5),   // click target
+  var hit = new THREE.Mesh(new THREE.BoxGeometry(5, 4.5, 6),   // click target (forgiving on low-end)
     new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide }));
   hit.position.set(0, 2.5, 6.3); hit.userData.dragonHit = true; grp.add(hit);
   grp.userData.dragon = true;

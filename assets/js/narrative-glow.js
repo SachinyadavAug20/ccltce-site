@@ -34,8 +34,8 @@ function glowSquid(g, x, y, z) {        // bioluminescent — the End light sour
 }
 
 function chorus(g, x, y, z, k) {       // chorus plant + flower (wiki: purpur stems, amethyst bloom)
-  for (var s = 0; s < 3; s++) P(g, box(0.6 * k, 1.4 * k, 0.6 * k, PURPUR), x + (s % 2) * 0.5 * k, y + s * 1.3 * k, z);
-  P(g, box(1.2 * k, 1.2 * k, 1.2 * k, AMETH, AMETH, 0.45), x + 0.4 * k, y + 3.6 * k, z);
+  for (var s = 0; s < 3; s++) P(g, box(0.6 * k, 1.4 * k, 0.6 * k, PURPUR), x + (s % 2) * 0.5 * k, y + s * 1.4 * k, z);
+  P(g, box(1.2 * k, 1.2 * k, 1.2 * k, AMETH, AMETH, 0.45), x + 0.4 * k, y + 3.7 * k, z);
 }
 
 function netherGlow(g) {

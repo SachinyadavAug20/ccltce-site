@@ -65,7 +65,7 @@ export function pond(g, x, z) {
 
 function bush(g, x, z) {
   P(g, box(1.6, 1.1, 1.6, LEAF), x, 0.2, z);
-  P(g, box(1.1, 0.9, 1.1, LEAF2), x + 0.25, 0.5, z + 0.15);
+  P(g, box(1.1, 0.9, 1.1, LEAF2), x + 0.15, 0.5, z + 0.1);
 }
 
 function rock(g, x, z, s) {
@@ -116,7 +116,7 @@ export function buildCampus(g) {
   P(g, box(3.8, 7.5, 0.3, DARKOAK), 0, 3, -19.5);
   P(g, box(0.3, 0.3, 0.3, GOLD, GOLD, 0.5), 1.5, 3, -19.3);
   for (var dp = 0; dp < 3; dp++) P(g, box(3.6, 0.15, 0.1, 0x3a2818), 0, 1.5 + dp * 2.2, -19.35);
-  for (var p = 0; p < 10; p++) P(g, box(4, 0.4, 3, STONE), p % 2 ? 2 : -2, -0.8, 2 - p * 3);
+  for (var p = 0; p < 10; p++) P(g, box(4, 0.4, 3, STONE), p % 2 ? 2 : -2, -0.74, 2 - p * 3);
   for (var t = 0; t < 5; t++) { P(g, box(0.8, 0.8, 0.8, GOLD, GOLD, 0.8), -6, 0, 0 - t * 5); g.add(glowLight(GOLD, 0.8, 12, -6, 1, 0 - t * 5)); }
   cow(g, -18, 0, -15); cow(g, 22, 0, -25); pig(g, 18, 0, -10); pig(g, -22, 0, -30);
   sheep(g, -28, 0, -18); sheep(g, 28, 0, -35);
@@ -136,7 +136,8 @@ export function buildCampus(g) {
   pillager(g, -32, 0, -20); drowned(g, 0, -2, -44); phantom(g, 30, 24, -8);
   warden(g, 40, 0, -48); guardian(g, 0, -2, -44);
   for (var e = 0; e < 20; e++) {
-    var ember = P(g, box(0.3, 0.3, 0.3, GOLD, GOLD, 1), (Math.random() - 0.5) * 40, Math.random() * 18, (Math.random() - 0.5) * 30);
+    // kept above y=11 so the descent corridor through the arch stays clear
+    var ember = P(g, box(0.3, 0.3, 0.3, GOLD, GOLD, 1), (Math.random() - 0.5) * 40, 11 + Math.random() * 13, (Math.random() - 0.5) * 30);
     ember.userData.float = Math.random() * Math.PI * 2;
   }
 }

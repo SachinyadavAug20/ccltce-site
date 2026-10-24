@@ -42,14 +42,16 @@ export function initDragon(scene, camera, host) {
     m.visible = false; scene.add(m);
     orbs.push({ m: m, v: new THREE.Vector3(), life: 0 });
   }
-  function pick(e) {
+  function aim(e) {
     var r = host.getBoundingClientRect();
-    ndc.x = ((e.clientX - r.left) / r.width) * 2 - 1;
-    ndc.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    ndc.x = ((e.clientX - r.left) / r.width) * 2 - 1; ndc.y = -((e.clientY - r.top) / r.height) * 2 + 1;
     ray.setFromCamera(ndc, camera);
-    return ray.intersectObject(hitbox, false).length > 0;
+    var h = ray.intersectObject(hitbox, false); return h.length ? h[0].distance : null;
   }
-  function ui() { var el = document.getElementById("dragon-hp"); if (el) el.textContent = hp > 0 ? "HP " + hp + " / 3" : "SLAIN!"; }
+  function pick(e) { return aim(e) !== null; }
+  function ui() { var el = document.getElementById("dragon-hp"); if (!el) return;
+    el.textContent = hp > 0 ? "HP " + hp + " / 3" : "SLAIN!";
+    var ov = el.closest(".narrative-overlay"); if (ov) ov.classList.toggle("slain", hp <= 0); }
   function fallOrbs(dt) {
     for (var i = 0; i < orbs.length; i++) {
       var o = orbs[i]; if (o.life <= 0) continue;
@@ -137,6 +139,7 @@ export function initDragon(scene, camera, host) {
     },
     hp: function () { return hp; },
     state: function () { return state; },
+    aim: function (e) { return api.armed && state === "alive" ? aim(e) : null; },
     headScreen: function () {
       var v = head ? head.getWorldPosition(new THREE.Vector3()) : new THREE.Vector3();
       v.project(camera);

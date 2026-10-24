@@ -4,6 +4,8 @@ import { buildScene } from "./narrative-scene.js";
 import { createCameraPath, phaseAt, dimAt } from "./narrative-camera.js";
 import { initDragon } from "./narrative-dragon.js";
 import { createLighting } from "./narrative-light.js";
+import { createPerf } from "./narrative-perf.js";
+import { initCrystals } from "./narrative-crystals.js";
 
 (function () {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -17,14 +19,17 @@ import { createLighting } from "./narrative-light.js";
     wrapper.prepend(canvas);
   }
   var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setSize(innerWidth, innerHeight, false);
   var camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 500);
   var built = buildScene(), scene = built.scene, L = built.lights;
   var curve = createCameraPath(), stations = built.stations;
   var viewport = wrapper.querySelector(".narrative-viewport");
+  var perf = createPerf({ renderer: renderer, scene: scene, section: wrapper, camera: camera });
+  window.CCLTCE_PERF = perf.profile();
+  window.CCLTCE_PERF_LIVE = perf.profile;   // live re-read: budget must stay a constant count
   var dragon = initDragon(scene, camera, viewport);
   window.CCLTCE_DRAGON = dragon;
+  var crystals = initCrystals(scene, camera, viewport);
+  window.CCLTCE_CRYSTALS = crystals;
   var hint = wrapper.querySelector(".narrative-hint");
   var lookV = new THREE.Vector3(), lookA = new THREE.Vector3();
   var light = createLighting(scene, L);
@@ -54,14 +59,16 @@ import { createLighting } from "./narrative-light.js";
   var lookSm = new THREE.Vector3();
   function animate() {
     requestAnimationFrame(animate);
-    if (document.hidden) return;
     var el = clock.getElapsedTime(), dt = Math.min(0.1, Math.max(0.001, el - lastEl));
     lastEl = el;
+    if (document.hidden || !perf.visible()) return;   // off-screen: no draw, no light work
+    perf.frame(dt);
     if (stations.s1) stations.s1.rotation.y = Math.sin(el * 0.3) * 0.12;
     if (stations.s2) stations.s2.rotation.y = el * 0.15;
     if (stations.s3) stations.s3.rotation.y = el * 0.2;
-    scene.traverse(function (o) {
-      var u = o.userData;
+    var anim = perf.anim;
+    for (var ai = 0; ai < anim.length; ai++) {
+      var o = anim[ai], u = o.userData;
       if (u.float !== undefined) { o.position.y += Math.sin(el * 1.2 + u.float) * 0.004; o.rotation.y = Math.sin(el * 0.6 + u.float) * 0.3; }
       if (u.blink !== undefined) o.visible = Math.sin(el * 4 + u.blink * 1.7) > -0.3;
       if (u.pulse !== undefined) { var s = 1 + Math.sin(el * 2 + u.pulse) * 0.12; o.scale.set(s, s, s); }
@@ -71,7 +78,7 @@ import { createLighting } from "./narrative-light.js";
       }
       if (u.cart) { o.position.x = 40 + ((el * 6) % 160); o.position.y = 5.5 + Math.sin(el * 3) * 0.1; }
       if (u.cloud !== undefined) o.position.x = u.baseX + Math.sin(el * 0.02 + u.cloud) * 10;
-    });
+    }
     // damped scroll follow — the frame loop owns the camera so nothing drifts off-screen
     progress.s += (progress.t - progress.s) * (1 - Math.pow(0.0004, dt));
     if (Math.abs(progress.t - progress.s) < 0.0002) progress.s = progress.t;
@@ -80,10 +87,11 @@ import { createLighting } from "./narrative-light.js";
     var look = lookA.copy(curve.getPointAt(Math.min(u + 0.04, 1))), shake = 0;
     if (dragon) {
       dragon.update(el);
-      var w = u > 0.84 ? clamp01((u - 0.84) / 0.08) : 0;   // finale — keep the boss framed
+      var w = u > 0.75 ? clamp01((u - 0.75) / 0.1) : 0;   // dive → finale: keep the boss framed
       if (w > 0) look.lerp(dragon.look(lookV), w);
       shake = dragon.shake();
     }
+    crystals.update(dt);
     if (firstLook) { lookSm.copy(look); firstLook = false; }
     else lookSm.lerp(look, 1 - Math.pow(0.0005, dt));
     camera.lookAt(lookSm);
@@ -103,17 +111,27 @@ import { createLighting } from "./narrative-light.js";
     if (dim !== lastDim) {
       lastDim = dim; progress.dim = dim; light.sky(dim); light.lights(dim);
       if (dragon) dragon.armed = dim === "end";
+      crystals.armed = dim === "end";
       window.CCLTCE_DIM = dim;
       document.documentElement.setAttribute("data-dim", dim);
       if (window.CCLTCE_SFX && window.CCLTCE_SFX.setPhase) window.CCLTCE_SFX.setPhase(dim);
     }
   }
   addEventListener("scroll", onScroll, { passive: true });
-  viewport.addEventListener("pointermove", function (e) { if (dragon) dragon.hover(e); }, { passive: true });
-  viewport.addEventListener("click", function (e) { if (dragon) dragon.click(e); });
+  viewport.addEventListener("pointermove", function (e) {
+    var c = crystals.peek(e), d = dragon ? dragon.aim(e) : null;
+    if (dragon) dragon.hover(e);
+    if (c && (d === null || c.distance < d)) viewport.style.cursor = "crosshair";
+  }, { passive: true });
+  // nearest target wins, so a crystal behind the boss can't steal its hit
+  viewport.addEventListener("click", function (e) {
+    var c = crystals.peek(e), d = dragon ? dragon.aim(e) : null;
+    if (c && (d === null || c.distance < d)) crystals.hit(e);
+    else if (d !== null) dragon.click(e);
+  });
   addEventListener("resize", function () {
     camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight, false);
+    perf.resize();
   });
   light.sky("overworld"); light.lights("overworld");
   updateOverlays(0);

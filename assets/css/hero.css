@@ -25,12 +25,7 @@
     0 0 96px rgba(23, 221, 98, 0.38);
 }
 
-/* bottom-only black filter over the void strip under the platform — no full-scene veil */
-.hero-overlay::before {
-  content: ""; position: absolute; inset: 0;
-  background: linear-gradient(to bottom, transparent 46%, rgba(0, 0, 0, 0.5) 74%, rgba(0, 0, 0, 0.92) 100%);
-  pointer-events: none;
-}
+/* no dark veil over the scene — the hero text carries its own contact shadows */
 
 /* block lettering — glow-squid bloom over a tight dark contact shadow (reads on any scene) */
 .hero-title {

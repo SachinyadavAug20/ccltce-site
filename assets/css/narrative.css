@@ -73,6 +73,7 @@
   color: #ff5555; border: 1px solid #ff2222; background: rgba(255, 34, 34, 0.12);
   text-shadow: 1px 1px 0 #000;
 }
+.narrative-overlay .n-cry { color: #c026d3; border-color: #c026d3; background: rgba(192, 38, 211, 0.14); }
 .narrative-overlay .n-accent {
   display: inline-block; width: 8px; height: 8px;
   margin-right: 6px; background: var(--gold); vertical-align: middle;
@@ -82,6 +83,12 @@
 .narrative-overlay.station-3 .n-accent { background: var(--emerald-hi); }
 .narrative-overlay.bedrock { right: auto; left: 50%; transform: translateX(-50%) translateY(16px); text-align: center; }
 .narrative-overlay.bedrock.on { transform: translateX(-50%) translateY(0); }
+
+/* post-kill: revealed once the dragon reads SLAIN! */
+.narrative-overlay .n-after { display: none; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+.narrative-overlay.slain .n-after { display: flex; animation: afterRise 0.5s ease-out both; }
+.narrative-overlay.slain #dragon-hp { color: #17dd62; border-color: #17dd62; background: rgba(23, 221, 98, 0.14); }
+@keyframes afterRise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
 /* scroll hint */
 .narrative-hint {
