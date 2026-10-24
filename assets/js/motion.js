@@ -7,8 +7,8 @@
   document.documentElement.classList.add("gsap-ready");
 
   function init() {
-    // hero intro
-    var hero = document.querySelector(".hero");
+    // hero intro — works with both .hero and .hero-overlay
+    var hero = document.querySelector(".hero, .hero-overlay");
     if (hero) {
       var intro = [".hero-logo", ".hero-title", ".hero-sub", ".hero-cta"]
         .map(function (s) { return hero.querySelector(s); }).filter(Boolean);

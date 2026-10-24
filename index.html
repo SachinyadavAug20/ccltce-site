@@ -17,13 +17,14 @@
   <meta property="og:url" content="https://ccltce.github.io/" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Coding Club — CCLTCE | LTCOE" />
-  <meta name="twitter:description" content="Coding Club LTCE (CCLTCE) — build, ship and break things. Events, challenges, resources and the core team at Lokmanya Tilak College of Engineering." />
+  <meta name="twitter:description" content="Coding Club LTCE (CCLTCE) — build, ship and break things." />
   <meta name="twitter:image" content="https://ccltce.github.io/assets/img/ccltce-logo.png" />
   <link rel="icon" href="assets/img/favicon.png" type="image/png" />
   <link rel="stylesheet" href="assets/css/global.css" />
   <link rel="stylesheet" href="assets/css/nav.css" />
   <link rel="stylesheet" href="assets/css/brand.css" />
   <link rel="stylesheet" href="assets/css/hero.css" />
+  <link rel="stylesheet" href="assets/css/narrative.css" />
   <link rel="stylesheet" href="assets/css/components.css" />
   <link rel="stylesheet" href="assets/css/footer.css" />
   <link rel="stylesheet" href="assets/css/gamify.css" />
@@ -37,19 +38,48 @@
   <header class="nav-wrap"></header>
 
   <main id="main">
-    <section class="hero">
-      <img class="hero-logo" src="assets/img/ccltce-logo.png" alt="Coding Club emblem" width="400" height="400" />
-      <h1 class="hero-title">Coding <em>Club</em></h1>
-      <p class="hero-sub">
-        Lokmanya Tilak College of Engineering
-        <small class="loc">Koparkhana &middot; Navi Mumbai</small>
-      </p>
-      <div class="hero-cta">
-        <a class="btn btn-primary" href="events.html">Browse Events</a>
-        <a class="btn" href="challenges.html">Take a Challenge</a>
-      </div>
-    </section>
+    <div id="narrative-scroll">
+      <div class="narrative-viewport">
+        <section class="hero-overlay">
+          <img class="hero-logo" src="assets/img/ccltce-logo.png" alt="Coding Club emblem" width="400" height="400" />
+          <h1 class="hero-title">Coding <em>Club</em></h1>
+          <p class="hero-sub">
+            Lokmanya Tilak College of Engineering
+            <small class="loc">Koparkhana &middot; Navi Mumbai</small>
+          </p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="events.html">Browse Events</a>
+            <a class="btn" href="challenges.html">Take a Challenge</a>
+          </div>
+        </section>
 
+        <p class="narrative-hint">▼ SCROLL TO DESCEND ▼</p>
+
+        <div class="narrative-overlay station-1">
+          <p class="n-label"><span class="n-accent"></span>[TRACK 01 // SYSTEMS &amp; INFRA]</p>
+          <h2 class="n-title">From Bare Metal to Cloud Pipelines</h2>
+          <p class="n-desc">Mastering Linux, distributed microservices, and full-stack systems.</p>
+        </div>
+
+        <div class="narrative-overlay station-2">
+          <p class="n-label"><span class="n-accent"></span>[TRACK 02 // ALGORITHMS]</p>
+          <h2 class="n-title">Codeforces &amp; DSA Mastery</h2>
+          <p class="n-desc">Graph theory, dynamic programming, and competitive problem-solving.</p>
+        </div>
+
+        <div class="narrative-overlay station-3">
+          <p class="n-label"><span class="n-accent"></span>[TRACK 03 // INTELLIGENCE]</p>
+          <h2 class="n-title">WebGL, Raylib &amp; Local Neural Models</h2>
+          <p class="n-desc">Pushing pixels and training intelligent agents on campus hardware.</p>
+        </div>
+
+        <div class="narrative-overlay bedrock">
+          <p class="n-label"><span class="n-accent"></span>[BEDROCK CORE]</p>
+          <h2 class="n-title">Terminal &amp; Challenge Arena</h2>
+          <p class="n-desc">You've reached the deepslate. Open the terminal with <code>`</code> or explore below.</p>
+        </div>
+      </div>
+    </div>
   </main>
 
   <footer></footer>
@@ -69,6 +99,7 @@
   <script src="assets/js/gamify.js"></script>
   <script src="assets/js/mobileTabs.js"></script>
   <script type="module" src="assets/js/bg.js"></script>
+  <script type="module" src="assets/js/narrative.js"></script>
   <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,123 @@
+/* ---------- narrative scroll — 3D journey overlays ---------- */
+#narrative-scroll {
+  position: relative;
+  height: 500vh; /* scroll length for the pinned journey */
+}
+
+#narrative-webgl {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.narrative-viewport {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* hero sits inside narrative, fades on scroll */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 5;
+  pointer-events: none;
+  transition: none;
+}
+.hero-overlay .btn { pointer-events: auto; }
+
+/* station overlays — slide in from right */
+.narrative-overlay {
+  position: absolute;
+  bottom: 12%;
+  right: 6%;
+  max-width: 420px;
+  padding: 1.4rem 1.6rem;
+  background: rgba(20, 20, 22, 0.92);
+  border: 2px solid #3f3f46;
+  box-shadow: inset 2px 2px 0 #2a2a2e, inset -2px -2px 0 #101012, 0 8px 0 rgba(0,0,0,0.5);
+  font-family: var(--mono);
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.35s ease-out, transform 0.35s ease-out;
+  z-index: 6;
+  pointer-events: none;
+}
+.narrative-overlay.on {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.narrative-overlay .n-label {
+  font-family: var(--disp);
+  font-size: 0.45rem;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.6rem;
+  text-shadow: 1px 1px 0 #000;
+}
+.narrative-overlay .n-title {
+  font-family: var(--disp);
+  font-size: 0.7rem;
+  color: #f4f4f5;
+  text-shadow: 2px 2px 0 #09090b;
+  line-height: 1.6;
+  margin-bottom: 0.6rem;
+}
+.narrative-overlay .n-desc {
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+.narrative-overlay .n-accent {
+  display: inline-block;
+  width: 8px; height: 8px;
+  margin-right: 6px;
+  background: var(--gold);
+  vertical-align: middle;
+}
+.narrative-overlay.station-1 .n-accent { background: var(--redstone); }
+.narrative-overlay.station-2 .n-accent { background: var(--gold); }
+.narrative-overlay.station-3 .n-accent { background: var(--emerald-hi); }
+.narrative-overlay.bedrock { right: auto; left: 50%; transform: translateX(-50%) translateY(40px); text-align: center; }
+.narrative-overlay.bedrock.on { transform: translateX(-50%) translateY(0); }
+
+/* scroll hint */
+.narrative-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--disp);
+  font-size: 0.45rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  z-index: 7;
+  animation: hintBob 2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes hintBob { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
+
+@media (max-width: 700px) {
+  .narrative-overlay { right: 4%; left: 4%; max-width: none; bottom: 8%; }
+  .narrative-overlay.bedrock { right: 4%; left: 4%; transform: translateY(40px); }
+  .narrative-overlay.bedrock.on { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #narrative-scroll { height: auto; }
+  #narrative-webgl { display: none; }
+  .narrative-overlay { position: relative; opacity: 1; transform: none; bottom: auto; right: auto; margin: 1rem auto; max-width: 480px; }
+  .narrative-hint { display: none; }
+}
