@@ -3,13 +3,17 @@ window.CCLTCE_CE = (function () {
   var KW = {
     js: /^(function|return|var|let|const|if|else|for|while|do|break|continue|new|typeof|null|undefined|true|false|this|class|import|export|async|await|try|catch|throw|switch|case|default|in|of|void|yield|static|get|set)$/,
     py: /^(def|return|if|elif|else|for|while|break|continue|import|from|as|class|try|except|finally|raise|with|lambda|None|True|False|and|or|not|in|is|pass|global|yield|assert|del|async|await)$/,
+    cpp: /^(int|float|double|char|bool|void|auto|long|short|unsigned|signed|const|static|struct|class|public|private|protected|template|typename|return|if|else|for|while|do|break|continue|switch|case|default|new|delete|true|false|nullptr|namespace|using|std|vector|string|size_t)$/,
   };
   function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function hlLine(line, lang) {
     var out = "", i = 0;
     while (i < line.length) {
       if (line[i] === "/" && line[i + 1] === "/") return out + '<span class="ce-c">' + esc(line.slice(i)) + "</span>";
-      if (line[i] === "#") return out + '<span class="ce-c">' + esc(line.slice(i)) + "</span>";
+      if (line[i] === "#") {
+        if (lang === "cpp") return out + '<span class="ce-k">' + esc(line.slice(i)) + "</span>";
+        return out + '<span class="ce-c">' + esc(line.slice(i)) + "</span>";
+      }
       if (line[i] === '"' || line[i] === "'" || line[i] === "`") {
         var q = line[i], j = i + 1;
         while (j < line.length && line[j] !== q) { if (line[j] === "\\") j++; j++; }
