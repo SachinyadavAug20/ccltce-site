@@ -62,11 +62,11 @@ export function buildCampus(g) {
   P(g, box(140, 2, 100, 0x2d5a1e), 0, -2, -10);
   P(g, box(140, 4, 100, 0x6b4423), 0, -5, -10);
   for (var gp = 0; gp < 15; gp++) P(g, box(2, 0.15, 2, 0x3d7a28), gp % 2 ? 1.5 : -1.5, -0.9, 5 - gp * 3);
-  P(g, box(5, 20, 5, STONE), -12, 9, -8); P(g, box(5, 20, 5, STONE), 12, 9, -8);
-  P(g, box(32, 5, 5, STONE), 0, 21, -8); P(g, box(36, 2, 8, DARKOAK), 0, 24, -8);
-  P(g, box(14, 3, 0.5, GOLD, GOLD, 0.5), 0, 21, -5.2);
-  g.add(glowLight(GOLD, 2, 30, 0, 20, -4));
-  [-10, 10].forEach(function (x) { torch(g, x, 15, -5); });
+  P(g, box(5, 11, 5, STONE), -12, 4.5, -8); P(g, box(5, 11, 5, STONE), 12, 4.5, -8);
+  P(g, box(32, 4, 5, STONE), 0, 12, -8); P(g, box(36, 1.5, 8, DARKOAK), 0, 14.75, -8);
+  P(g, box(14, 2.5, 0.5, GOLD, GOLD, 0.5), 0, 12, -5.2);
+  g.add(glowLight(GOLD, 2, 30, 0, 12, -4));
+  [-10, 10].forEach(function (x) { torch(g, x, 8, -5); });
   tree(g, -25, -5, 1.2); tree(g, 25, -5, 1.1); tree(g, -20, -20, 1.4); tree(g, 20, -20, 1.3);
   tree(g, -30, -35, 1); tree(g, 30, -35, 1.1); tree(g, 15, -45, 0.9); tree(g, -15, -45, 1);
   tree(g, -38, -12, 1.3); tree(g, 38, -12, 1.2); tree(g, -42, -30, 1.1); tree(g, 42, -30, 1);
@@ -81,10 +81,10 @@ export function buildCampus(g) {
     P(g, box(3, 4, 0.5, GOLD, GOLD, 0.4), -20 + i * 5.7, 7, -20);
     P(g, box(3.5, 0.3, 0.8, STONE), -20 + i * 5.7, 4.8, -19.8);
   }
-  P(g, box(5, 8.5, 1.2, STONE), 0, 3.25, -19.5);
-  P(g, box(3.8, 7.5, 0.4, DARKOAK), 0, 3, -19.3);
-  P(g, box(0.3, 0.3, 0.3, GOLD, GOLD, 0.5), 1.5, 3, -19);
-  for (var dp = 0; dp < 3; dp++) P(g, box(3.6, 0.15, 0.1, 0x3a2818), 0, 1.5 + dp * 2.2, -19.1);
+  P(g, box(5, 8.5, 0.5, STONE), 0, 3.25, -19.75);
+  P(g, box(3.8, 7.5, 0.3, DARKOAK), 0, 3, -19.5);
+  P(g, box(0.3, 0.3, 0.3, GOLD, GOLD, 0.5), 1.5, 3, -19.3);
+  for (var dp = 0; dp < 3; dp++) P(g, box(3.6, 0.15, 0.1, 0x3a2818), 0, 1.5 + dp * 2.2, -19.35);
   for (var p = 0; p < 10; p++) P(g, box(4, 0.4, 3, STONE), p % 2 ? 2 : -2, -0.8, 2 - p * 3);
   for (var t = 0; t < 5; t++) { P(g, box(0.8, 0.8, 0.8, GOLD, GOLD, 0.8), -6, 0, 0 - t * 5); g.add(glowLight(GOLD, 0.8, 12, -6, 1, 0 - t * 5)); }
   cow(g, -18, 0, -15); cow(g, 22, 0, -25); pig(g, 18, 0, -10); pig(g, -22, 0, -30);
@@ -99,7 +99,7 @@ export function buildCampus(g) {
   ironGolem(g, -3, 0, -16); snowGolem(g, 14, 0, -28);
   spider(g, -34, 0, -44); zombie(g, 34, 0, -44); skeleton(g, -36, 0, -30);
   creeper(g, 36, 0, -30); slime(g, -24, 0, -46); witch(g, 28, 0, -46);
-  pillager(g, -32, 0, -20); drowned(g, 0, -2, -44); phantom(g, 0, 14, -30);
+  pillager(g, -32, 0, -20); drowned(g, 0, -2, -44); phantom(g, 30, 24, -8);
   warden(g, 40, 0, -48); guardian(g, 0, -2, -44);
   for (var e = 0; e < 20; e++) {
     var ember = P(g, box(0.3, 0.3, 0.3, GOLD, GOLD, 1), (Math.random() - 0.5) * 40, Math.random() * 18, (Math.random() - 0.5) * 30);
