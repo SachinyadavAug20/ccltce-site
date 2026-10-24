@@ -95,8 +95,8 @@ export function buildCampus(g) {
   g.add(glowLight(GOLD, 2, 30, 0, 12, -4));
   [-10, 10].forEach(function (x) { torch(g, x, 8, -5); });
   tree(g, -25, -5, 1.2); tree(g, 25, -5, 1.1); tree(g, -20, -20, 1.4); tree(g, 20, -20, 1.3);
-  tree(g, -30, -35, 1); tree(g, 30, -35, 1.1); tree(g, 15, -45, 0.9); tree(g, -15, -45, 1);
-  tree(g, -38, -12, 1.3); tree(g, 38, -12, 1.2); tree(g, -42, -30, 1.1); tree(g, 42, -30, 1);
+  tree(g, -40, -40, 1); tree(g, 30, -35, 1.1); tree(g, 15, -45, 0.9); tree(g, -15, -45, 1);
+  tree(g, -44, -16, 1.3); tree(g, 34, -26, 1.2); tree(g, -42, -30, 1.1); tree(g, 42, -30, 1);
   bush(g, -16, -10); bush(g, 16, -12); bush(g, -24, -40); bush(g, 24, -38);
   bush(g, -8, -36); bush(g, 8, -36); bush(g, -34, -4); bush(g, 34, -4);
   rock(g, -14, -42, 1.2); rock(g, 14, -44, 1); rock(g, -36, -46, 1.4); rock(g, 30, -16, 0.9);

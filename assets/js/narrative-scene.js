@@ -3,6 +3,7 @@ import * as THREE from "../vendor/three.module.js";
 import { GOLD, EMER, RED, AMETH, STONE, STONE2, DEEP, DARK, DARKOAK, QUARTZ, box, glowLight, torch } from "./narrative-blocks.js";
 import { buildNether, buildEnd } from "./narrative-zones.js";
 import { buildCampus } from "./narrative-campus.js";
+import { buildGlow } from "./narrative-glow.js";
 
 function P(g, m, x, y, z) { m.position.set(x, y, z); g.add(m); return m; }
 
@@ -79,12 +80,12 @@ export function buildScene() {
   var world = new THREE.Group(); scene.add(world);
   buildCampus(world);
   var stations = buildTrack(world);
-  buildNether(world); buildEnd(world); buildBedrock(world);
+  buildNether(world); buildEnd(world); buildBedrock(world); buildGlow(world);
   scene.userData.skyPresets = {
     overworld: { sky: 0x78a7ff, fog: 0xbdd5ff, d: 0.0028 },
-    nether: { sky: 0x3a0a0a, fog: 0x4a1515, d: 0.011 },
-    end: { sky: 0x0a0512, fog: 0x120a20, d: 0.007 },
-    bedrock: { sky: 0x050508, fog: 0x0a0a10, d: 0.013 },
+    nether: { sky: 0x4a1010, fog: 0x5e1e1e, d: 0.0085 },
+    end: { sky: 0x120a22, fog: 0x1e1233, d: 0.0045 },
+    bedrock: { sky: 0x0a0a12, fog: 0x12121c, d: 0.010 },
   };
   return { scene: scene, stations: stations, lights: { amb: amb, sun: sun, fill: fill, hemi: hemi } };
 }

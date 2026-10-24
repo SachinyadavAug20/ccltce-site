@@ -2,7 +2,7 @@
 import * as THREE from "../vendor/three.module.js";
 import {
   GOLD, NETHERRACK, LAVA, GLOWSTONE, ENDSTONE, OBSIDIAN, PURPUR, END_ROD,
-  SOUL, WARP, AMETH, box, glowLight,
+  SOUL, WARP, AMETH, box, glowLight, torch,
 } from "./narrative-blocks.js";
 import { piglin, hoglin, ghast, magmaCube, blaze, witherSkeleton } from "./narrative-mobs.js";
 import { strider, piglinBrute, zombifiedPiglin, endermite } from "./narrative-mobs3.js";
@@ -17,6 +17,10 @@ export function buildNether(g) {
   // Shell: floor, ceiling, walls (netherrack)
   P(g, box(160, 4, 80, NETHERRACK), 120, 22, 10); P(g, box(160, 4, 80, NETHERRACK), 120, -3, 10);
   P(g, box(160, 24, 4, NETHERRACK), 120, 9, -28); P(g, box(160, 24, 4, NETHERRACK), 120, 9, 48);
+  // Entry face sealed with a doorway (z 14..30, y -1..16) so no overworld sky leaks through
+  P(g, box(4, 24, 44, NETHERRACK), 40, 9, -8); P(g, box(4, 24, 20, NETHERRACK), 40, 9, 40);
+  P(g, box(4, 8, 16, NETHERRACK), 40, 20, 22); P(g, box(4, 4, 16, NETHERRACK), 40, -3, 22);
+  torch(g, 42.6, 0, 16); torch(g, 42.6, 0, 28);
   // Basalt delta pillars
   var B = 0x3a3a3e;
   for (var bp = 0; bp < 10; bp++) { var bx = 48 + bp * 15, bz = (bp % 2 ? -18 : 32); P(g, box(3 + (bp % 3), 12 + (bp % 4) * 3, 3 + (bp % 3), B), bx, 4 + (bp % 4) * 1.5, bz); }
@@ -115,11 +119,11 @@ export function buildEnd(g) {
     P(g, box(2, 10 + pp2 * 2, 2, PURPUR), ppx, -22 + pp2, 35);
     P(g, box(2.5, 1, 2.5, 0xc4b4d4), ppx, -16.5 + pp2 * 3, 35);
   }
-  // End ship (floating purpur hull with end rod mast)
-  P(g, box(8, 2, 4, PURPUR), 210, -12, 40); P(g, box(6, 1.5, 3, 0xc4b4d4), 210, -10.5, 40);
-  P(g, box(0.4, 6, 0.4, END_ROD, END_ROD, 0.8), 210, -7, 40); P(g, box(3, 2, 0.2, END_ROD, END_ROD, 0.6), 210, -5, 40);
-  P(g, box(1.5, 1.5, 1.5, AMETH, AMETH, 0.5), 214, -12, 40);
-  g.add(glowLight(AMETH, 1.5, 25, 214, -11, 40));
+  // End ship (floating purpur hull with end rod mast) — moored off the island edge, clear of the fight camera
+  P(g, box(8, 2, 4, PURPUR), 214, -15, 70); P(g, box(6, 1.5, 3, 0xc4b4d4), 214, -13.5, 70);
+  P(g, box(0.4, 6, 0.4, END_ROD, END_ROD, 0.8), 214, -10, 70); P(g, box(3, 2, 0.2, END_ROD, END_ROD, 0.6), 214, -8, 70);
+  P(g, box(1.5, 1.5, 1.5, AMETH, AMETH, 0.5), 218, -15, 70);
+  g.add(glowLight(AMETH, 1.5, 25, 218, -14, 70));
   // End gateway portal frame (obsidian mini-pillars)
   P(g, box(5, 0.5, 5, OBSIDIAN), 200, -26.5, 20);
   [[-2, -2], [2, -2], [-2, 2], [2, 2]].forEach(function (gp) {
