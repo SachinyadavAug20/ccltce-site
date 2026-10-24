@@ -4,6 +4,7 @@ import {
 } from "./narrative-blocks.js";
 import { piglin, hoglin, ghast, magmaCube, blaze, witherSkeleton } from "./narrative-mobs.js";
 import { strider, piglinBrute, zombifiedPiglin } from "./narrative-mobs3.js";
+import { buildBiomes } from "./narrative-biomes.js";
 
 function P(g, m, x, y, z) { m.position.set(x, y, z); g.add(m); return m; }
 function fx(g, c, n, x0, span, yMax, zSpan) {
@@ -23,6 +24,7 @@ export function buildNether(g) {
   P(g, box(4, 24, 46, NETHERRACK), 202, 9, -7); P(g, box(4, 24, 14, NETHERRACK), 202, 9, 43);
   P(g, box(4, 7, 20, NETHERRACK), 202, 19.5, 26);
   torch(g, 42.6, 0, 16); torch(g, 42.6, 0, 28);
+  buildBiomes(g);   // crimson/warped/soul/basalt patches lining both sides of the camera path
   // Basalt delta pillars
   var B = 0x3a3a3e;
   for (var bp = 0; bp < 10; bp++) { var bx = 48 + bp * 15, bz = (bp % 2 ? -18 : 32); P(g, box(3 + (bp % 3), 12 + (bp % 4) * 3, 3 + (bp % 3), B), bx, 4 + (bp % 4) * 1.5, bz); }
@@ -75,16 +77,16 @@ export function buildNether(g) {
   P(g, box(18, 2, 12, BK), 168, 12, -18); P(g, box(12, 3, 8, 0x1a1a1e), 168, 14.5, -18);
   P(g, box(6, 5, 6, GOLD, GOLD, 0.3), 168, 17, -18);
   g.add(glowLight(GOLD, 2, 30, 168, 18, -18));
-  // Mobs
-  piglin(g, 55, 4, -4); piglin(g, 95, 4, 5); piglin(g, 140, 4, -3);
-  piglinBrute(g, 152, 4, 14); piglinBrute(g, 110, 4, 0);
-  hoglin(g, 75, 4, 8); hoglin(g, 130, 4, -8);
-  zombifiedPiglin(g, 62, 4, 6); zombifiedPiglin(g, 105, 4, -7); zombifiedPiglin(g, 158, 4, 2);
+  // Mobs — grounded on the floor top (y=-2); striders stand on lava (top y=-0.2)
+  piglin(g, 55, -2, -4); piglin(g, 95, -2, 5); piglin(g, 140, -2, -3);
+  piglinBrute(g, 152, -2, 14); piglinBrute(g, 110, 4, 0);
+  hoglin(g, 75, -2, 8); hoglin(g, 130, -2, -8);
+  zombifiedPiglin(g, 62, -2, 6); zombifiedPiglin(g, 105, -2, -7); zombifiedPiglin(g, 158, 4, 2);
   ghast(g, 100, 16, -10); ghast(g, 150, 14, 12);
-  magmaCube(g, 65, 4, 4); magmaCube(g, 115, 4, -5); magmaCube(g, 155, 4, 6);
+  magmaCube(g, 65, -2, 4); magmaCube(g, 115, -2, -5); magmaCube(g, 155, -2, 6);
   blaze(g, 85, 14, -3); blaze(g, 145, 15, 4);
-  witherSkeleton(g, 70, 4, -2); witherSkeleton(g, 125, 4, 3); witherSkeleton(g, 160, 4, -4);
-  strider(g, 78, 2, 10); strider(g, 132, 2, -10); strider(g, 95, 2, 10);
+  witherSkeleton(g, 70, 4, -2); witherSkeleton(g, 125, -2, 3); witherSkeleton(g, 160, -2, -4);
+  strider(g, 78, -0.2, 10); strider(g, 132, -0.2, -10); strider(g, 110, -0.2, 10);
   fx(g, SOUL, 25, 45, 150, 20, 35); fx(g, LAVA, 15, 50, 140, 15, 30);
   g.add(glowLight(0xff6622, 2, 100, 100, 5, 0)); g.add(glowLight(LAVA, 1.5, 70, 80, 0, 5));
 }

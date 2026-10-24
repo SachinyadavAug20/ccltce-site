@@ -93,9 +93,13 @@
     q(".tf-item").innerHTML = d.item ? 'Holds: <b>' + String(d.item).replace(/[&<>]/g, "") + "</b>" : "";
     q(".tf-strip").style.background = d.accent || "#17DD62";
     q(".tf-badge").style.background = d.accent || "#17DD62";
-    q(".tf-links").innerHTML = [["PORT", d.portfolio], ["GH", "https://github.com/" + d.github],
-      ["X", "https://x.com/" + d.twitter], ["LI", "https://linkedin.com/in/" + d.linkedin]]
+    // only the handles a member actually filled in — never a dead root-domain link
+    var btns = [["PORT", d.portfolio], ["GH", d.github && "https://github.com/" + d.github],
+      ["X", d.twitter && "https://x.com/" + d.twitter], ["LI", d.linkedin && "https://linkedin.com/in/" + d.linkedin]]
+      .filter(function (l) { return l[1]; })
       .map(function (l) { return '<a class="tf-btn" href="' + l[1] + '" target="_blank" rel="noopener">' + l[0] + "</a>"; }).join("");
+    q(".tf-links").innerHTML = btns;
+    q(".tf-links").style.display = btns ? "flex" : "none";
     ov.hidden = false;
     document.body.style.overflow = "hidden";
     q(".tf-close").focus();
@@ -107,8 +111,10 @@
       .fromTo(panel, { y: 34, scale: 0.86, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.8)" }, "-=0.05")
       .fromTo(q(".tf-head"), { scale: 0, rotation: -10 }, { scale: 1, rotation: 0, duration: 0.34, ease: "back.out(2.4)" }, "-=0.14")
       .fromTo(q(".tf-badge"), { scaleX: 0 }, { scaleX: 1, duration: 0.2, ease: "steps(5)" }, "-=0.16")
-      .fromTo(parts, { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2, stagger: 0.05, ease: "power2.out" }, "-=0.08")
-      .fromTo(q(".tf-links").children, { scale: 0 }, { scale: 1, duration: 0.2, stagger: 0.04, ease: "back.out(2.6)" }, "-=0.12");
+      .fromTo(parts, { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2, stagger: 0.05, ease: "power2.out" }, "-=0.08");
+    var lks = q(".tf-links").children;   // empty when the member filled in no handles
+    if (lks.length)
+      openTl.fromTo(lks, { scale: 0 }, { scale: 1, duration: 0.2, stagger: 0.04, ease: "back.out(2.6)" }, "-=0.12");
   }
 
   function close() {

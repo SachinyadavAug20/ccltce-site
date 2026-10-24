@@ -1,5 +1,6 @@
 /* ---------- Minecraft design system — dual typography ---------- */
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;600;700&display=swap");
+/* Fonts are loaded from each page's <head> (preconnect + stylesheet) so the CSS never
+   stalls on a nested @import round-trip before the first paint. */
 
 :root {
   --bg: #141414;

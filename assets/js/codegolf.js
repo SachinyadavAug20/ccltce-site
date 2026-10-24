@@ -3,21 +3,33 @@
   var mount = document.querySelector("[data-golf]");
   if (!mount) return;
   var PUZZLES = [
-    { prompt: "Return the sum of two numbers.", tests: [[2, 3, 5], [10, -4, 6], [0, 0, 0]] },
-    { prompt: "Return true if n is even, else false.", tests: [[4, true], [7, false], [0, true]] },
-    { prompt: "Return the larger of two numbers.", tests: [[3, 8, 8], [9, 2, 9], [-1, -5, -1]] },
-    { prompt: "Return the first letter of a string.", tests: [["hello", "h"], ["Mine", "M"], ["x", "x"]] },
-    { prompt: "Return n multiplied by 2.", tests: [[5, 10], [-3, -6], [0, 0]] },
-    { prompt: "Return the length of an array.", tests: [[[1, 2, 3], 3], [[], 0], [["a"], 1]] },
-    { prompt: "Return true if string contains 'a' (case-insensitive).", tests: [["cat", true], ["dog", false], ["A", true]] },
-    { prompt: "Return the last item of an array.", tests: [[[7, 8, 9], 9], [[1], 1], [["x", "y"], "y"]] },
-    { prompt: "Return true if a > b, else false.", tests: [[5, 3, true], [2, 2, false], [-1, -2, true]] },
-    { prompt: "Return a string reversed.", tests: [["abc", "cba"], ["hi", "ih"], ["a", "a"]] },
-    { prompt: "Return the sum of an array of numbers.", tests: [[[1, 2, 3], 6], [[], 0], [[-1, 1], 0]] },
-    { prompt: "Return true if number is positive (or zero).", tests: [[3, true], [-2, false], [0, true]] },
+    { prompt: "Return the sum of two numbers.", tests: [[2, 3, 5], [10, -4, 6], [0, 0, 0]], params: ["a", "b"], cppRet: "int", cppArgs: "int a, int b" },
+    { prompt: "Return true if n is even, else false.", tests: [[4, true], [7, false], [0, true]], params: ["n"], cppRet: "bool", cppArgs: "int n" },
+    { prompt: "Return the larger of two numbers.", tests: [[3, 8, 8], [9, 2, 9], [-1, -5, -1]], params: ["a", "b"], cppRet: "int", cppArgs: "int a, int b" },
+    { prompt: "Return the first letter of a string.", tests: [["hello", "h"], ["Mine", "M"], ["x", "x"]], params: ["s"], cppRet: "char", cppArgs: "string s" },
+    { prompt: "Return n multiplied by 2.", tests: [[5, 10], [-3, -6], [0, 0]], params: ["n"], cppRet: "int", cppArgs: "int n" },
+    { prompt: "Return the length of an array.", tests: [[[1, 2, 3], 3], [[], 0], [["a"], 1]], params: ["arr"], cppRet: "int", cppArgs: "vector<int> arr" },
+    { prompt: "Return true if string contains 'a' (case-insensitive).", tests: [["cat", true], ["dog", false], ["A", true]], params: ["s"], cppRet: "bool", cppArgs: "string s" },
+    { prompt: "Return the last item of an array.", tests: [[[7, 8, 9], 9], [[1], 1], [["x", "y"], "y"]], params: ["arr"], cppRet: "auto", cppArgs: "vector<int> arr" },
+    { prompt: "Return true if a > b, else false.", tests: [[5, 3, true], [2, 2, false], [-1, -2, true]], params: ["a", "b"], cppRet: "bool", cppArgs: "int a, int b" },
+    { prompt: "Return a string reversed.", tests: [["abc", "cba"], ["hi", "ih"], ["a", "a"]], params: ["s"], cppRet: "string", cppArgs: "string s" },
+    { prompt: "Return the sum of an array of numbers.", tests: [[[1, 2, 3], 6], [[], 0], [[-1, 1], 0]], params: ["arr"], cppRet: "int", cppArgs: "vector<int> arr" },
+    { prompt: "Return true if number is positive (or zero).", tests: [[3, true], [-2, false], [0, true]], params: ["n"], cppRet: "bool", cppArgs: "int n" },
   ];
   var P = PUZZLES[Math.floor(Date.now() / 86400000) % PUZZLES.length];
   var LANG = "js", pyReady = null;
+
+  function getTemplate(lang, pz) {
+    var pStr = (pz.params || ["a", "b"]).join(", ");
+    if (lang === "js") return "function solve(" + pStr + ") {\n  // your code\n}";
+    if (lang === "py") return "def solve(" + pStr + "):\n    # your code\n    pass";
+    if (lang === "cpp") {
+      var ret = pz.cppRet || "int", args = pz.cppArgs || "int a, int b";
+      var defRet = ret === "bool" ? "false" : ret === "string" ? '""' : ret === "char" ? "'\\0'" : "0";
+      return ret + " solve(" + args + ") {\n    // your code\n    return " + defRet + ";\n}";
+    }
+    return "";
+  }
 
   mount.innerHTML =
     '<div class="golf-card"><h3 class="golf-title">TODAY\'S 1-MINUTE MINING EXPEDITION</h3>' +
@@ -27,7 +39,8 @@
     }).join("\n") + "</pre>" +
     '<div class="golf-lang-row"><label class="golf-lang-lbl">LANGUAGE</label><div class="golf-lang">' +
     '<button type="button" class="golf-lang-btn active" data-lang="js">JS</button>' +
-    '<button type="button" class="golf-lang-btn" data-lang="py">PY</button></div></div>' +
+    '<button type="button" class="golf-lang-btn" data-lang="py">PY</button>' +
+    '<button type="button" class="golf-lang-btn" data-lang="cpp">CPP</button></div></div>' +
     '<textarea class="golf-code" spellcheck="false" rows="6"></textarea>' +
     '<div class="golf-row"><span class="golf-bytes">0 bytes</span><button class="btn golf-run" type="button">RUN</button></div>' +
     '<pre class="golf-log"></pre>' +
@@ -36,7 +49,6 @@
   var ta = mount.querySelector(".golf-code"), bytes = mount.querySelector(".golf-bytes"),
     log = mount.querySelector(".golf-log"), list = mount.querySelector(".golf-list"),
     runBtn = mount.querySelector(".golf-run");
-  var SAMPLES = { js: "function solve() {\n  // your code\n}", py: "def solve():\n    # your code\n    pass" };
 
   // mount code editor overlay
   var wrap = document.createElement("div");
@@ -52,13 +64,13 @@
   function setLang(l) {
     LANG = l;
     mount.querySelectorAll(".golf-lang-btn").forEach(function (b) { b.classList.toggle("active", b.dataset.lang === l); });
-    ta.value = SAMPLES[l]; re(); refresh();
+    ta.value = getTemplate(l, P); re(); refresh();
   }
   mount.querySelectorAll(".golf-lang-btn").forEach(function (b) {
     b.addEventListener("click", function () { setLang(b.dataset.lang); if (window.CCLTCE_SFX) CCLTCE_SFX.click(); });
   });
 
-  function countBytes(s) { return s.replace(/\/\/[^\n]*/g, "").replace(/#[^\n]*/g, "").replace(/\s+/g, "").length; }
+  function countBytes(s) { return s.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "").replace(/#[^\n]*/g, "").replace(/\s+/g, "").length; }
   function refresh() { bytes.textContent = countBytes(ta.value) + " bytes"; }
   ta.addEventListener("input", onChange);
   ta.addEventListener("scroll", function () { hl.scrollTop = ta.scrollTop; gut.scrollTop = ta.scrollTop; });
@@ -110,6 +122,41 @@
       if (log.textContent.indexOf("PASS") === -1) { log.textContent += "ERROR: " + (err.message || "runtime") + "\n"; log.classList.add("golf-err"); if (window.CCLTCE_SFX) CCLTCE_SFX.error(); }
     }
   }
+  function transpileCPP(src) {
+    var s = src;
+    s = s.replace(/#include\s*<[^>]+>/g, "").replace(/#include\s*"[^"]+"/g, "");
+    s = s.replace(/using\s+namespace\s+std\s*;/g, "");
+    s = s.replace(/\bstd::/g, "");
+    s = s.replace(/\breverse\s*\(\s*(\w+)\.begin\(\)\s*,\s*\1\.end\(\)\s*\)\s*;/g, "$1 = (Array.isArray($1) ? $1.slice().reverse() : $1.split('').reverse().join(''));");
+    s = s.replace(/\.size\(\)/g, ".length").replace(/\.length\(\)/g, ".length");
+    s = s.replace(/\.push_back\(([^)]+)\)/g, ".push($1)").replace(/\.pop_back\(\)/g, ".pop()");
+    s = s.replace(/for\s*\(\s*(?:[\w:<>*&]+)\s+(\w+)\s*:\s*([^)]+)\)/g, "for (let $1 of $2)");
+    s = s.replace(/(?:[\w:<>*&]+)\s+solve\s*\(([^)]*)\)/, function (_, args) {
+      var cleanArgs = args.split(",").map(function (a) {
+        return a.trim().replace(/^[\w:<>*&]+\s+/, "");
+      }).filter(Boolean).join(", ");
+      return "function solve(" + cleanArgs + ")";
+    });
+    s = s.replace(/\b(?:int|float|double|char|bool|auto|long|short|string|vector<[^>]+>)\s+([a-zA-Z_$][\w$]*)\s*(=|[;,])/g, "let $1 $2");
+    return s;
+  }
+  function runCPP() {
+    try {
+      var js = transpileCPP(ta.value);
+      var prelude = "var max = Math.max, min = Math.min, abs = Math.abs;\n" +
+        "function tolower(c) { return String(c).toLowerCase(); }\n" +
+        "function toupper(c) { return String(c).toUpperCase(); }\n";
+      var fn = new Function(prelude + js + "\nreturn solve;")();
+      P.tests.forEach(function (t, i) { report(fn.apply(null, t.slice(0, -1)), i); });
+      finishPass(countBytes(ta.value));
+    } catch (err) {
+      if (log.textContent.indexOf("PASS") === -1) {
+        log.textContent += "ERROR: " + (err.message || "runtime") + "\n";
+        log.classList.add("golf-err");
+        if (window.CCLTCE_SFX) CCLTCE_SFX.error();
+      }
+    }
+  }
   function loadPy() {
     if (pyReady) return pyReady;
     pyReady = new Promise(function (resolve, reject) {
@@ -140,6 +187,6 @@
   }
   runBtn.addEventListener("click", function () {
     log.textContent = "mining...\n"; log.className = "golf-log";
-    if (LANG === "py") runPY(); else runJS();
+    if (LANG === "py") runPY(); else if (LANG === "cpp") runCPP(); else runJS();
   });
 })();
