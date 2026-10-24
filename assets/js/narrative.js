@@ -18,11 +18,15 @@ import { createCameraPath, updateCamera, phaseAt } from "./narrative-camera.js";
     wrapper.prepend(canvas);
   }
 
-  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false, powerPreference: "high-performance" });
+  var renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    antialias: false,
+    alpha: true,
+    powerPreference: "high-performance",
+  });
+  renderer.setClearColor(0x000000, 0);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.setSize(innerWidth, innerHeight, false);
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.BasicShadowMap;
 
   var camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 400);
   var built = buildScene();
@@ -56,25 +60,43 @@ import { createCameraPath, updateCamera, phaseAt } from "./narrative-camera.js";
     }
   }
 
-  // animate stations gently
   var clock = new THREE.Clock();
   function animate() {
     requestAnimationFrame(animate);
     if (document.hidden) return;
     var el = clock.getElapsedTime();
-    if (stations.s1) stations.s1.rotation.y = Math.sin(el * 0.3) * 0.1;
+
+    // station idle rotation
+    if (stations.s1) stations.s1.rotation.y = Math.sin(el * 0.3) * 0.12;
     if (stations.s2) stations.s2.rotation.y = el * 0.15;
     if (stations.s3) stations.s3.rotation.y = el * 0.2;
-    // spin sparks
-    if (stations.s3) {
-      stations.s3.children.forEach(function (c) {
-        if (c.userData.spin !== undefined) {
-          var a = el + c.userData.spin;
-          c.position.x = Math.cos(a) * 5;
-          c.position.z = Math.sin(a) * 5;
-        }
-      });
-    }
+
+    // animate every tagged object in the world once
+    scene.traverse(function (o) {
+      if (o.userData.float !== undefined) {
+        o.position.y += Math.sin(el * 1.2 + o.userData.float) * 0.004;
+        o.rotation.y = Math.sin(el * 0.6 + o.userData.float) * 0.3;
+      }
+      if (o.userData.blink !== undefined) {
+        o.visible = Math.sin(el * 4 + o.userData.blink * 1.7) > -0.3;
+      }
+      if (o.userData.pulse !== undefined) {
+        var s = 1 + Math.sin(el * 2 + o.userData.pulse) * 0.12;
+        o.scale.set(s, s, s);
+      }
+      if (o.userData.orbit !== undefined) {
+        var a = el * o.userData.speed + o.userData.orbit;
+        var r = o.userData.radius;
+        o.position.x = Math.cos(a) * r;
+        o.position.z = Math.sin(a) * r;
+        o.position.y = 4 + Math.sin(el + o.userData.orbit) * 2;
+      }
+      if (o.userData.cart) {
+        o.position.x = 40 + ((el * 6) % 160);
+        o.position.y = 5.5 + Math.sin(el * 3) * 0.1;
+      }
+    });
+
     renderer.render(scene, camera);
   }
 
@@ -96,7 +118,6 @@ import { createCameraPath, updateCamera, phaseAt } from "./narrative-camera.js";
   addEventListener("scroll", onScroll, { passive: true });
   addEventListener("resize", onResize);
 
-  // initial
   updateCamera(camera, curve, 0);
   updateOverlays(0);
   animate();
