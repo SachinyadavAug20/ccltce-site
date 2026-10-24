@@ -95,7 +95,7 @@ import { initCrystals } from "./narrative-crystals.js";
       dragon.update(el);
       var w = u > 0.75 ? clamp01((u - 0.75) / 0.1) : 0;   // dive → finale: keep the boss framed
       if (w > 0) look.lerp(dragon.look(lookV), w);
-      shake = dragon.shake();
+      shake = Math.max(dragon.shake(), crystals.shake());
     }
     crystals.update(dt);
     if (firstLook) { lookSm.copy(look); firstLook = false; }
@@ -132,7 +132,7 @@ import { initCrystals } from "./narrative-crystals.js";
   viewport.addEventListener("pointermove", function (e) {
     var c = crystals.peek(e), d = dragon ? dragon.aim(e) : null;
     if (dragon) dragon.hover(e);
-    if (c && (d === null || c.distance < d)) viewport.style.cursor = "crosshair";
+    viewport.style.cursor = (c && (d === null || c.distance < d)) || d !== null ? "crosshair" : "";
   }, { passive: true });
   // nearest target wins, so a crystal behind the boss can't steal its hit
   viewport.addEventListener("click", function (e) {

@@ -87,11 +87,15 @@ export function buildCampus(g) {
   P(g, box(110, 2, 170, GRASS), -15, -2, 25);   // z -60..110 (covers the start camera; x still ends at 40 — nether floor)
   P(g, box(110, 4, 170, DIRT), -15, -5, 25);
   for (var gp = 0; gp < 15; gp++) P(g, box(2, 0.15, 2, PATH), gp % 2 ? 1.5 : -1.5, -0.9, 5 - gp * 3);
-  P(g, box(5, 11, 5, STONE), -12, 4.5, -8); P(g, box(5, 11, 5, STONE), 12, 4.5, -8);
-  P(g, box(32, 4, 5, STONE), 0, 12, -8); P(g, box(36, 1.5, 8, DARKOAK), 0, 14.75, -8);
+  P(g, box(5.4, 2, 5.4, STONE2), -12, 0, -8); P(g, box(5.4, 2, 5.4, STONE2), 12, 0, -8);
+  P(g, box(4.6, 9, 4.6, STONE), -12, 5.5, -8); P(g, box(4.6, 9, 4.6, STONE), 12, 5.5, -8);
+  P(g, box(32, 4, 5, STONE), 0, 12, -8);
+  P(g, box(36, 1.5, 8, DARKOAK), 0, 14.75, -8); P(g, box(28, 1.4, 6, DARKOAK), 0, 16.2, -8);
   P(g, box(14, 2.5, 0.5, GOLD, GOLD, 0.5), 0, 12, -5.2);
-  P(g, box(0.25, 3.5, 2, 0xeab308), -14.6, 10, -5.3);
-  P(g, box(0.25, 3.5, 2, 0x17dd62), 14.6, 10, -5.3);
+  [-12, 12].forEach(function (bx) {
+    P(g, box(1.8, 4.2, 0.2, 0x17dd62), bx, 6.5, -5.4);
+    P(g, box(1.0, 3.2, 0.24, 0xeab308), bx, 6.5, -5.35);
+  });
   g.add(glowLight(GOLD, 2, 30, 0, 12, -4));
   [-10, 10].forEach(function (x) { torch(g, x, 8, -5); });
   tree(g, -25, -5, 1.2); tree(g, 25, -5, 1.1); tree(g, -20, -20, 1.4); tree(g, 20, -20, 1.3);
@@ -108,6 +112,7 @@ export function buildCampus(g) {
   flowerBed(g, -5, -12, 8); flowerBed(g, 5, -24, 6);
   pond(g, 0, -44);
   P(g, box(50, 14, 20, STONE2), 0, 6, -30); P(g, box(54, 2, 22, DARKOAK), 0, 14, -30);
+  P(g, box(46, 1.8, 18, DARKOAK), 0, 15.9, -30); P(g, box(36, 1.8, 12, DARKOAK), 0, 17.7, -30);
   for (var i = 0; i < 8; i++) {
     P(g, box(3, 4, 0.5, GOLD, GOLD, 0.4), -20 + i * 5.7, 7, -20);
     P(g, box(3.5, 0.3, 0.8, STONE), -20 + i * 5.7, 4.8, -19.8);
