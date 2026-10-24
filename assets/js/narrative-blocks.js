@@ -9,6 +9,15 @@ export var ENDSTONE = 0xd4c87a, OBSIDIAN = 0x141018, PURPUR = 0xa87fb5;
 export var END_ROD = 0xf0e8ff, SOUL = 0x2dd4a8, WARP = 0x1a6b5a;
 export var GRASS = 0x91bd59, DIRT = 0x866043, LEAF = 0x77ab2f, LEAF2 = 0x8bc34a;
 export var WATER = 0x3f76e4, PATH = 0x9e8154;
+// Nether biome palette (wiki): crimson/warped nylium + stems, shroomlight, soul sand/soil, basalt
+export var NYL_C = 0xa5352e, NYL_W = 0x2e7d6e, CRIM = 0x7c2f2b, CRIM_CAP = 0xb02e26;
+export var WARP_STEM = 0x1c5a4e, WARP_CAP = 0x259b87, SHROOM = 0xff9b50;
+export var SOULSAND = 0x7a6650, SOIL = 0x584738, FOSSIL = 0xd8d0c0;
+export var GRAVEL = 0x84817a, MAGMA = 0xc4661f, BASALT = 0x4a4a4f, BLACKSTONE = 0x232126;
+// Overworld biome palette: sand, birch/spruce/acacia, snow, swamp, terracotta
+export var SAND = 0xdbd3a0, SANDSTONE = 0xc8bb8a, CACTUS = 0x58a83a, BIRCH = 0xcfcfb8;
+export var SPRUCE = 0x2d5a34, SNOW = 0xf4f8f8, ACACIA = 0xb0682e, ACACIA_LEAF = 0x7ab04a;
+export var SWAMPW = 0x4a5a3a, LILY = 0x4a8a3a, MESA = 0x9a5a3a, MESA2 = 0xc47a4a;
 
 export function box(w, h, d, color, emissive, ei) {
   var mat = new THREE.MeshLambertMaterial({ color: color });

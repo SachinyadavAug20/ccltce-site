@@ -1,8 +1,8 @@
 // Overworld hostiles/neutral + nether extras — box geometry. Compact.
-import * as THREE from "../vendor/three.module.js";
-import { M } from "./narrative-mobs.js";
+import * as THREE from "../vendor/three.module.js"; import { M } from "./narrative-mobs.js";
 function A(g, m, x, y, z) { m.position.set(x, y, z); g.add(m); return m; }
-function L(g, list, mat) { list.forEach(function (p) { A(g, M(p[3] || mat[0], p[4] || mat[1], p[5] || mat[2], mat[3]), p[0], p[1], p[2]); }); }
+function L(g, list, mat, ph) { list.forEach(function (p, i) { var h = p[4] || mat[1], m = M(p[3] || mat[0], h, p[5] || mat[2], mat[3]); m.geometry.translate(0, -h / 2, 0);
+  m.position.set(p[0], p[1] + h / 2, p[2]); m.userData.leg = (ph || 0) + (i % 2 ? Math.PI : 0) + (i >> 1) * 1.1; g.add(m); }); }
 function E(grp, g) { g.add(grp); return grp; }
 function G() { return new THREE.Group(); }
 
@@ -10,14 +10,14 @@ export function spider(g, x, y, z) {
   var r = G(); r.position.set(x, y, z);
   A(r, M(1.2, 0.6, 1.2, 0x1a1a1a), 0, 0.5, 0); A(r, M(0.6, 0.5, 0.6, 0x2a2a2a), 0, 0.6, 0.8);
   A(r, M(0.15, 0.1, 0.1, 0xd42020), -0.15, 0.7, 1.1); A(r, M(0.15, 0.1, 0.1, 0xd42020), 0.15, 0.7, 1.1);
-  for (var l = 0; l < 8; l++) { var s = l < 4 ? -1 : 1, li = l % 4; var leg = M(0.1, 0.1, 1.0, 0x1a1a1a); leg.position.set(s * 0.7, 0.5, -0.4 + li * 0.35); leg.rotation.z = s * 0.4; leg.rotation.y = (li - 1.5) * 0.2; r.add(leg); }
+  for (var l = 0; l < 8; l++) { var s = l < 4 ? -1 : 1, li = l % 4; var leg = M(0.1, 0.1, 1.0, 0x1a1a1a); leg.position.set(s * 0.7, 0.5, -0.4 + li * 0.35); leg.rotation.z = s * 0.4; leg.rotation.y = (li - 1.5) * 0.2; leg.userData.leg = l * 0.8; r.add(leg); }
   return E(r, g);
 }
 export function zombie(g, x, y, z) {
   var r = G(); r.position.set(x, y, z);
   A(r, M(0.7, 1.0, 0.4, 0x3d6b3d), 0, 1.0, 0); A(r, M(0.55, 0.55, 0.55, 0x4a8a4a), 0, 1.8, 0);
   A(r, M(0.2, 0.1, 0.05, 0x1a1a1a), -0.12, 1.85, 0.3); A(r, M(0.2, 0.1, 0.05, 0x1a1a1a), 0.12, 1.85, 0.3);
-  A(r, M(0.2, 0.8, 0.2, 0x3d6b3d), -0.55, 1.2, 0.3); A(r, M(0.2, 0.8, 0.2, 0x3d6b3d), 0.55, 1.2, 0.3);
+  A(r, M(0.2, 0.8, 0.2, 0x3d6b3d), -0.55, 1.2, 0.3).userData.tail = 0.5; A(r, M(0.2, 0.8, 0.2, 0x3d6b3d), 0.55, 1.2, 0.3).userData.tail = 3.64;
   A(r, M(0.25, 0.9, 0.25, 0x2a4a2a), -0.2, 0.4, 0); A(r, M(0.25, 0.9, 0.25, 0x2a4a2a), 0.2, 0.4, 0);
   return E(r, g);
 }
@@ -35,7 +35,7 @@ export function creeper(g, x, y, z) {
   A(r, M(0.7, 1.2, 0.5, 0x3d8c3d), 0, 1.0, 0); A(r, M(0.7, 0.7, 0.7, 0x4caf50), 0, 1.9, 0);
   A(r, M(0.2, 0.2, 0.1, 0x0a0a0a), -0.15, 2.0, 0.38); A(r, M(0.2, 0.2, 0.1, 0x0a0a0a), 0.15, 2.0, 0.38);
   A(r, M(0.3, 0.3, 0.1, 0x0a0a0a), 0, 1.7, 0.38);
-  L(r, [[-0.2, 0.3, -0.1], [0.2, 0.3, -0.1], [-0.2, 0.3, 0.2], [0.2, 0.3, 0.2]], [0.25, 0.6, 0.25, 0x3d8c3d]);
+  L(r, [[-0.2, 0.3, -0.1], [0.2, 0.3, -0.1], [-0.2, 0.3, 0.2], [0.2, 0.3, 0.2]], [0.25, 0.6, 0.25, 0x3d8c3d], 0);
   return E(r, g);
 }
 export function ironGolem(g, x, y, z) {
@@ -70,7 +70,7 @@ export function witch(g, x, y, z) {
   A(r, M(0.6, 0.15, 0.6, 0x2a1a3a), 0, 2.2, 0); A(r, M(0.35, 0.5, 0.35, 0x2a1a3a), 0, 2.5, 0);
   A(r, M(0.12, 0.6, 0.12, 0xc4956a), -0.55, 1.2, 0); A(r, M(0.12, 0.6, 0.12, 0xc4956a), 0.55, 1.2, 0);
   A(r, M(0.2, 0.3, 0.2, 0x17dd62), 0.65, 1.2, 0.2);
-  L(r, [[-0.2, 0.4, 0], [0.2, 0.4, 0]], [0.22, 0.8, 0.22, 0x2a1a3a]);
+  L(r, [[-0.2, 0.4, 0], [0.2, 0.4, 0]], [0.22, 0.8, 0.22, 0x2a1a3a], 0.9);
   return E(r, g);
 }
 export function pillager(g, x, y, z) {
@@ -79,7 +79,7 @@ export function pillager(g, x, y, z) {
   A(r, M(0.15, 0.1, 0.06, 0xd42020), -0.12, 1.85, 0.3); A(r, M(0.15, 0.1, 0.06, 0xd42020), 0.12, 1.85, 0.3);
   A(r, M(0.5, 0.12, 0.5, 0x3a3a3a), 0, 2.15, 0); A(r, M(0.2, 0.7, 0.2, 0x5a5a5a), -0.55, 1.1, 0);
   A(r, M(0.1, 0.6, 0.4, 0x6a4a2a), 0.55, 1.2, 0.2);
-  L(r, [[-0.2, 0.4, 0], [0.2, 0.4, 0]], [0.22, 0.8, 0.22, 0x4a4a4a]);
+  L(r, [[-0.2, 0.4, 0], [0.2, 0.4, 0]], [0.22, 0.8, 0.22, 0x4a4a4a], 1.8);
   return E(r, g);
 }
 export function drowned(g, x, y, z) {
@@ -94,8 +94,8 @@ export function phantom(g, x, y, z) {
   var r = G(); r.position.set(x, y, z);
   A(r, M(1.2, 0.4, 2.0, 0x2a2a4a), 0, 0, 0); A(r, M(0.5, 0.4, 0.5, 0x1a1a3a), 0, 0.1, 1.2);
   A(r, M(0.12, 0.1, 0.08, 0x17dd62), -0.12, 0.15, 1.4); A(r, M(0.12, 0.1, 0.08, 0x17dd62), 0.12, 0.15, 1.4);
-  var wl = M(3.5, 0.1, 1.5, 0x1a1a3a); wl.position.set(-2.0, 0.2, 0); wl.rotation.z = 0.25; r.add(wl);
-  var wr = M(3.5, 0.1, 1.5, 0x1a1a3a); wr.position.set(2.0, 0.2, 0); wr.rotation.z = -0.25; r.add(wr);
+  var wl = M(3.5, 0.1, 1.5, 0x1a1a3a); wl.position.set(-2.0, 0.2, 0); wl.rotation.z = 0.25; wl.geometry.translate(-1.75, 0, 0); wl.position.x = -0.25; wl.userData.wing = 1; r.add(wl);
+  var wr = M(3.5, 0.1, 1.5, 0x1a1a3a); wr.position.set(2.0, 0.2, 0); wr.rotation.z = -0.25; wr.geometry.translate(1.75, 0, 0); wr.position.x = 0.25; wr.userData.wing = 0; r.add(wr);
   r.userData.float = Math.random() * Math.PI * 2; return E(r, g);
 }
 export function warden(g, x, y, z) {
@@ -104,7 +104,7 @@ export function warden(g, x, y, z) {
   A(r, M(0.3, 0.2, 0.15, 0x17dd62), -0.15, 2.75, 0.4); A(r, M(0.3, 0.2, 0.15, 0x17dd62), 0.15, 2.75, 0.4);
   A(r, M(0.25, 0.4, 0.2, 0x17dd62), -0.35, 3.0, 0.1); A(r, M(0.25, 0.4, 0.2, 0x17dd62), 0.35, 3.0, 0.1);
   A(r, M(0.3, 1.4, 0.3, 0x0a2a2a), -0.75, 1.7, 0); A(r, M(0.3, 1.4, 0.3, 0x0a2a2a), 0.75, 1.7, 0);
-  L(r, [[-0.3, 0.5, 0], [0.3, 0.5, 0]], [0.35, 1.0, 0.35, 0x0a1a1a]);
+  L(r, [[-0.3, 0.5, 0], [0.3, 0.5, 0]], [0.35, 1.0, 0.35, 0x0a1a1a], 2.7);
   A(r, M(0.5, 0.2, 0.5, 0x17dd62), 0, 1.6, 0.35); r.userData.pulse = 0; return E(r, g);
 }
 export function guardian(g, x, y, z) {
@@ -119,7 +119,7 @@ export function strider(g, x, y, z) {
   var r = G(); r.position.set(x, y, z);
   A(r, M(0.9, 0.7, 1.2, 0xaa3333), 0, 1.2, 0); A(r, M(0.5, 0.45, 0.4, 0xaa3333), 0, 1.6, 0.7);
   A(r, M(0.1, 0.1, 0.06, 0x1a1a1a), -0.12, 1.65, 0.9); A(r, M(0.1, 0.1, 0.06, 0x1a1a1a), 0.12, 1.65, 0.9);
-  L(r, [[-0.25, 0.6, -0.3], [0.25, 0.6, -0.3], [-0.25, 0.6, 0.3], [0.25, 0.6, 0.3]], [0.1, 1.2, 0.1, 0x8a2a2a]);
+  L(r, [[-0.25, 0.6, -0.3], [0.25, 0.6, -0.3], [-0.25, 0.6, 0.3], [0.25, 0.6, 0.3]], [0.1, 1.2, 0.1, 0x8a2a2a], 3.6);
   A(r, M(0.3, 0.15, 0.5, 0x6a4a2a), 0, 1.8, 0); return E(r, g);
 }
 export function piglinBrute(g, x, y, z) {
@@ -129,7 +129,7 @@ export function piglinBrute(g, x, y, z) {
   A(r, M(0.15, 0.3, 0.1, 0xa08060), -0.3, 2.2, 0); A(r, M(0.15, 0.3, 0.1, 0xa08060), 0.3, 2.2, 0);
   var axe = M(0.15, 1.2, 0.15, 0x6a4a2a); axe.position.set(0.65, 1.2, 0.2); axe.rotation.z = -0.3; r.add(axe);
   A(r, M(0.4, 0.3, 0.15, 0x8a8a8a), 0.85, 1.8, 0.2);
-  L(r, [[-0.2, 0.35, 0], [0.2, 0.35, 0]], [0.25, 0.7, 0.25, 0x4a3328]);
+  L(r, [[-0.2, 0.35, 0], [0.2, 0.35, 0]], [0.25, 0.7, 0.25, 0x4a3328], 4.5);
   return E(r, g);
 }
 export function zombifiedPiglin(g, x, y, z) {
@@ -138,13 +138,13 @@ export function zombifiedPiglin(g, x, y, z) {
   A(r, M(0.3, 0.2, 0.15, 0xc4956a), 0, 1.7, 0.35);
   A(r, M(0.12, 0.2, 0.08, 0xc4956a), -0.22, 2.0, 0); A(r, M(0.12, 0.2, 0.08, 0xc4956a), 0.22, 2.0, 0);
   A(r, M(0.2, 0.8, 0.2, 0x5a8a5a), -0.55, 1.2, 0.3); A(r, M(0.2, 0.8, 0.2, 0x5a8a5a), 0.55, 1.2, 0.3);
-  L(r, [[-0.2, 0.4, 0], [0.2, 0.4, 0]], [0.25, 0.9, 0.25, 0x4a7a4a]);
+  L(r, [[-0.2, 0.4, 0], [0.2, 0.4, 0]], [0.25, 0.9, 0.25, 0x4a7a4a], 5.4);
   return E(r, g);
 }
 export function endermite(g, x, y, z) {
   var r = G(); r.position.set(x, y, z);
   A(r, M(0.5, 0.3, 0.7, 0x4a2a5a), 0, 0.2, 0); A(r, M(0.3, 0.25, 0.3, 0x5a3a6a), 0, 0.35, 0.4);
   A(r, M(0.06, 0.06, 0.04, 0xd420d4), -0.08, 0.4, 0.55); A(r, M(0.06, 0.06, 0.04, 0xd420d4), 0.08, 0.4, 0.55);
-  for (var l = 0; l < 6; l++) { var s = l < 3 ? -1 : 1; A(r, M(0.06, 0.2, 0.06, 0x3a1a4a), s * 0.3, 0.1, -0.2 + (l % 3) * 0.2); }
+  for (var l = 0; l < 6; l++) { var s = l < 3 ? -1 : 1; A(r, M(0.06, 0.2, 0.06, 0x3a1a4a), s * 0.3, 0.1, -0.2 + (l % 3) * 0.2).userData.leg = l; }
   return E(r, g);
 }
