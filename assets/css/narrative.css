@@ -1,0 +1,114 @@
+/* ---------- narrative scroll — 3D journey overlays ---------- */
+#narrative-scroll { position: relative; height: 500vh; }
+
+#narrative-webgl {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+}
+
+.narrative-viewport {
+  position: sticky; top: 0; height: 100svh;
+  overflow: hidden; z-index: 1;
+}
+
+/* hero sits inside narrative, fades on scroll */
+.hero-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; z-index: 5;
+  pointer-events: none; transition: none;
+}
+.hero-overlay .btn { pointer-events: auto; }
+
+/* station overlays — in-world panel: translucent so the scene reads through, soft rise-in */
+.narrative-overlay {
+  position: absolute; bottom: 12%; right: 6%; max-width: 420px;
+  padding: 1.4rem 1.6rem;
+  background: rgba(13, 13, 16, 0.72);
+  backdrop-filter: blur(4px) saturate(1.15);
+  -webkit-backdrop-filter: blur(4px) saturate(1.15);
+  border: 2px solid #0c0c0e;
+  box-shadow: inset 0 0 0 2px #4a4a52, 0 14px 36px rgba(0, 0, 0, 0.45);
+  font-family: var(--mono);
+  opacity: 0; transform: translateY(16px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  z-index: 6; pointer-events: none;
+}
+.narrative-overlay.on { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.narrative-overlay .n-label {
+  font-family: var(--disp); font-size: 0.45rem;
+  color: var(--gold); letter-spacing: 0.08em;
+  margin-bottom: 0.6rem; text-shadow: 1px 1px 0 #000;
+}
+.narrative-overlay .n-title {
+  font-family: var(--disp); font-size: 0.7rem;
+  color: #f4f4f5; text-shadow: 2px 2px 0 #09090b;
+  line-height: 1.6; margin-bottom: 0.6rem;
+}
+.narrative-overlay .n-desc {
+  font-family: var(--mono); font-size: 13px;
+  line-height: 1.65; color: var(--muted); margin-top: 0.5rem;
+}
+.narrative-overlay .n-examples {
+  list-style: none; margin: 0.4rem 0 0; padding: 0;
+  font-family: var(--mono); font-size: 12px;
+  line-height: 1.7; color: #d4d4d8;
+}
+.narrative-overlay .n-examples li { padding: 0.15rem 0; }
+.narrative-overlay .n-examples li::before { content: "> "; color: var(--gold); font-weight: 700; }
+.narrative-overlay .n-examples b { color: var(--gold); font-weight: 700; }
+.narrative-overlay .n-dim {
+  display: inline-block; margin-top: 0.4rem; padding: 0.15rem 0.5rem;
+  font-family: var(--disp); font-size: 0.4rem;
+  letter-spacing: 0.08em; border: 1px solid; text-shadow: 1px 1px 0 #000;
+}
+.n-dim.overworld { color: #17dd62; border-color: #17dd62; background: rgba(23, 221, 98, 0.1); }
+.n-dim.nether { color: #ff4400; border-color: #ff4400; background: rgba(255, 68, 0, 0.12); }
+.n-dim.end { color: #c026d3; border-color: #c026d3; background: rgba(192, 38, 211, 0.12); }
+.n-dim.bedrock { color: #eab308; border-color: #eab308; background: rgba(234, 179, 8, 0.1); }
+.narrative-overlay .n-hp {
+  display: inline-block; margin-left: 0.35rem; padding: 0.15rem 0.5rem;
+  font-family: var(--disp); font-size: 0.4rem; letter-spacing: 0.06em;
+  color: #ff5555; border: 1px solid #ff2222; background: rgba(255, 34, 34, 0.12);
+  text-shadow: 1px 1px 0 #000;
+}
+.narrative-overlay .n-cry { color: #c026d3; border-color: #c026d3; background: rgba(192, 38, 211, 0.14); }
+.narrative-overlay .n-accent {
+  display: inline-block; width: 8px; height: 8px;
+  margin-right: 6px; background: var(--gold); vertical-align: middle;
+}
+.narrative-overlay.station-1 .n-accent { background: var(--redstone); }
+.narrative-overlay.station-2 .n-accent { background: var(--gold); }
+.narrative-overlay.station-3 .n-accent { background: var(--emerald-hi); }
+.narrative-overlay.bedrock { right: auto; left: 50%; transform: translateX(-50%) translateY(16px); text-align: center; }
+.narrative-overlay.bedrock.on { transform: translateX(-50%) translateY(0); }
+
+/* post-kill: revealed once the dragon reads SLAIN! */
+.narrative-overlay .n-after { display: none; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+.narrative-overlay.slain .n-after { display: flex; animation: afterRise 0.5s ease-out both; }
+.narrative-overlay.slain #dragon-hp { color: #17dd62; border-color: #17dd62; background: rgba(23, 221, 98, 0.14); }
+@keyframes afterRise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* scroll hint */
+.narrative-hint {
+  position: absolute; bottom: 2rem; left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--disp); font-size: 0.45rem;
+  color: var(--muted); letter-spacing: 0.1em;
+  z-index: 7; animation: hintBob 2s ease-in-out infinite; pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+@keyframes hintBob { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
+
+@media (max-width: 700px) {
+  .narrative-overlay { right: 4%; left: 4%; max-width: none; bottom: 8%; }
+  .narrative-overlay.bedrock { right: 4%; left: 4%; transform: translateY(16px); }
+  .narrative-overlay.bedrock.on { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #narrative-scroll { height: auto; }
+  #narrative-webgl { display: none; }
+  .narrative-overlay { position: relative; opacity: 1; transform: none; bottom: auto; right: auto; margin: 1rem auto; max-width: 480px; }
+  .narrative-hint { display: none; }
+}

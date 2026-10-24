@@ -37,42 +37,43 @@
     g.gain.value = peak || 0.1; s.connect(f).connect(g).connect(master); s.start(t);
   }
 
-  // ambient chiptune loop — soft Am pentatonic pad + bass pulse
-  var SCALE = [220, 261.63, 293.66, 329.63, 392, 440, 523.25];
-  var BASS = [55, 65.41, 73.42, 82.41];
+  // ambient chiptune loop — phase-aware scale + bass
+  var PHASES = {
+    overworld: { scale: [220, 261.63, 293.66, 329.63, 392, 440, 523.25], bass: [55, 65.41, 73.42, 82.41], tempo: 480, wave: "triangle", vol: 0.12 },
+    nether: { scale: [164.81, 174.61, 196, 207.65, 233.08, 246.94, 261.63], bass: [41.2, 43.65, 49, 51.91], tempo: 520, wave: "sawtooth", vol: 0.09 },
+    end: { scale: [329.63, 369.99, 415.3, 440, 493.88, 554.37, 659.25], bass: [82.41, 92.5, 110, 123.47], tempo: 620, wave: "sine", vol: 0.08 },
+    bedrock: { scale: [110, 130.81, 146.83, 164.81, 196, 220, 261.63], bass: [27.5, 32.7, 36.71, 41.2], tempo: 560, wave: "square", vol: 0.07 },
+  };
+  var phase = "overworld";
+  var cur = PHASES.overworld;
   var step = 0;
   function musicTick() {
     if (!musicOn || !ctx) return;
     var t = ctx.currentTime + 0.05;
-    // pad note
-    var freq = SCALE[step % SCALE.length];
+    var freq = cur.scale[step % cur.scale.length];
     var o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = "triangle"; o.frequency.setValueAtTime(freq, t);
+    o.type = cur.wave; o.frequency.setValueAtTime(freq, t);
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.12, t + 0.04);
+    g.gain.exponentialRampToValueAtTime(cur.vol, t + 0.04);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 0.55);
     o.connect(g).connect(musicGain); o.start(t); o.stop(t + 0.6);
-    // bass every 4 steps
     if (step % 4 === 0) {
       var bo = ctx.createOscillator(), bg = ctx.createGain();
-      bo.type = "sine"; bo.frequency.setValueAtTime(BASS[(step / 4) % BASS.length], t);
+      bo.type = "sine"; bo.frequency.setValueAtTime(cur.bass[(step / 4) % cur.bass.length], t);
       bg.gain.setValueAtTime(0.0001, t);
       bg.gain.exponentialRampToValueAtTime(0.2, t + 0.02);
       bg.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
       bo.connect(bg).connect(musicGain); bo.start(t); bo.stop(t + 0.45);
       musicNodes.push(bo);
     }
-    musicNodes.push(o);
-    step++;
-    // clean old nodes
-    if (musicNodes.length > 40) {
-      musicNodes.splice(0, 20).forEach(function (n) { try { n.disconnect(); } catch (e) {} });
-    }
+    musicNodes.push(o); step++;
+    if (musicNodes.length > 40) musicNodes.splice(0, 20).forEach(function (n) { try { n.disconnect(); } catch (e) {} });
   }
+  var musicTempo = 480;
   function startMusic() {
     if (musicTimer) return;
     ac();
-    musicTimer = setInterval(musicTick, 480);
+    musicTimer = setInterval(musicTick, musicTempo);
   }
   function stopMusic() {
     if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
@@ -108,6 +109,11 @@
       tone("sawtooth", 126, 96, 0.2, 0.05, 0.02);
     },
     win: function () { this.levelUp(); noise(0.2, 0.06); },
+    setPhase: function (dim) {
+      if (!PHASES[dim] || dim === phase) return;
+      phase = dim; cur = PHASES[dim]; musicTempo = cur.tempo;
+      if (musicTimer) { clearInterval(musicTimer); musicTimer = setInterval(musicTick, musicTempo); }
+    },
     getAnalyser: function () {
       if (!ctx) return null;
       if (!this._an) {

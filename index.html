@@ -17,39 +17,87 @@
   <meta property="og:url" content="https://ccltce.github.io/" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Coding Club — CCLTCE | LTCOE" />
-  <meta name="twitter:description" content="Coding Club LTCE (CCLTCE) — build, ship and break things. Events, challenges, resources and the core team at Lokmanya Tilak College of Engineering." />
+  <meta name="twitter:description" content="Coding Club LTCE (CCLTCE) — build, ship and break things." />
   <meta name="twitter:image" content="https://ccltce.github.io/assets/img/ccltce-logo.png" />
   <link rel="icon" href="assets/img/favicon.png" type="image/png" />
   <link rel="stylesheet" href="assets/css/global.css" />
   <link rel="stylesheet" href="assets/css/nav.css" />
   <link rel="stylesheet" href="assets/css/brand.css" />
   <link rel="stylesheet" href="assets/css/hero.css" />
+  <link rel="stylesheet" href="assets/css/narrative.css" />
   <link rel="stylesheet" href="assets/css/components.css" />
   <link rel="stylesheet" href="assets/css/footer.css" />
   <link rel="stylesheet" href="assets/css/gamify.css" />
   <link rel="stylesheet" href="assets/css/mobile.css" />
 </head>
 <body>
-  <canvas id="bg" aria-hidden="true"></canvas>
 
   <a class="skip" href="#main">Skip to content</a>
 
   <header class="nav-wrap"></header>
 
   <main id="main">
-    <section class="hero">
-      <img class="hero-logo" src="assets/img/ccltce-logo.png" alt="Coding Club emblem" width="400" height="400" />
-      <h1 class="hero-title">Coding <em>Club</em></h1>
-      <p class="hero-sub">
-        Lokmanya Tilak College of Engineering
-        <small class="loc">Koparkhana &middot; Navi Mumbai</small>
-      </p>
-      <div class="hero-cta">
-        <a class="btn btn-primary" href="events.html">Browse Events</a>
-        <a class="btn" href="challenges.html">Take a Challenge</a>
-      </div>
-    </section>
+    <div id="narrative-scroll">
+      <div class="narrative-viewport">
+        <section class="hero-overlay">
+          <img class="hero-logo" src="assets/img/ccltce-logo.png" alt="Coding Club emblem" width="400" height="400" />
+          <h1 class="hero-title">Coding <em>Club</em></h1>
+          <p class="hero-sub">
+            Lokmanya Tilak College of Engineering
+            <small class="loc">Koparkhana &middot; Navi Mumbai</small>
+          </p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="events.html">Browse Events</a>
+            <a class="btn" href="challenges.html">Take a Challenge</a>
+          </div>
+        </section>
 
+        <p class="narrative-hint">▼ SCROLL TO DESCEND ▼</p>
+
+        <div class="narrative-overlay station-1">
+          <p class="n-label"><span class="n-accent"></span>[TRACK 01 // SYSTEMS &amp; INFRA]</p>
+          <h2 class="n-title">Linux, Servers &amp; Raylib Games</h2>
+          <ul class="n-examples">
+            <li><b>raylib-asteroids</b> — C game loop, collision, score HUD</li>
+            <li><b>nginx reverse proxy</b> — campus VM, Let's Encrypt</li>
+            <li><b>github.com/…</b> — shell scripts, CI runners, Dockerfiles</li>
+          </ul>
+          <p class="n-desc">Bare metal, Docker, Linux, and shipping games at 60fps. <span class="n-dim overworld">◈ OVERWORLD</span></p>
+        </div>
+
+        <div class="narrative-overlay station-2">
+          <p class="n-label"><span class="n-accent"></span>[TRACK 02 // ALGORITHMS]</p>
+          <h2 class="n-title">DSA Notes &amp; Competitive Wins</h2>
+          <ul class="n-examples">
+            <li><b>DSA-notes repo</b> — graphs, DP, bit manipulation PDFs</li>
+            <li><b>Codeforces 1400+</b> — interactive problems, binary search</li>
+            <li><b>LeetCode 300+</b> — trees, heaps, sliding window sets</li>
+          </ul>
+          <p class="n-desc">Gold BST, hand-written notes, weekly Codeforces grind. <span class="n-dim nether">◈ NETHER</span></p>
+        </div>
+
+        <div class="narrative-overlay station-3">
+          <p class="n-label"><span class="n-accent"></span>[TRACK 03 // INTELLIGENCE]</p>
+          <h2 class="n-title">WebGL, Raylib &amp; Local Neural Models</h2>
+          <ul class="n-examples">
+            <li><b>this site</b> — Three.js voxel world, no frameworks</li>
+            <li><b>raylib-shaders</b> — GLSL post-fx, mesh generation</li>
+            <li><b>tiny-ml demos</b> — TF.js, on-device inference</li>
+          </ul>
+          <p class="n-desc">Pushing pixels and training agents on campus hardware. <span class="n-dim end">◈ END</span></p>
+        </div>
+
+        <div class="narrative-overlay bedrock">
+          <p class="n-label"><span class="n-accent"></span>[THE END // FINAL BOSS]</p>
+          <h2 class="n-title">Slay the Ender Dragon</h2>
+          <p class="n-desc">Click its head — 3 hits. <span id="dragon-hp" class="n-hp">HP 3 / 3</span><span id="crystal-hp" class="n-hp n-cry">◆ 8 / 8</span><br />Break the pillar crystals for XP, then drop the boss. <span class="n-dim end">◈ END</span></p>
+          <div class="n-after">
+            <a class="btn btn-primary" href="events.html">Browse Events</a>
+            <a class="btn" href="resources.html">Get Resources</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <footer></footer>
@@ -68,7 +116,7 @@
   <script src="assets/js/physics.js"></script>
   <script src="assets/js/gamify.js"></script>
   <script src="assets/js/mobileTabs.js"></script>
-  <script type="module" src="assets/js/bg.js"></script>
+  <script type="module" src="assets/js/narrative.js"></script>
   <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>
