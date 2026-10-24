@@ -1,63 +1,59 @@
 /* ---------- Minecraft team cards ---------- */
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
-.grid.team { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 2rem 1.4rem; justify-items: stretch; padding: 3rem 0 2.5rem; }
+.grid.team { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 2.5rem 1.4rem; justify-items: stretch; padding: 3rem 0 2.5rem; }
 @media (min-width: 900px) { .grid.team { grid-template-columns: repeat(5, 1fr); } }
 .t-card {
-  --accent: #17DD62;
-  position: relative; aspect-ratio: 3 / 4.6; border: 4px solid #000; border-radius: 0;
-  background: #262626; box-shadow: inset 3px 3px 0 #404040, inset -3px -3px 0 #151515;
-  overflow: visible; font-family: "Press Start 2P", monospace; cursor: pointer;
-  transition: transform 0.12s steps(2);
+  --accent: #16a34a;
+  position: relative; aspect-ratio: 3 / 4.4; border: 3px solid #27272a; border-radius: 0;
+  background: #141416; box-shadow: inset 2px 2px 0 #1f1f22, inset -2px -2px 0 #0c0c0e;
+  overflow: visible; font-family: var(--disp); cursor: pointer;
+  transition: transform 0.2s ease-out, border-color 0.2s ease-out;
 }
 .t-card:hover, .t-card:focus-visible {
-  transform: translateY(-4px);
-  box-shadow: inset 3px 3px 0 #404040, inset -3px -3px 0 #151515, 0 0 0 2px #000, 0 8px 0 0 #000;
+  transform: translateY(-4px); border-color: #3f3f46;
+  box-shadow: inset 2px 2px 0 #1f1f22, inset -2px -2px 0 #0c0c0e, 0 8px 0 #09090b;
 }
-.t-card:focus-visible { outline: 2px solid var(--yellow); outline-offset: 4px; }
+.t-card:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
 .t-head {
-  position: absolute; top: -36px; left: 50%; transform: translateX(-50%);
+  position: absolute; top: -38px; left: 50%; transform: translateX(-50%);
   width: 92px; height: 92px; z-index: 5;
   image-rendering: pixelated; image-rendering: crisp-edges;
-  filter: drop-shadow(0 3px 0 rgba(0,0,0,0.55));
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
 }
 .t-head img { width: 100%; height: 100%; display: block; }
 .t-badge {
   position: absolute; top: 58px; left: 0; right: 0; z-index: 4;
   display: flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 8px 4px; background: var(--accent); border-bottom: 3px solid #000;
-  font-family: "Press Start 2P", monospace; font-size: 0.52rem; letter-spacing: 0.04em;
-  text-transform: uppercase; color: #000; white-space: nowrap; text-align: center;
+  padding: 8px 4px; background: var(--accent); border-bottom: 2px solid #09090b;
+  font-size: 0.48rem; letter-spacing: 0.04em;
+  text-transform: uppercase; color: #fff; white-space: nowrap; text-align: center;
 }
-.t-badge i { width: 8px; height: 8px; background: #000; flex: none; }
+.t-badge i { width: 6px; height: 6px; background: #fff; flex: none; }
 .t-info { position: absolute; left: 0; right: 0; bottom: 48px; z-index: 3; padding: 12px 8px 8px; text-align: center; }
-.t-info h3 {
-  font-family: "Press Start 2P", monospace; font-size: 0.68rem; font-weight: 400;
-  letter-spacing: 0.02em; text-transform: uppercase; color: #FFFF55;
-  line-height: 1.5; text-shadow: 2px 2px 0 #000;
-}
-.t-spec { font-family: "Press Start 2P", monospace; font-size: 0.44rem; color: #AAAAAA; margin-top: 8px; text-shadow: 1px 1px 0 #000; line-height: 1.6; }
+.t-info h3 { font-size: 0.6rem; font-weight: 400; letter-spacing: 0.02em; text-transform: uppercase; color: #facc15; line-height: 1.5; text-shadow: 2px 2px 0 #09090b; }
+.t-spec { font-family: var(--mono); font-size: 12px; color: #a1a1aa; margin-top: 6px; text-shadow: none; line-height: 1.4; }
 .t-lore {
-  position: absolute; left: 6px; right: 6px; bottom: 96px; z-index: 6; padding: 8px;
-  background: #100010; border: 2px solid #2C0959; opacity: 0; pointer-events: none;
-  transform: translateY(6px); transition: opacity 0.12s steps(2), transform 0.12s steps(2);
+  position: absolute; left: 6px; right: 6px; bottom: 96px; z-index: 6; padding: 10px;
+  background: #0f0214; border: 2px solid #3b0764; opacity: 0; pointer-events: none;
+  transform: translateY(8px); transition: opacity 0.2s ease-out, transform 0.2s ease-out;
 }
 .t-card:hover .t-lore { opacity: 1; transform: none; }
-.t-lore-h { font-family: "Press Start 2P", monospace; font-size: 0.44rem; color: #FFFF55; margin: 0 0 6px; text-shadow: 1px 1px 0 #000; }
-.t-lore-b { font-family: "Press Start 2P", monospace; font-size: 0.4rem; line-height: 1.7; color: #AAAAAA; margin: 0; }
+.t-lore-h { font-size: 0.42rem; color: #facc15; margin: 0 0 6px; text-shadow: 1px 1px 0 #000; }
+.t-lore-b { font-family: var(--mono); font-size: 11px; line-height: 1.6; color: #d8b4fe; margin: 0; }
 .t-links {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
-  display: flex; justify-content: center; gap: 5px; padding: 10px 8px;
-  background: #1a1a1a; border-top: 3px solid #000;
+  display: flex; justify-content: center; gap: 4px; padding: 10px 8px;
+  background: #0e0e10; border-top: 2px solid #09090b;
 }
 .t-btn {
-  font-family: "Press Start 2P", monospace; font-size: 0.48rem; color: #FFF;
-  background: #3c3c3c; border: 2px solid #000;
-  box-shadow: inset -2px -2px 0 #1a1a1a, inset 2px 2px 0 #5a5a5a;
-  padding: 8px 10px; text-decoration: none; transition: none;
+  font-size: 0.44rem; color: #f4f4f5;
+  background: #27272a; border: 2px solid #09090b;
+  box-shadow: inset -1px -1px 0 #18181b, inset 1px 1px 0 #3f3f46;
+  padding: 7px 10px; text-decoration: none;
+  transition: color 0.12s ease-out, background 0.12s ease-out;
 }
-.t-btn:hover { background: var(--accent); color: #000; }
-.t-btn:active { transform: translateY(2px); box-shadow: inset 2px 2px 0 #1a1a1a, inset -2px -2px 0 #5a5a5a; }
+.t-btn:hover { color: var(--gold); background: #3f3f46; }
+.t-btn:active { transform: translateY(1px); box-shadow: inset 1px 1px 0 #18181b, inset -1px -1px 0 #3f3f46; }
 @media (prefers-reduced-motion: reduce) {
-  .t-lore, .t-card { transition: none; }
+  .t-lore, .t-card, .t-btn { transition: none; }
   .t-card:hover, .t-card:focus-visible { transform: none; }
 }

@@ -62,11 +62,13 @@ const TEMPLATES = {
       <p class="ev-body">${escape(e.desc)}</p>
     </details>`,
 
-  notices: (n) => `
-    <div class="notice-item">
-      <span class="tag">${escape(n.tag)}</span>
+  notices: (n) => {
+    const cls = /urgent|important|deadline/i.test(n.tag) ? "urgent" : /new|fresh|latest/i.test(n.tag) ? "new" : "info";
+    return `<div class="notice-item">
+      <span class="tag ${cls}">${escape(n.tag)}</span>
       <div><strong>${escape(n.title)}</strong> <span class="n-body">${escape(n.body)}</span></div>
-    </div>`,
+    </div>`;
+  },
 
   challenges: (c) => `
     <article class="challenge">

@@ -1,43 +1,17 @@
-/* ---------- page layout grids (Minecraft theme, works with components.css) ---------- */
+/* ---------- page layout grids (Minecraft theme) ---------- */
 .events, .notices, .challenges { display: grid; gap: 0.9rem; }
-
-/* event open state — keep bevel, lift accent */
-.event[open] {
-  box-shadow: inset 3px 3px 0 #404040, inset -3px -3px 0 #151515, 0 0 0 2px var(--emerald);
-}
-.event summary img { width: 48px; height: 36px; image-rendering: pixelated; border: 2px solid #000; flex: none; }
-.event .ev-title { flex: 1; display: flex; flex-direction: column; gap: 0.2rem; }
-.event .ev-date { font-family: var(--mono); font-size: 0.95rem; color: var(--muted); text-shadow: none; }
-.event .ev-toggle { font-family: var(--disp); font-size: 0.8rem; color: var(--emerald); flex: none; transition: transform 0.15s steps(2); }
-.event[open] .ev-toggle { transform: rotate(45deg); color: #fff; }
-.event .ev-body {
-  padding: 0 1.1rem 1rem; font-family: var(--mono); font-size: 1.05rem; color: #c8c8c8;
-  border-top: 2px solid #000; margin-top: 0.2rem; padding-top: 0.8rem;
-}
-
-/* notices — allow wrap for long bodies */
-.notices .notice-item { align-items: flex-start; }
-.notices .notice-item .n-body { flex: 1; color: #c8c8c8; }
-
-/* challenges — stack, badge pinned right */
-.challenges .challenge { display: flex; flex-direction: column; gap: 0.55rem; }
-.challenge .ch-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
 
 /* achievements grid */
 .achs { display: grid; gap: 0.9rem; }
 @media (min-width: 720px) { .achs { grid-template-columns: 1fr 1fr; } }
 
 /* resources grid */
-.res-grid { display: grid; gap: 1.2rem; }
+.res-grid { display: grid; gap: 1.4rem; }
 @media (min-width: 720px) { .res-grid { grid-template-columns: 1fr 1fr; } }
 
 /* ascii decorative note */
 .ascii-note {
-  font-family: var(--mono); font-size: 0.75rem; line-height: 1.35;
-  color: #5a8a5a; white-space: pre; overflow: hidden;
-  letter-spacing: 0.08em; text-shadow: 1px 1px 0 #000;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .event .ev-toggle { transition: none; }
+  font-family: var(--mono); font-size: 12px; line-height: 1.4;
+  color: #4ade80; white-space: pre; overflow: hidden;
+  letter-spacing: 0.08em; text-shadow: 1px 1px 0 #000; opacity: 0.6;
 }
