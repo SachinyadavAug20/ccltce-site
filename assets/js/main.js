@@ -21,8 +21,19 @@ const TEMPLATES = {
       <a class="btn btn-primary" href="${escape(r.link)}">Start Exploring</a>
     </article>`,
 
-  team: (m) => `
-    <article class="t-card" tabindex="0" style="--accent:${escape(m.accent || "#17DD62")}"
+  team: (m) => {
+    const links = [
+      m.portfolio && ["PORT", m.portfolio, ""],
+      m.github && ["GH", `https://github.com/${handle(m.github)}`, "GitHub"],
+      m.twitter && ["X", `https://x.com/${handle(m.twitter)}`, "X"],
+      m.linkedin && ["LI", `https://linkedin.com/in/${handle(m.linkedin)}`, "LinkedIn"],
+    ].filter(Boolean);
+    const bar = links.length
+      ? `<div class="t-links">${links.map(([t, u, al]) =>
+          `<a class="t-btn" href="${escape(u)}" target="_blank" rel="noopener"${al ? ` aria-label="${al}"` : ""}>${t}</a>`).join("")}</div>`
+      : "";
+    return `
+    <article class="t-card${links.length ? "" : " t-no-links"}" tabindex="0" style="--accent:${escape(m.accent || "#17DD62")}"
       data-name="${escape(m.name)}" data-role="${escape(m.role)}" data-area="${escape(m.area)}"
       data-bio="${escape(m.bio || "")}" data-item="${escape(m.item || "")}" data-accent="${escape(m.accent || "#17DD62")}"
       data-portfolio="${escape(m.portfolio)}" data-github="${escape(handle(m.github))}"
@@ -37,13 +48,9 @@ const TEMPLATES = {
         <p class="t-lore-h">Item Lore:</p>
         <p class="t-lore-b">${escape(m.bio || "")}</p>
       </div>
-      <div class="t-links">
-        <a class="t-btn" href="${escape(m.portfolio)}" target="_blank" rel="noopener">PORT</a>
-        <a class="t-btn" href="https://github.com/${escape(handle(m.github))}" target="_blank" rel="noopener" aria-label="GitHub">GH</a>
-        <a class="t-btn" href="https://x.com/${escape(handle(m.twitter))}" target="_blank" rel="noopener" aria-label="X">X</a>
-        <a class="t-btn" href="https://linkedin.com/in/${escape(handle(m.linkedin))}" target="_blank" rel="noopener" aria-label="LinkedIn">LI</a>
-      </div>
-    </article>`,
+      ${bar}
+    </article>`;
+  },
 
   achievements: (a) => `
     <article class="ach">
@@ -55,7 +62,7 @@ const TEMPLATES = {
   events: (e) => `
     <details class="event">
       <summary>
-        <img src="assets/img/${escape(e.image)}.svg" alt="${escape(e.title)} poster" width="56" height="38" />
+        <img src="assets/img/${escape(e.image)}.svg" alt="${escape(e.title)} poster" width="56" height="38" loading="lazy" decoding="async" />
         <span class="ev-title">${escape(e.title)}<span class="ev-date">${escape(e.date)}</span></span>
         <span class="ev-toggle" aria-hidden="true">+</span>
       </summary>

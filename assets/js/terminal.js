@@ -53,8 +53,8 @@
       })[0];
       if (!m) return print("no member: " + arg, "term-err");
       ["— " + m.name + " —", "  role    " + m.role, "  track   " + m.track,
-       "  stack   " + m.stack.join(", "), "  github  github.com/" + m.github,
-       "  lore    " + m.bio].forEach(print);
+       "  stack   " + m.stack.join(", "), m.github ? "  github  github.com/" + m.github : "",
+       "  lore    " + m.bio].filter(Boolean).forEach(print);
     },
     sudo: function (arg) {
       if (arg !== "join") return print("sudo: unknown op", "term-err");

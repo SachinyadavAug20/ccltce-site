@@ -1,15 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8" shape-rendering="crispEdges">
-  <!-- Marzia head: blonde hair, pale skin -->
-  <rect width="8" height="8" fill="#F5D0A9"/>
-  <rect x="0" y="0" width="8" height="2" fill="#F5E6A3"/>
-  <rect x="0" y="0" width="1" height="3" fill="#F5E6A3"/>
-  <rect x="7" y="0" width="1" height="3" fill="#F5E6A3"/>
-  <rect x="0" y="2" width="1" height="2" fill="#F5E6A3"/>
-  <rect x="7" y="2" width="1" height="2" fill="#F5E6A3"/>
-  <rect x="2" y="3" width="1" height="1" fill="#FFF"/>
-  <rect x="5" y="3" width="1" height="1" fill="#FFF"/>
-  <rect x="2" y="3" width="1" height="1" fill="#7C3AED"/>
-  <rect x="5" y="3" width="1" height="1" fill="#7C3AED"/>
-  <rect x="3" y="5" width="2" height="1" fill="#E8A0BF"/>
-  <rect x="1" y="7" width="6" height="1" fill="#F5D0A9"/>
+  <!-- Nitesh Yadav — President -->
+  <rect x="0" y="0" width="8" height="8" fill="#C68642"/>
+  <rect x="0" y="0" width="8" height="2" fill="#4A2C12"/>
+  <rect x="1" y="2" width="1" height="1" fill="#4A2C12"/>
+  <rect x="2" y="2" width="1" height="1" fill="#4A2C12"/>
+  <rect x="5" y="2" width="1" height="1" fill="#4A2C12"/>
+  <rect x="6" y="2" width="1" height="1" fill="#4A2C12"/>
+  <rect x="2" y="3" width="1" height="1" fill="#2B1B0E"/>
+  <rect x="5" y="3" width="1" height="1" fill="#2B1B0E"/>
+  <rect x="3" y="5" width="2" height="1" fill="#7F1D1D"/>
 </svg>
