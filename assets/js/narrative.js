@@ -26,7 +26,7 @@ import { createLighting } from "./narrative-light.js";
   var dragon = initDragon(scene, camera, viewport);
   window.CCLTCE_DRAGON = dragon;
   var hint = wrapper.querySelector(".narrative-hint");
-  var lookV = new THREE.Vector3(), lookA = new THREE.Vector3(), tg1 = new THREE.Vector3(), tg2 = new THREE.Vector3();
+  var lookV = new THREE.Vector3(), lookA = new THREE.Vector3();
   var light = createLighting(scene, L);
   var progress = { t: 0, s: 0, dim: "overworld" };
   var overlays = {
@@ -49,14 +49,8 @@ import { createLighting } from "./narrative-light.js";
     }
     if (hint) hint.style.opacity = t > 0.06 ? "0" : "1";
   }
-  // lean into the turn: heading delta between two points on the spline
-  function bank(u) {
-    curve.getTangentAt(u, tg1); curve.getTangentAt(Math.min(u + 0.02, 1), tg2);
-    var d = Math.atan2(tg2.x, tg2.z) - Math.atan2(tg1.x, tg1.z);
-    if (d > Math.PI) d -= Math.PI * 2; else if (d < -Math.PI) d += Math.PI * 2;
-    return Math.max(-0.07, Math.min(0.07, d * 2.5));
-  }
-  var clock = new THREE.Clock(), lastEl = 0, fovS = 45, bankS = 0, firstLook = true;
+  // simple stable cinematic: fixed 45° lens, level horizon, damped scroll follow + damped look
+  var clock = new THREE.Clock(), lastEl = 0, firstLook = true;
   var lookSm = new THREE.Vector3();
   function animate() {
     requestAnimationFrame(animate);
@@ -83,10 +77,6 @@ import { createLighting } from "./narrative-light.js";
     if (Math.abs(progress.t - progress.s) < 0.0002) progress.s = progress.t;
     var u = Math.min(Math.max(progress.s, 0), 1);
     camera.position.copy(curve.getPointAt(u));
-    // damped lens/bank/look — nothing snaps frame-to-frame on fast scroll (was jumpy)
-    var fovT = 45 + Math.min(5, Math.abs(progress.t - progress.s) * 60);
-    fovS += (fovT - fovS) * (1 - Math.pow(0.002, dt));
-    if (Math.abs(camera.fov - fovS) > 0.02) { camera.fov = fovS; camera.updateProjectionMatrix(); }
     var look = lookA.copy(curve.getPointAt(Math.min(u + 0.04, 1))), shake = 0;
     if (dragon) {
       dragon.update(el);
@@ -97,8 +87,6 @@ import { createLighting } from "./narrative-light.js";
     if (firstLook) { lookSm.copy(look); firstLook = false; }
     else lookSm.lerp(look, 1 - Math.pow(0.0005, dt));
     camera.lookAt(lookSm);
-    bankS += (bank(u) - bankS) * (1 - Math.pow(0.001, dt));
-    camera.rotateZ(bankS);
     if (shake > 0) {
       camera.position.x += (Math.random() - 0.5) * shake;
       camera.position.y += (Math.random() - 0.5) * shake;
