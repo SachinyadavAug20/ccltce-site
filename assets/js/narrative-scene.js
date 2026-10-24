@@ -8,7 +8,7 @@ function P(g, m, x, y, z) { m.position.set(x, y, z); g.add(m); return m; }
 
 function buildTrack(g) {
   P(g, box(180, 1, 6, DARKOAK), 120, 3, 0); P(g, box(180, 0.3, 1.5, 0x8a8a8a), 120, 3.7, 0);
-  for (var i = 0; i < 36; i++) P(g, box(1.2, 0.5, 5, 0xbc7b44), 40 + i * 5, 3.3, 0);
+  for (var i = 0; i < 36; i++) P(g, box(1.2, 0.5, 5, 0xbd7f32), 40 + i * 5, 3.3, 0);
   var cart = P(g, box(4, 2, 3, STONE), 80, 5.5, 0); cart.userData.cart = true;
   P(g, box(2, 1.5, 2, GOLD, GOLD, 0.3), 80, 7, 0);
   for (var a = 0; a < 6; a++) {
@@ -72,19 +72,19 @@ export function buildScene() {
   var scene = new THREE.Scene();
   scene.background = new THREE.Color(0x78a7ff);
   scene.fog = new THREE.FogExp2(0x78a7ff, 0.006);
-  scene.add(new THREE.AmbientLight(0xffeedd, 0.9));
-  var sun = new THREE.DirectionalLight(0xffcc88, 0.9); sun.position.set(50, 80, 30); scene.add(sun);
-  var fill = new THREE.DirectionalLight(0xffaa66, 0.45); fill.position.set(-30, 20, -40); scene.add(fill);
-  scene.add(new THREE.HemisphereLight(0xaaccff, 0x554433, 0.6));
+  var amb = new THREE.AmbientLight(0xffeedd, 0.55); scene.add(amb);
+  var sun = new THREE.DirectionalLight(0xffffff, 1.0); sun.position.set(50, 80, 30); scene.add(sun);
+  var fill = new THREE.DirectionalLight(0xffccaa, 0.35); fill.position.set(-30, 20, -40); scene.add(fill);
+  var hemi = new THREE.HemisphereLight(0xaaccff, 0x665544, 0.55); scene.add(hemi);
   var world = new THREE.Group(); scene.add(world);
   buildCampus(world);
   var stations = buildTrack(world);
   buildNether(world); buildEnd(world); buildBedrock(world);
   scene.userData.skyPresets = {
-    overworld: { sky: 0x78a7ff, fog: 0x78a7ff, d: 0.006 },
-    nether: { sky: 0x3a0a0a, fog: 0x3a0a0a, d: 0.02 },
-    end: { sky: 0x0a0512, fog: 0x0a0512, d: 0.018 },
-    bedrock: { sky: 0x050508, fog: 0x050508, d: 0.03 },
+    overworld: { sky: 0x78a7ff, fog: 0xbdd5ff, d: 0.0028 },
+    nether: { sky: 0x3a0a0a, fog: 0x4a1515, d: 0.011 },
+    end: { sky: 0x0a0512, fog: 0x120a20, d: 0.007 },
+    bedrock: { sky: 0x050508, fog: 0x0a0a10, d: 0.013 },
   };
-  return { scene: scene, stations: stations };
+  return { scene: scene, stations: stations, lights: { amb: amb, sun: sun, fill: fill, hemi: hemi } };
 }

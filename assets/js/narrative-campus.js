@@ -1,5 +1,5 @@
 // Overworld campus: village, farms, pond, lamps, animals, hostiles.
-import { GOLD, STONE, STONE2, DARKOAK, OAK, box, glowLight, tree, torch } from "./narrative-blocks.js";
+import { GOLD, STONE, STONE2, DARKOAK, OAK, GRASS, DIRT, LEAF, LEAF2, WATER, PATH, box, glowLight, tree, torch } from "./narrative-blocks.js";
 import { cow, pig, sheep, chicken, villager } from "./narrative-mobs.js";
 import { wolf, cat, horse, rabbit, fox, bee, mooshroom, turtle, panda, polarBear, goat, llama, bat, parrot, axolotl, armadillo, frog } from "./narrative-mobs2.js";
 import { spider, zombie, skeleton, creeper, ironGolem, snowGolem, slime, witch, pillager, drowned, phantom, warden, guardian } from "./narrative-mobs3.js";
@@ -20,12 +20,12 @@ export function villageHouse(g, x, z, s) {
 
 export function well(g, x, z) {
   P(g, box(5, 0.5, 5, STONE), x, -0.5, z); P(g, box(4, 2.5, 4, STONE), x, 0.5, z);
-  P(g, box(3, 2, 3, 0x3355aa), x, 0.5, z);
+  P(g, box(3, 2, 3, WATER), x, 0.5, z);
   [[-2.5, -2.5], [2.5, -2.5], [-2.5, 2.5], [2.5, 2.5]].forEach(function (p) {
     P(g, box(0.4, 3, 0.4, STONE2), x + p[0], 2, z + p[1]);
   });
   P(g, box(6, 0.4, 6, DARKOAK), x, 3.5, z);
-  g.add(glowLight(0x3355aa, 0.5, 8, x, 1, z));
+  g.add(glowLight(WATER, 0.5, 8, x, 1, z));
 }
 
 export function lampPost(g, x, z) {
@@ -35,41 +35,72 @@ export function lampPost(g, x, z) {
 }
 
 export function farmPlot(g, x, z, w, d) {
-  P(g, box(w, 0.4, d, 0x6b4423), x, -0.6, z);
-  P(g, box(w + 0.5, 0.5, d + 0.5, 0x8b6b4a), x, -0.8, z);
+  P(g, box(w, 0.4, d, DIRT), x, -0.6, z);
+  P(g, box(w + 0.5, 0.5, d + 0.5, PATH), x, -0.8, z);
   for (var c = 0; c < Math.floor(w * d / 2); c++) {
     var cx = x + (Math.random() - 0.5) * w * 0.8, cz = z + (Math.random() - 0.5) * d * 0.8;
-    P(g, box(0.25, 0.6 + (c % 3) * 0.2, 0.25, c % 2 ? 0x3d8c2a : 0x2d7a1e), cx, -0.3, cz);
+    P(g, box(0.25, 0.6 + (c % 3) * 0.2, 0.25, c % 2 ? LEAF2 : LEAF), cx, -0.3, cz);
   }
+  var hw = w / 2 + 0.6, hd = d / 2 + 0.6;
+  for (var fx = -hw; fx <= hw + 0.1; fx += 2) { P(g, box(0.15, 1, 0.15, OAK), x + fx, 0.3, z - hd); P(g, box(0.15, 1, 0.15, OAK), x + fx, 0.3, z + hd); }
+  for (var fz = -hd; fz <= hd + 0.1; fz += 2) { P(g, box(0.15, 1, 0.15, OAK), x - hw, 0.3, z + fz); P(g, box(0.15, 1, 0.15, OAK), x + hw, 0.3, z + fz); }
+  P(g, box(w + 1.4, 0.12, 0.1, OAK), x, 0.72, z - hd); P(g, box(w + 1.4, 0.12, 0.1, OAK), x, 0.72, z + hd);
+  P(g, box(0.1, 0.12, d + 1.4, OAK), x - hw, 0.72, z); P(g, box(0.1, 0.12, d + 1.4, OAK), x + hw, 0.72, z);
 }
 
 export function flowerBed(g, x, z, n) {
   for (var f = 0; f < n; f++) {
     var fx2 = x + (Math.random() - 0.5) * 6, fz = z + (Math.random() - 0.5) * 6;
-    P(g, box(0.3, 0.8, 0.3, 0x2d7a1e), fx2, 0, fz);
+    P(g, box(0.3, 0.8, 0.3, LEAF), fx2, 0, fz);
     P(g, box(0.5, 0.5, 0.5, f % 3 === 0 ? 0xff3355 : f % 3 === 1 ? 0xffaa00 : 0xff66cc), fx2, 0.6, fz);
   }
 }
 
 export function pond(g, x, z) {
-  P(g, box(10, 0.3, 8, 0x3355aa, 0x3355aa, 0.15), x, -1, z);
-  P(g, box(12, 0.4, 10, 0x4a3728), x, -1.3, z);
-  for (var rl = 0; rl < 6; rl++) P(g, box(0.15, 1.2, 0.15, 0x2d7a1e), x + (Math.random() - 0.5) * 8, -0.5, z + (Math.random() - 0.5) * 6);
-  g.add(glowLight(0x3355aa, 0.4, 10, x, 0, z));
+  P(g, box(10, 0.3, 8, WATER, WATER, 0.15), x, -1, z);
+  P(g, box(12, 0.4, 10, DIRT), x, -1.3, z);
+  for (var rl = 0; rl < 6; rl++) P(g, box(0.15, 1.2, 0.15, LEAF), x + (Math.random() - 0.5) * 8, -0.5, z + (Math.random() - 0.5) * 6);
+  g.add(glowLight(WATER, 0.4, 10, x, 0, z));
+}
+
+function bush(g, x, z) {
+  P(g, box(1.6, 1.1, 1.6, LEAF), x, 0.2, z);
+  P(g, box(1.1, 0.9, 1.1, LEAF2), x + 0.25, 0.5, z + 0.15);
+}
+
+function rock(g, x, z, s) {
+  var k = s || 1;
+  P(g, box(1.3 * k, 0.9 * k, 1.1 * k, STONE), x, 0.25 * k, z);
+  P(g, box(0.8 * k, 0.6 * k, 0.7 * k, STONE2), x + 0.3 * k, 0.6 * k, z + 0.1 * k);
+}
+
+function clouds(g) {
+  for (var c = 0; c < 10; c++) {
+    var cx = -70 + c * 16 + (c % 3) * 4;
+    var cl = P(g, box(14 + (c % 4) * 8, 2.5, 10 + (c % 3) * 5, 0xffffff, 0xffffff, 0.25), cx, 50 + (c % 4) * 5, -40 + (c % 6) * 14);
+    cl.material.transparent = true; cl.material.opacity = 0.88;
+    cl.userData.cloud = c * 0.8; cl.userData.baseX = cx;
+  }
 }
 
 export function buildCampus(g) {
-  P(g, box(140, 2, 100, 0x2d5a1e), 0, -2, -10);
-  P(g, box(140, 4, 100, 0x6b4423), 0, -5, -10);
-  for (var gp = 0; gp < 15; gp++) P(g, box(2, 0.15, 2, 0x3d7a28), gp % 2 ? 1.5 : -1.5, -0.9, 5 - gp * 3);
+  P(g, box(140, 2, 100, GRASS), 0, -2, -10);
+  P(g, box(140, 4, 100, DIRT), 0, -5, -10);
+  for (var gp = 0; gp < 15; gp++) P(g, box(2, 0.15, 2, PATH), gp % 2 ? 1.5 : -1.5, -0.9, 5 - gp * 3);
   P(g, box(5, 11, 5, STONE), -12, 4.5, -8); P(g, box(5, 11, 5, STONE), 12, 4.5, -8);
   P(g, box(32, 4, 5, STONE), 0, 12, -8); P(g, box(36, 1.5, 8, DARKOAK), 0, 14.75, -8);
   P(g, box(14, 2.5, 0.5, GOLD, GOLD, 0.5), 0, 12, -5.2);
+  P(g, box(0.25, 3.5, 2, 0xeab308), -14.6, 10, -5.3);
+  P(g, box(0.25, 3.5, 2, 0x17dd62), 14.6, 10, -5.3);
   g.add(glowLight(GOLD, 2, 30, 0, 12, -4));
   [-10, 10].forEach(function (x) { torch(g, x, 8, -5); });
   tree(g, -25, -5, 1.2); tree(g, 25, -5, 1.1); tree(g, -20, -20, 1.4); tree(g, 20, -20, 1.3);
   tree(g, -30, -35, 1); tree(g, 30, -35, 1.1); tree(g, 15, -45, 0.9); tree(g, -15, -45, 1);
   tree(g, -38, -12, 1.3); tree(g, 38, -12, 1.2); tree(g, -42, -30, 1.1); tree(g, 42, -30, 1);
+  bush(g, -16, -10); bush(g, 16, -12); bush(g, -24, -40); bush(g, 24, -38);
+  bush(g, -8, -36); bush(g, 8, -36); bush(g, -34, -4); bush(g, 34, -4);
+  rock(g, -14, -42, 1.2); rock(g, 14, -44, 1); rock(g, -36, -46, 1.4); rock(g, 30, -16, 0.9);
+  clouds(g);
   for (var fl = 0; fl < 15; fl++) P(g, box(0.4, 0.8, 0.4, fl % 3 === 0 ? 0xff3355 : fl % 3 === 1 ? 0xffaa00 : 0xff66cc, fl % 3 === 2 ? 0xff66cc : 0, 0.3), -30 + Math.random() * 60, 0, -50 + Math.random() * 45);
   villageHouse(g, -32, -14, 1); villageHouse(g, 32, -14, 1.1); villageHouse(g, -28, -38, 0.9);
   well(g, 0, -14); lampPost(g, -8, -14); lampPost(g, 8, -14); lampPost(g, -8, -28); lampPost(g, 8, -28);
