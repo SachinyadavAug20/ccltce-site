@@ -92,15 +92,30 @@ import { initAudio, AUDIO_BINS } from "./audio.js";
   const audio = initAudio();
   const spec = uni.uSpec.value;
 
-  // Pointer torch: smoothed cursor target in UV space (y-up), ramped on first move.
+  // dimension palettes — overworld → nether → end → bedrock
+  const DIMS = {
+    overworld: { sky: [0.078, 0.078, 0.078], mid: [0.055, 0.078, 0.045], deep: [0.045, 0.045, 0.045], ink: [0.30, 0.85, 0.38], hot: [1.0, 0.67, 0.0] },
+    nether: { sky: [0.10, 0.04, 0.03], mid: [0.08, 0.03, 0.02], deep: [0.06, 0.02, 0.02], ink: [1.0, 0.40, 0.20], hot: [1.0, 0.20, 0.0] },
+    end: { sky: [0.06, 0.04, 0.09], mid: [0.05, 0.03, 0.07], deep: [0.04, 0.02, 0.05], ink: [0.75, 0.55, 0.85], hot: [0.94, 0.90, 1.0] },
+    bedrock: { sky: [0.04, 0.04, 0.05], mid: [0.03, 0.03, 0.035], deep: [0.02, 0.02, 0.025], ink: [0.10, 0.86, 0.38], hot: [1.0, 0.67, 0.0] },
+  };
+  let curDim = "overworld", tgt = DIMS.overworld;
+  function lerpArr(a, b, k) { for (let i = 0; i < 3; i++) a[i] += (b[i] - a[i]) * k; }
+  setInterval(() => {
+    const d = window.CCLTCE_DIM || "overworld";
+    if (d !== curDim) { curDim = d; tgt = DIMS[d] || DIMS.overworld; }
+  }, 200);
+
   const mTarget = { x: 0.5, y: 0.5 };
   const draw = (t) => {
     uni.uTime.value = t;
     const m = uni.uMouse.value;
     m.x += (mTarget.x - m.x) * 0.12;
     m.y += (mTarget.y - m.y) * 0.12;
-    audio.bars(spec);
-    renderer.render(scene, cam);
+    lerpArr(uni.uSkyCol.value, tgt.sky, 0.02); lerpArr(uni.uMidCol.value, tgt.mid, 0.02);
+    lerpArr(uni.uDeepCol.value, tgt.deep, 0.02); lerpArr(uni.uInk.value, tgt.ink, 0.02);
+    lerpArr(uni.uHot.value, tgt.hot, 0.02);
+    audio.bars(spec); renderer.render(scene, cam);
   };
 
   addEventListener("pointermove", (e) => {
