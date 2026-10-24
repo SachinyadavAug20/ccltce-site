@@ -1,48 +1,14 @@
-// Voxel campus + track + bedrock with skybox + overworld mobs.
+// Voxel track + bedrock terminal. Campus/terrain in narrative-campus.js.
 import * as THREE from "../vendor/three.module.js";
-import { GOLD, EMER, RED, AMETH, STONE, STONE2, DEEP, DARK, OAK, DARKOAK, QUARTZ, box, glowLight, tree, torch } from "./narrative-blocks.js";
+import { GOLD, EMER, RED, AMETH, STONE, STONE2, DEEP, DARK, DARKOAK, QUARTZ, box, glowLight, torch } from "./narrative-blocks.js";
 import { buildNether, buildEnd } from "./narrative-zones.js";
-import { cow, pig, sheep, chicken, villager } from "./narrative-mobs.js";
+import { buildCampus } from "./narrative-campus.js";
 
 function P(g, m, x, y, z) { m.position.set(x, y, z); g.add(m); return m; }
 
-function buildCampus(g) {
-  P(g, box(140, 2, 100, 0x2d5a1e), 0, -2, -10);
-  P(g, box(140, 4, 100, 0x6b4423), 0, -5, -10);
-  for (var gp = 0; gp < 15; gp++) P(g, box(2, 0.15, 2, 0x3d7a28), gp % 2 ? 1.5 : -1.5, -0.9, 5 - gp * 3);
-  P(g, box(5, 20, 5, STONE), -12, 9, -8); P(g, box(5, 20, 5, STONE), 12, 9, -8);
-  P(g, box(32, 5, 5, STONE), 0, 21, -8); P(g, box(36, 2, 8, DARKOAK), 0, 24, -8);
-  P(g, box(14, 3, 0.5, GOLD, GOLD, 0.5), 0, 21, -5.2);
-  g.add(glowLight(GOLD, 2, 30, 0, 20, -4));
-  [-10, 10].forEach(function (x) { torch(g, x, 15, -5); });
-  tree(g, -25, -5, 1.2); tree(g, 25, -5, 1.1); tree(g, -20, -20, 1.4); tree(g, 20, -20, 1.3);
-  tree(g, -30, -35, 1); tree(g, 30, -35, 1.1); tree(g, 15, -45, 0.9); tree(g, -15, -45, 1);
-  for (var fl = 0; fl < 15; fl++) P(g, box(0.4, 0.8, 0.4, fl % 3 === 0 ? 0xff3355 : fl % 3 === 1 ? 0xffaa00 : 0xff66cc, fl % 3 === 2 ? 0xff66cc : 0, 0.3), -30 + Math.random() * 60, 0, -50 + Math.random() * 45);
-  P(g, box(50, 14, 20, STONE2), 0, 6, -30); P(g, box(54, 2, 22, DARKOAK), 0, 14, -30);
-  for (var i = 0; i < 8; i++) {
-    P(g, box(3, 4, 0.5, GOLD, GOLD, 0.4), -20 + i * 5.7, 7, -20);
-    P(g, box(3.5, 0.3, 0.8, STONE), -20 + i * 5.7, 4.8, -19.8);
-  }
-  // door — recessed into frame to avoid z-fighting
-  P(g, box(5, 8.5, 1.2, STONE), 0, 3.25, -19.5);
-  P(g, box(3.8, 7.5, 0.4, DARKOAK), 0, 3, -19.3);
-  P(g, box(0.3, 0.3, 0.3, GOLD, GOLD, 0.5), 1.5, 3, -19);
-  for (var dp = 0; dp < 3; dp++) P(g, box(3.6, 0.15, 0.1, 0x3a2818), 0, 1.5 + dp * 2.2, -19.1);
-  for (var p = 0; p < 10; p++) P(g, box(4, 0.4, 3, STONE), p % 2 ? 2 : -2, -0.8, 2 - p * 3);
-  for (var t = 0; t < 5; t++) { P(g, box(0.8, 0.8, 0.8, GOLD, GOLD, 0.8), -6, 0, 0 - t * 5); g.add(glowLight(GOLD, 0.8, 12, -6, 1, 0 - t * 5)); }
-  cow(g, -18, 0, -15); cow(g, 22, 0, -25); pig(g, 18, 0, -10); pig(g, -22, 0, -30);
-  sheep(g, -28, 0, -18); sheep(g, 28, 0, -35);
-  chicken(g, 12, 0, -5); chicken(g, -14, 0, -8); chicken(g, 8, 0, -18);
-  villager(g, -5, 0, -18); villager(g, 8, 0, -22);
-  for (var e = 0; e < 20; e++) {
-    var ember = P(g, box(0.3, 0.3, 0.3, GOLD, GOLD, 1), (Math.random() - 0.5) * 40, Math.random() * 18, (Math.random() - 0.5) * 30);
-    ember.userData.float = Math.random() * Math.PI * 2;
-  }
-}
-
 function buildTrack(g) {
   P(g, box(180, 1, 6, DARKOAK), 120, 3, 0); P(g, box(180, 0.3, 1.5, 0x8a8a8a), 120, 3.7, 0);
-  for (var i = 0; i < 36; i++) P(g, box(1.2, 0.5, 5, OAK), 40 + i * 5, 3.3, 0);
+  for (var i = 0; i < 36; i++) P(g, box(1.2, 0.5, 5, 0xbc7b44), 40 + i * 5, 3.3, 0);
   var cart = P(g, box(4, 2, 3, STONE), 80, 5.5, 0); cart.userData.cart = true;
   P(g, box(2, 1.5, 2, GOLD, GOLD, 0.3), 80, 7, 0);
   for (var a = 0; a < 6; a++) {
