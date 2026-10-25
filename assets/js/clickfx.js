@@ -84,11 +84,13 @@
 
   document.addEventListener("pointerdown", function (e) {
     if (reduce) return;
+    if (e.pointerType === "touch" || window.innerWidth <= 768 || window.matchMedia("(max-width: 768px), (pointer: coarse)").matches) return;
     burst(e.clientX, e.clientY);
   }, { passive: true });
 
   document.addEventListener("pointerover", function (e) {
     if (reduce || !e.target.closest) return;
+    if (e.pointerType === "touch" || window.innerWidth <= 768 || window.matchMedia("(max-width: 768px), (pointer: coarse)").matches) return;
     var el = e.target.closest(HOVER);
     if (el) sparks(el);
   }, { passive: true });

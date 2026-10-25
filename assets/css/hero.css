@@ -6,24 +6,47 @@
   padding: clamp(6.5rem, 11vh, 8.5rem) 1.25rem 3rem;
 }
 
-/* emblem in a dark bevel slot — no cream square */
+/* floating emblem — luminous beacon aura, no harsh black box */
 .hero-logo {
-  width: clamp(110px, 14vw, 160px); height: clamp(110px, 14vw, 160px);
-  object-fit: contain; image-rendering: auto; margin-bottom: 0.8rem;
-  padding: 0.85rem;
+  width: clamp(115px, 14vw, 160px); height: clamp(115px, 14vw, 160px);
+  object-fit: contain; image-rendering: auto; margin-bottom: 0.5rem;
+  padding: 0;
   pointer-events: auto;   /* parent overlay is pointer-events:none — needed for :hover */
-  background: #1c1c1f;
-  border: 2px solid #38383a;
-  box-shadow: inset 2px 2px 0 #2a2a2e, inset -2px -2px 0 #121214, 4px 4px 0 rgba(0,0,0,0.5),
-    0 0 0 1px rgba(46, 230, 208, 0.4), 0 0 30px rgba(46, 230, 208, 0.28);
-  transition: transform 0.15s ease-out, box-shadow 0.3s ease-out;
+  background: radial-gradient(circle, rgba(46, 230, 208, 0.22) 0%, rgba(255, 215, 106, 0.09) 50%, transparent 72%);
+  border: none;
+  border-radius: 50%;
+  filter:
+    drop-shadow(0 0 16px rgba(46, 230, 208, 0.85))
+    drop-shadow(0 0 36px rgba(255, 215, 106, 0.45))
+    drop-shadow(0 8px 16px rgba(0, 0, 0, 0.85));
+  transition: transform 0.25s ease-out, filter 0.3s ease-out;
 }
 .hero-logo:hover {
-  transform: translateY(-4px);
-  box-shadow: inset 2px 2px 0 #2a2a2e, inset -2px -2px 0 #121214, 4px 4px 0 rgba(0,0,0,0.5),
-    0 0 0 1px rgba(46, 230, 208, 0.95), 0 0 48px rgba(46, 230, 208, 0.6),
-    0 0 96px rgba(23, 221, 98, 0.38);
+  transform: translateY(-4px) scale(1.06);
+  filter:
+    drop-shadow(0 0 24px rgba(46, 230, 208, 1))
+    drop-shadow(0 0 55px rgba(23, 221, 98, 0.7))
+    drop-shadow(0 0 70px rgba(255, 215, 106, 0.6))
+    drop-shadow(0 10px 22px rgba(0, 0, 0, 0.9));
 }
+
+/* RPG quest spawn badge */
+.hero-badge {
+  font-family: var(--disp);
+  font-size: clamp(0.5rem, 1.1vw, 0.65rem);
+  letter-spacing: 0.16em;
+  color: #17dd62;
+  background: rgba(13, 13, 16, 0.78);
+  border: 2px solid #000;
+  box-shadow: inset 2px 2px 0 #2a2a2e, inset -2px -2px 0 #121214, 0 4px 14px rgba(0,0,0,0.65);
+  padding: 0.35rem 0.9rem;
+  margin: 0.1rem auto 0.4rem;
+  text-shadow: 0 0 8px rgba(23, 221, 98, 0.8);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.hb-gem { color: #ffd76a; text-shadow: 0 0 8px rgba(255, 215, 106, 0.8); }
 
 /* no dark veil over the scene — the hero text carries its own contact shadows */
 
@@ -97,34 +120,43 @@
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
-/* college name — clean mono, tracking-wide, softly lit */
+/* adventure quest subtext & college location */
 .hero-sub {
-  display: flex; flex-direction: column; align-items: center;
-  margin: 0.5rem auto 1rem;
-  font-family: var(--mono); font-size: clamp(13px, 2vw, 15px);
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: #f2fbf9;
-  text-shadow:
-    0 0 9px rgba(46, 230, 208, 0.55),
-    0 0 22px rgba(46, 230, 208, 0.3),
-    1px 1px 0 #000,
-    0 3px 10px rgba(0, 0, 0, 0.9);
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+  margin: 0.4rem auto 1.15rem;
   z-index: 10;
 }
-.hero-sub small {
-  display: inline-flex; align-items: center; gap: 0.6rem;
-  font-family: var(--mono); font-size: 12px;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: #ffd76a; margin-top: 0.7rem;
-  text-shadow:
-    0 0 10px rgba(234, 179, 8, 0.75),
-    0 0 24px rgba(234, 179, 8, 0.35),
-    1px 1px 0 #000;
+.hero-motto {
+  font-family: var(--disp);
+  font-size: clamp(0.62rem, 1.3vw, 0.82rem);
+  letter-spacing: 0.22em;
+  color: #ffd76a;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(255, 215, 106, 0.85), 2px 2px 0 #2b1d04, 0 4px 12px rgba(0, 0, 0, 0.9);
 }
-.hero-sub small::before, .hero-sub small::after {
-  content: "———"; color: var(--gold); letter-spacing: 0.05em;
-  text-shadow: 0 0 8px rgba(234, 179, 8, 0.85), 0 0 18px rgba(234, 179, 8, 0.4);
+.hero-college {
+  font-family: var(--mono);
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 0 0 12px rgba(46, 230, 208, 0.55), 2px 2px 0 #000, 0 3px 12px rgba(0, 0, 0, 0.95);
 }
+.hero-loc {
+  font-family: var(--mono);
+  font-size: clamp(11px, 1.5vw, 13px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a8d5c8;
+  margin: 0;
+  text-shadow: 1px 1px 0 #000, 0 2px 8px rgba(0, 0, 0, 0.85);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.loc-gem { color: #ffd76a; text-shadow: 0 0 8px rgba(255, 215, 106, 0.75); }
 
 /* inventory buttons — rich emerald / stone bevels */
 .hero-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 0.8rem; }

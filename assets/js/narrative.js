@@ -49,7 +49,7 @@ import { initCrystals } from "./narrative-crystals.js";
     var phase = phaseAt(t);
     for (var key in overlays) { var el = overlays[key]; if (el) el.classList.toggle("on", key === phase); }
     if (heroOverlay) {
-      var hf = clamp01(t / 0.12);
+      var hf = clamp01(t / 0.18);
       heroOverlay.style.opacity = 1 - hf; heroOverlay.style.transform = "translateY(" + (-60 * hf) + "px)";
       heroOverlay.style.display = hf >= 1 ? "none" : "";
     }
@@ -63,8 +63,8 @@ import { initCrystals } from "./narrative-crystals.js";
     var el = clock.getElapsedTime(), dt = Math.min(0.1, Math.max(0.001, el - lastEl));
     lastEl = el;
     // forced slow-motion: the raw scroll position may teleport, but the story can only
-    // advance GLOW per second — then the camera eases the rest of the way (keeps working off-screen)
-    var diff = progress.raw - progress.t, cap = GLOW * dt;
+    // advance GLOW per second (forcefully slow at hero to enjoy the spawn) — then the camera eases the rest
+    var diff = progress.raw - progress.t, cap = (progress.t < 0.22 || progress.raw < 0.22 ? 0.08 : GLOW) * dt;
     progress.t += diff > cap ? cap : diff < -cap ? -cap : diff;
     progress.s += (progress.t - progress.s) * (1 - Math.pow(0.0004, dt));
     if (Math.abs(progress.t - progress.s) < 0.0002) progress.s = progress.t;
@@ -125,8 +125,8 @@ import { initCrystals } from "./narrative-crystals.js";
     }
   }
   function onScroll() {
-    var rect = wrapper.getBoundingClientRect();
-    progress.raw = clamp01(-rect.top / (wrapper.offsetHeight - innerHeight));
+    var rect = wrapper.getBoundingClientRect(), y = clamp01(-rect.top / (wrapper.offsetHeight - innerHeight));
+    progress.raw = y < 0.3 ? Math.pow(y / 0.3, 1.4) * 0.3 : y;
   }
   addEventListener("scroll", onScroll, { passive: true });
   viewport.addEventListener("pointermove", function (e) {
