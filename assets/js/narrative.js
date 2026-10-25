@@ -63,7 +63,7 @@ import { initCrystals } from "./narrative-crystals.js";
     var el = clock.getElapsedTime(), dt = Math.min(0.1, Math.max(0.001, el - lastEl));
     lastEl = el;
     // smooth cinematic scroll glide: responsive exponential tracking without runaway lag
-    var ease = 1 - Math.exp((progress.raw < 0.25 ? -5 : -7) * dt);
+    var ease = 1 - Math.exp((progress.raw < 0.25 ? -5 : -10) * dt);
     progress.t += (progress.raw - progress.t) * ease;
     progress.s += (progress.t - progress.s) * (1 - Math.pow(0.0004, dt));
     if (Math.abs(progress.t - progress.s) < 0.0002) progress.s = progress.t;

@@ -6,27 +6,22 @@
   var TIERS = [
     {
       tier: 0,
-      badge: "LEVEL 0 // EXECUTIVE BOARD",
       members: ["Aakash Gupta", "Nitesh Yadav"]
     },
     {
       tier: 1,
-      badge: "LEVEL 1 // OPERATIONS & COORDINATION",
       members: ["Vivek Tiwari"]
     },
     {
       tier: 2,
-      badge: "LEVEL 2 // CORE PILLARS",
       members: ["Sachin Yadav", "Ayush Vishwakarma", "Shashank Suryawanshi"]
     },
     {
       tier: 3,
-      badge: "LEVEL 3 // DOMAINS & CREATIVE",
       members: ["Rashi Kasotiya", "Samiksha Patil", "Sanjana Jagtap", "Adarsh Mishra"]
     },
     {
       tier: 4,
-      badge: "LEVEL 4 // STUDENT OUTREACH",
       members: ["Rushi Jadhav"]
     }
   ];
@@ -141,8 +136,7 @@
     var memberMap = {};
     list.forEach(function (m) { memberMap[m.name] = m; });
 
-    var html = '<div class="tree-mobile-hint">↔ Drag or swipe horizontally to navigate tree &bull; Click node for lore</div>';
-    html += '<div class="tree-canvas">';
+    var html = '<div class="tree-canvas">';
     html += '<svg class="tree-svg" aria-hidden="true">';
     CONNECTIONS.forEach(function (c, idx) {
       html += '<path class="tree-edge" data-from="' + escapeAttr(c.from) + '" data-to="' + escapeAttr(c.to) + '" data-index="' + idx + '"></path>';
@@ -151,7 +145,6 @@
 
     TIERS.forEach(function (t) {
       html += '<section class="tree-tier" data-tier="' + t.tier + '">';
-      html += '<div class="tree-tier-badge"><span class="ttb-gem">◈</span> ' + escapeHtml(t.badge) + ' <span class="ttb-gem">◈</span></div>';
       html += '<div class="tree-tier-nodes">';
 
       t.members.forEach(function (name) {
@@ -160,6 +153,7 @@
         var progress = PROGRESS_MAP[name] || 90;
         var accent = m.accent || "#17dd62";
         var yearClass = (m.area || "").split("•")[0].trim() || "MEMBER";
+        var roleLabel = cleanRole(m.role);
 
         html += '<article class="tree-node" tabindex="0" role="button" aria-haspopup="dialog"';
         html += ' style="--accent: ' + accent + '; --accent-glow: ' + hexToRgba(accent, 0.4) + ';"';
@@ -175,9 +169,9 @@
         html += ' data-linkedin="' + escapeAttr(m.linkedin || "") + '">';
 
         html += '<div class="tn-body">';
-        html += '<div class="tn-avatar"><img src="assets/img/' + escapeAttr(m.image) + '" alt="" width="40" height="40" loading="lazy" /></div>';
+        html += '<div class="tn-avatar"><img src="assets/img/' + escapeAttr(m.image) + '" alt="" width="38" height="38" loading="lazy" /></div>';
         html += '<div class="tn-content">';
-        html += '<span class="tn-role">' + escapeHtml(m.role) + '</span>';
+        html += '<span class="tn-role">' + escapeHtml(roleLabel) + '</span>';
         html += '<h3 class="tn-name">' + escapeHtml(m.name) + '</h3>';
         html += '<span class="tn-class">' + escapeHtml(yearClass) + '</span>';
         html += '</div></div>';
@@ -341,6 +335,13 @@
       var walk = (x - startX) * 1.4;
       container.scrollLeft = scrollLeft - walk;
     });
+  }
+
+  function cleanRole(role) {
+    if (!role) return "";
+    if (/documentation/i.test(role)) return "Docs & Content";
+    if (/social media/i.test(role)) return "Socials & Publicity";
+    return role;
   }
 
   function hexToRgba(hex, alpha) {
