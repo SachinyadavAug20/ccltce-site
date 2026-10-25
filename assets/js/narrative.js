@@ -34,7 +34,7 @@ import { initCrystals } from "./narrative-crystals.js";
   var lookV = new THREE.Vector3(), lookA = new THREE.Vector3();
   var light = createLighting(scene, L);
   var progress = { raw: 0, t: 0, s: 0, dim: "overworld" };
-  var GLOW = 0.85, lastHud = -1;   // max progress units/second + last HUD-synced t
+  var lastHud = -1;
   var overlays = {
     surface: wrapper.querySelector(".narrative-overlay.surface"),
     station1: wrapper.querySelector(".narrative-overlay.station-1"),
@@ -49,11 +49,11 @@ import { initCrystals } from "./narrative-crystals.js";
     var phase = phaseAt(t);
     for (var key in overlays) { var el = overlays[key]; if (el) el.classList.toggle("on", key === phase); }
     if (heroOverlay) {
-      var hf = clamp01(t / 0.18);
-      heroOverlay.style.opacity = 1 - hf; heroOverlay.style.transform = "translateY(" + (-60 * hf) + "px)";
+      var hf = clamp01((t - 0.05) / 0.16);
+      heroOverlay.style.opacity = 1 - hf; heroOverlay.style.transform = "translateY(" + (-50 * hf) + "px)";
       heroOverlay.style.display = hf >= 1 ? "none" : "";
     }
-    if (hint) hint.style.opacity = t > 0.06 ? "0" : "1";
+    if (hint) hint.style.opacity = t > 0.04 ? "0" : "1";
   }
   // simple stable cinematic: fixed 45° lens, level horizon, damped scroll follow + damped look
   var clock = new THREE.Clock(), lastEl = 0, firstLook = true;
@@ -62,10 +62,9 @@ import { initCrystals } from "./narrative-crystals.js";
     requestAnimationFrame(animate);
     var el = clock.getElapsedTime(), dt = Math.min(0.1, Math.max(0.001, el - lastEl));
     lastEl = el;
-    // forced slow-motion: the raw scroll position may teleport, but the story can only
-    // advance GLOW per second (smoothly slow at hero to enjoy the spawn) — then the camera eases the rest
-    var diff = progress.raw - progress.t, cap = (progress.t < 0.22 || progress.raw < 0.22 ? 0.38 : GLOW) * dt;
-    progress.t += diff > cap ? cap : diff < -cap ? -cap : diff;
+    // smooth cinematic scroll glide: responsive exponential tracking without runaway lag
+    var ease = 1 - Math.exp((progress.raw < 0.25 ? -5 : -7) * dt);
+    progress.t += (progress.raw - progress.t) * ease;
     progress.s += (progress.t - progress.s) * (1 - Math.pow(0.0004, dt));
     if (Math.abs(progress.t - progress.s) < 0.0002) progress.s = progress.t;
     syncHud(progress.t);
