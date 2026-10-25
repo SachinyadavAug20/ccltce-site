@@ -119,6 +119,8 @@ async function init() {
   let data;
   try {
     data = await loadData();
+    window.CCLTCE_DATA = data;
+    window.dispatchEvent(new CustomEvent("ccltce:data", { detail: data }));
   } catch {
     return;
   }

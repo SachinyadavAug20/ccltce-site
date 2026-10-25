@@ -31,6 +31,7 @@
   <link rel="stylesheet" href="assets/css/components.css" />
   <link rel="stylesheet" href="assets/css/team.css" />
   <link rel="stylesheet" href="assets/css/teamfx.css" />
+  <link rel="stylesheet" href="assets/css/teamtree.css" />
   <link rel="stylesheet" href="assets/css/footer.css" />
   <link rel="stylesheet" href="assets/css/gamify.css" />
   <link rel="stylesheet" href="assets/css/mobile.css" />
@@ -51,7 +52,28 @@
       <p>The people who run CCLTCE &mdash; people over positions.</p>
     </section>
 
-    <section class="grid team" data-render="team"></section>
+    <!-- View Mode Switcher -->
+    <div class="team-view-controls">
+      <div class="team-view-switcher" role="tablist" aria-label="Team view selector">
+        <button class="tvs-btn active" data-view="tree" role="tab" aria-selected="true" aria-controls="team-tree">
+          <svg class="tvs-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v6m0 0l-5 5m5-5l5 5M7 14v6m10-6v6"/></svg>
+          <span class="tvs-label">SKILL TREE</span>
+        </button>
+        <button class="tvs-btn" data-view="grid" role="tab" aria-selected="false" aria-controls="team-grid">
+          <svg class="tvs-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          <span class="tvs-label">GRID VIEW</span>
+        </button>
+      </div>
+      <p class="team-view-hint">
+        <span class="tvh-gem">◈</span> NeetCode roadmap style &bull; Click any node for character sheet &amp; lore <span class="tvh-gem">◈</span>
+      </p>
+    </div>
+
+    <!-- Tree View Container -->
+    <section class="team-tree-container" id="team-tree" aria-label="Team Hierarchy Tree"></section>
+
+    <!-- Classic Roster Grid -->
+    <section class="grid team" id="team-grid" data-render="team"></section>
   </main>
 
   <footer></footer>
@@ -61,6 +83,7 @@
   <script defer src="assets/js/motion.js"></script>
   <script defer src="assets/js/clickfx.js"></script>
   <script defer src="assets/js/teamFx.js"></script>
+  <script defer src="assets/js/teamTree.js"></script>
 
   <script defer src="assets/js/sfx.js"></script>
   <script defer src="assets/js/term-vfs.js"></script>

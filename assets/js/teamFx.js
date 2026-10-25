@@ -63,13 +63,31 @@
     ov.addEventListener("keydown", trap);
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !ov.hidden) close(); });
     var grid = document.querySelector(".grid.team");
-    grid.addEventListener("click", function (e) {
-      var c = e.target.closest(".t-card");
-      if (c && !e.target.closest("a")) open(c);
+    if (grid) {
+      grid.addEventListener("click", function (e) {
+        var c = e.target.closest(".t-card");
+        if (c && !e.target.closest("a")) open(c);
+      });
+      grid.addEventListener("keydown", function (e) {
+        var c = e.target.closest(".t-card");
+        if (c && (e.key === "Enter" || e.key === " ") && !e.target.closest("a")) { e.preventDefault(); open(c); }
+      });
+    }
+    window.CCLTCE_OPEN_TEAM_MODAL = open;
+    document.addEventListener("click", function (e) {
+      var node = e.target.closest(".tree-node");
+      if (node && !e.target.closest("a")) {
+        var card = document.querySelector('.grid.team .t-card[data-name="' + node.dataset.name + '"]');
+        open(card || node);
+      }
     });
-    grid.addEventListener("keydown", function (e) {
-      var c = e.target.closest(".t-card");
-      if (c && (e.key === "Enter" || e.key === " ") && !e.target.closest("a")) { e.preventDefault(); open(c); }
+    document.addEventListener("keydown", function (e) {
+      var node = e.target.closest(".tree-node");
+      if (node && (e.key === "Enter" || e.key === " ") && !e.target.closest("a")) {
+        e.preventDefault();
+        var card = document.querySelector('.grid.team .t-card[data-name="' + node.dataset.name + '"]');
+        open(card || node);
+      }
     });
   }
 
@@ -85,7 +103,8 @@
   function open(card) {
     var d = card.dataset, q = function (s) { return ov.querySelector(s); };
     if (ov.hidden) last = document.activeElement;
-    q(".tf-head img").src = card.querySelector(".t-head img").src;
+    var imgEl = card.querySelector(".t-head img") || card.querySelector(".tn-avatar img") || card.querySelector("img");
+    q(".tf-head img").src = imgEl ? imgEl.src : "";
     q(".tf-role").textContent = d.role || "";
     q(".tf-name").textContent = d.name || "";
     q(".tf-area").textContent = d.area || "";

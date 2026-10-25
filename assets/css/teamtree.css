@@ -1,0 +1,427 @@
+/* ==========================================================================
+   CCLTCE — Team Hierarchy Skill Tree (NeetCode Reference Style)
+   Dot-grid canvas, curved Bezier connectors, status bars, and view switcher
+   ========================================================================== */
+
+/* ---------- View Mode Switcher ---------- */
+.team-view-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 1.8rem auto 2.2rem;
+  padding: 0 1rem;
+}
+
+.team-view-switcher {
+  display: inline-flex;
+  align-items: center;
+  background: #0f1015;
+  border: 2px solid #27272a;
+  border-radius: 6px;
+  padding: 4px;
+  gap: 6px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.tvs-btn {
+  font-family: var(--disp);
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  padding: 9px 18px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  background: #17181e;
+  color: #94a3b8;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.16s ease-out;
+  user-select: none;
+}
+
+.tvs-btn .tvs-icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex: none;
+  transition: transform 0.15s ease;
+}
+
+.tvs-btn:hover {
+  background: #232530;
+  color: #f8fafc;
+}
+
+.tvs-btn:hover .tvs-icon {
+  transform: scale(1.1);
+}
+
+.tvs-btn.active {
+  background: #222533;
+  color: #facc15;
+  border-color: #facc15;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  text-shadow: 0 0 8px rgba(250, 204, 21, 0.5);
+}
+
+.tvs-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.team-view-hint {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: #71717a;
+  margin: 0.85rem 0 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.team-view-hint .tvh-gem {
+  color: var(--gold);
+  margin: 0 4px;
+}
+
+/* ---------- Tree View Container & Canvas ---------- */
+.team-tree-container {
+  position: relative;
+  width: 100%;
+  max-width: 1220px;
+  margin: 0 auto 5.5rem;
+  background-color: #0c0e14;
+  background-image: radial-gradient(circle, rgba(148, 163, 184, 0.15) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  border: 2px solid #232733;
+  border-radius: 12px;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.75), 0 14px 34px rgba(0, 0, 0, 0.5);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #0c0e14;
+  touch-action: pan-x;
+  cursor: grab;
+}
+
+.team-tree-container:active {
+  cursor: grabbing;
+}
+
+.team-tree-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.team-tree-container::-webkit-scrollbar-track {
+  background: #0c0e14;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.team-tree-container::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+.team-tree-container::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+.tree-canvas {
+  position: relative;
+  min-width: 1120px;
+  padding: 3rem 2.5rem 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------- SVG Bezier Connectors Layer ---------- */
+.tree-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.tree-edge {
+  stroke: #334155;
+  stroke-width: 2.4;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.25s ease, stroke-width 0.25s ease, filter 0.25s ease, opacity 0.25s ease;
+  opacity: 0.85;
+}
+
+.tree-edge.edge-dim {
+  opacity: 0.2;
+}
+
+.tree-edge.edge-highlight {
+  stroke: var(--edge-color, #10b981) !important;
+  stroke-width: 3.5 !important;
+  opacity: 1 !important;
+  stroke-dasharray: 8 4;
+  animation: treeDash 1.2s linear infinite;
+  filter: drop-shadow(0 0 8px var(--edge-glow, rgba(16, 185, 129, 0.85)));
+}
+
+@keyframes treeDash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+/* ---------- Tiers & Layout ---------- */
+.tree-tier {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 5.5rem;
+}
+
+.tree-tier:last-child {
+  margin-bottom: 0;
+}
+
+.tree-tier-badge {
+  font-family: var(--disp);
+  font-size: 0.44rem;
+  letter-spacing: 0.12em;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 1.3rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid #1e293b;
+  padding: 5px 14px;
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.tree-tier-badge .ttb-gem {
+  color: var(--gold);
+  font-size: 0.5rem;
+}
+
+.tree-tier-nodes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.2rem;
+  flex-wrap: nowrap;
+}
+
+/* Tier-specific custom gaps for symmetrical alignment */
+.tree-tier[data-tier="0"] .tree-tier-nodes {
+  gap: 7rem;
+}
+
+.tree-tier[data-tier="1"] .tree-tier-nodes {
+  gap: 0;
+}
+
+.tree-tier[data-tier="2"] .tree-tier-nodes {
+  gap: 3.6rem;
+}
+
+.tree-tier[data-tier="3"] .tree-tier-nodes {
+  gap: 1.8rem;
+}
+
+/* ---------- Tree Node Card (NeetCode Style) ---------- */
+.tree-node {
+  --accent: #17dd62;
+  --accent-glow: rgba(23, 221, 98, 0.4);
+  position: relative;
+  width: 235px;
+  background: #141722;
+  border: 2px solid #283244;
+  border-radius: 10px;
+  padding: 11px 13px 13px;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.2),
+              border-color 0.2s ease,
+              box-shadow 0.2s ease,
+              background-color 0.2s ease,
+              opacity 0.2s ease;
+}
+
+.tree-node:hover,
+.tree-node:focus-visible {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--accent);
+  background: #191d2c;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65), 0 0 20px -2px var(--accent-glow);
+  outline: none;
+}
+
+.tree-node:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.tree-node.node-dim {
+  opacity: 0.35;
+}
+
+.tree-node.node-active {
+  border-color: var(--accent);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65), 0 0 20px -2px var(--accent-glow);
+}
+
+.tn-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tn-avatar {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  background: #0b0d14;
+  border: 1.5px solid #263143;
+  border-radius: 6px;
+  padding: 2px;
+  display: grid;
+  place-items: center;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  transition: transform 0.2s ease;
+}
+
+.tree-node:hover .tn-avatar {
+  transform: scale(1.08) rotate(-2deg);
+  border-color: var(--accent);
+}
+
+.tn-avatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.tn-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tn-role {
+  font-family: var(--disp);
+  font-size: 0.38rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.tn-name {
+  font-family: var(--disp);
+  font-size: 0.48rem;
+  font-weight: 500;
+  color: #f8fafc;
+  margin: 3px 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.35;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.tn-class {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: #94a3b8;
+  line-height: 1.2;
+}
+
+/* Bottom Progress Bar (Exact NeetCode reference style) */
+.tn-bar-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  overflow: hidden;
+}
+
+.tn-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Mobile pan banner */
+.tree-mobile-hint {
+  display: none;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: #94a3b8;
+  text-align: center;
+  padding: 8px 12px;
+  background: rgba(15, 23, 42, 0.85);
+  border-bottom: 1px solid #1e293b;
+}
+
+@media (max-width: 900px) {
+  .tree-mobile-hint {
+    display: block;
+  }
+}
+
+/* ---------- Mode Switching Display Rules ---------- */
+body.team-mode-grid #team-tree {
+  display: none !important;
+}
+
+body.team-mode-grid #team-grid {
+  display: grid !important;
+}
+
+body.team-mode-tree #team-tree {
+  display: block;
+}
+
+body.team-mode-tree #team-grid {
+  display: none !important;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .tree-edge.edge-highlight {
+    animation: none;
+  }
+  .tree-node,
+  .tn-avatar,
+  .tree-edge {
+    transition: none;
+  }
+  .tree-node:hover {
+    transform: none;
+  }
+}

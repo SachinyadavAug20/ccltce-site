@@ -1,5 +1,5 @@
 /* ---------- team modal: Minecraft character sheet ---------- */
-.tf-overlay { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 1rem; background: rgba(8, 8, 10, 0.82); }
+.tf-overlay { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; padding: 1rem; background: rgba(8, 8, 10, 0.82); }
 .tf-overlay[hidden] { display: none; }
 .tf-panel {
   position: relative; width: min(560px, 100%); padding: 2.2rem 1.8rem 1.6rem;
