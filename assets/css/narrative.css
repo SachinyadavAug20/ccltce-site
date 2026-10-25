@@ -90,13 +90,14 @@
 .narrative-overlay.slain #dragon-hp { color: #17dd62; border-color: #17dd62; background: rgba(23, 221, 98, 0.14); }
 @keyframes afterRise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-/* scroll hint */
+/* scroll hint — floats comfortably above the bottom hotbar */
 .narrative-hint {
-  position: absolute; bottom: 2rem; left: 50%;
+  position: absolute; bottom: 5rem; left: 50%;
   transform: translateX(-50%);
-  font-family: var(--disp); font-size: 0.45rem;
-  color: var(--muted); letter-spacing: 0.1em;
-  z-index: 7; animation: hintBob 2s ease-in-out infinite; pointer-events: none;
+  font-family: var(--disp); font-size: 0.5rem;
+  color: #ffd76a; letter-spacing: 0.12em;
+  text-shadow: 0 0 10px rgba(255, 215, 106, 0.85), 2px 2px 0 #000;
+  z-index: 75; animation: hintBob 2s ease-in-out infinite; pointer-events: none;
   transition: opacity 0.4s ease;
 }
 @keyframes hintBob { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
