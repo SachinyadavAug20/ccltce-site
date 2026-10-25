@@ -1,4 +1,4 @@
-// CCLTCE — Team Hierarchy Skill Tree (NeetCode Reference Style)
+// CCLTCE — Team Hierarchy Interactive Graph
 // Dynamic Bezier connector renderer, glowing flows, responsive panning, and view toggle.
 (function () {
   "use strict";
@@ -18,11 +18,7 @@
     },
     {
       tier: 3,
-      members: ["Rashi Kasotiya", "Samiksha Patil", "Sanjana Jagtap", "Adarsh Mishra"]
-    },
-    {
-      tier: 4,
-      members: ["Rushi Jadhav"]
+      members: ["Rashi Kasotiya", "Samiksha Patil", "Sanjana Jagtap", "Adarsh Mishra", "Rushi Jadhav"]
     }
   ];
 
@@ -36,17 +32,15 @@
     { from: "Vivek Tiwari", to: "Ayush Vishwakarma" },
     { from: "Vivek Tiwari", to: "Shashank Suryawanshi" },
 
-    // Tier 2 -> Tier 3 (Core Officers -> Domains)
+    // Tier 2 -> Tier 3 (Core Officers -> Domain Leads)
     { from: "Sachin Yadav", to: "Rashi Kasotiya" },
     { from: "Sachin Yadav", to: "Samiksha Patil" },
     { from: "Ayush Vishwakarma", to: "Samiksha Patil" },
     { from: "Ayush Vishwakarma", to: "Sanjana Jagtap" },
     { from: "Ayush Vishwakarma", to: "Adarsh Mishra" },
+    { from: "Ayush Vishwakarma", to: "Rushi Jadhav" },
     { from: "Shashank Suryawanshi", to: "Adarsh Mishra" },
-
-    // Tier 3 -> Tier 4 (Domains -> Outreach)
-    { from: "Sanjana Jagtap", to: "Rushi Jadhav" },
-    { from: "Adarsh Mishra", to: "Rushi Jadhav" }
+    { from: "Shashank Suryawanshi", to: "Rushi Jadhav" }
   ];
 
   var PROGRESS_MAP = {
@@ -69,20 +63,8 @@
     container = document.getElementById("team-tree");
     if (!container) return;
 
-    // View toggle listeners
-    var switcher = document.querySelector(".team-view-switcher");
-    if (switcher) {
-      switcher.addEventListener("click", function (e) {
-        var btn = e.target.closest(".tvs-btn");
-        if (btn && btn.dataset.view) {
-          setMode(btn.dataset.view);
-        }
-      });
-    }
-
-    var savedMode = "tree";
-    try { savedMode = sessionStorage.getItem("ccltce_team_mode") || "tree"; } catch (e) {}
-    setMode(savedMode);
+    document.body.classList.remove("team-mode-grid");
+    document.body.classList.add("team-mode-tree");
 
     // Get team data
     if (window.CCLTCE_DATA && window.CCLTCE_DATA.team) {
@@ -101,33 +83,6 @@
         })
         .catch(function () {});
     }
-  }
-
-  function setMode(mode) {
-    var body = document.body;
-    var btns = document.querySelectorAll(".tvs-btn");
-    if (mode === "grid") {
-      body.classList.remove("team-mode-tree");
-      body.classList.add("team-mode-grid");
-      btns.forEach(function (b) {
-        var isGrid = b.dataset.view === "grid";
-        b.classList.toggle("active", isGrid);
-        b.setAttribute("aria-selected", isGrid ? "true" : "false");
-      });
-    } else {
-      body.classList.remove("team-mode-grid");
-      body.classList.add("team-mode-tree");
-      btns.forEach(function (b) {
-        var isTree = b.dataset.view === "tree";
-        b.classList.toggle("active", isTree);
-        b.setAttribute("aria-selected", isTree ? "true" : "false");
-      });
-      requestAnimationFrame(function () {
-        centerTree();
-        updateLines();
-      });
-    }
-    try { sessionStorage.setItem("ccltce_team_mode", mode); } catch (e) {}
   }
 
   function buildTree(list) {

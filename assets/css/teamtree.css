@@ -1,105 +1,23 @@
 /* ==========================================================================
-   CCLTCE — Team Hierarchy Skill Tree (NeetCode Reference Style)
+   CCLTCE — Team Hierarchy Interactive Graph
    Pure node-to-node curved Bezier connectors, clean flexible layout, status bars
    ========================================================================== */
 
-/* ---------- View Mode Switcher ---------- */
-.team-view-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 1.5rem auto 2rem;
-  padding: 0 1rem;
-}
 
-.team-view-switcher {
-  display: inline-flex;
-  align-items: center;
-  background: #0f1015;
-  border: 2px solid #27272a;
-  border-radius: 6px;
-  padding: 4px;
-  gap: 6px;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 4px 14px rgba(0, 0, 0, 0.3);
-}
-
-.tvs-btn {
-  font-family: var(--disp);
-  font-size: 0.52rem;
-  letter-spacing: 0.08em;
-  padding: 9px 18px;
-  border: 2px solid transparent;
-  border-radius: 4px;
-  background: #17181e;
-  color: #94a3b8;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.16s ease-out;
-  user-select: none;
-}
-
-.tvs-btn .tvs-icon {
-  display: inline-block;
-  vertical-align: middle;
-  flex: none;
-  transition: transform 0.15s ease;
-}
-
-.tvs-btn:hover {
-  background: #232530;
-  color: #f8fafc;
-}
-
-.tvs-btn:hover .tvs-icon {
-  transform: scale(1.1);
-}
-
-.tvs-btn.active {
-  background: #222533;
-  color: #facc15;
-  border-color: #facc15;
-  box-shadow: 0 0 14px rgba(250, 204, 21, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  text-shadow: 0 0 8px rgba(250, 204, 21, 0.5);
-}
-
-.tvs-btn:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
-.team-view-hint {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  color: #71717a;
-  margin: 0.85rem 0 0;
-  text-align: center;
-  line-height: 1.4;
-}
-
-.team-view-hint .tvh-gem {
-  color: var(--gold);
-  margin: 0 4px;
-}
 
 /* ---------- Tree View Container & Canvas ---------- */
 .team-tree-container {
   position: relative;
   width: 100%;
-  max-width: 1220px;
+  max-width: 1300px;
   margin: 0 auto 9rem; /* generous bottom clearance above hotbar */
-  background-color: #0c0e14;
-  background-image: radial-gradient(circle, rgba(148, 163, 184, 0.15) 1.5px, transparent 1.5px);
-  background-size: 24px 24px;
-  border: 2px solid #232733;
-  border-radius: 12px;
-  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.75), 0 14px 34px rgba(0, 0, 0, 0.5);
+  background: transparent;
+  border: none;
+  box-shadow: none;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: thin;
-  scrollbar-color: #334155 #0c0e14;
+  scrollbar-color: rgba(71, 85, 105, 0.4) transparent;
   touch-action: pan-x;
   cursor: grab;
 }
@@ -109,32 +27,32 @@
 }
 
 .team-tree-container::-webkit-scrollbar {
-  height: 8px;
+  height: 6px;
 }
 
 .team-tree-container::-webkit-scrollbar-track {
-  background: #0c0e14;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
+  background: transparent;
 }
 
 .team-tree-container::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
+  background: rgba(71, 85, 105, 0.45);
+  border-radius: 3px;
 }
 
 .team-tree-container::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: rgba(148, 163, 184, 0.7);
 }
 
 .tree-canvas {
   position: relative;
-  min-width: 960px;
+  min-width: 1200px;
   width: 100%;
-  padding: 3.2rem 2rem 6.5rem;
+  padding: 1.5rem 1rem 5.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-image: radial-gradient(circle, rgba(148, 163, 184, 0.12) 1.5px, transparent 1.5px);
+  background-size: 26px 26px;
 }
 
 /* ---------- SVG Bezier Connectors Layer ---------- */
@@ -214,10 +132,10 @@
 }
 
 .tree-tier[data-tier="3"] .tree-tier-nodes {
-  gap: clamp(1rem, 1.8vw, 2rem);
+  gap: clamp(0.75rem, 1.4vw, 1.6rem);
 }
 
-/* ---------- Tree Node Card (NeetCode Style) ---------- */
+/* ---------- Tree Node Card ---------- */
 .tree-node {
   --accent: #17dd62;
   --accent-glow: rgba(23, 221, 98, 0.4);
@@ -332,7 +250,7 @@
   line-height: 1.2;
 }
 
-/* Bottom Progress Bar (Exact NeetCode reference style) */
+/* Bottom Progress Bar */
 .tn-bar-wrap {
   position: absolute;
   bottom: 0;
@@ -353,21 +271,21 @@
   transition: width 0.3s ease;
 }
 
-/* ---------- Mode Switching Display Rules ---------- */
+/* ---------- Display Rules ---------- */
+#team-tree {
+  display: block;
+}
+
+#team-grid {
+  display: none !important;
+}
+
 body.team-mode-grid #team-tree {
   display: none !important;
 }
 
 body.team-mode-grid #team-grid {
   display: grid !important;
-}
-
-body.team-mode-tree #team-tree {
-  display: block;
-}
-
-body.team-mode-tree #team-grid {
-  display: none !important;
 }
 
 /* Reduced motion preference */
