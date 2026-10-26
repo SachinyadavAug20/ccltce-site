@@ -189,3 +189,35 @@ export function minecraftFace(seed, size) {
 export function navFace(seed) {
   return minecraftFace(seed, 40);
 }
+
+// render a 16×16 pixel matrix (array of arrays of hex|null) as an SVG data URI
+export function pixelMatrixToSvg(matrix, size) {
+  const S = size || 128;
+  const G = 16;
+  const px = S / G;
+  let rects = "";
+  for (let y = 0; y < G; y++) {
+    for (let x = 0; x < G; x++) {
+      const c = matrix && matrix[y] && matrix[y][x];
+      if (!c) continue;
+      rects += '<rect x="' + x * px + '" y="' + y * px + '" width="' + px + '" height="' + px + '" fill="' + c + '"/>';
+    }
+  }
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="' + S + '" height="' + S + '" viewBox="0 0 ' + S + " " + S + '" shape-rendering="crispEdges">' +
+    '<rect width="' + S + '" height="' + S + '" fill="#1a1a1a"/>' +
+    rects +
+    "</svg>";
+  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+}
+
+// parse stored pixel matrix (JSON string or array) → matrix or null
+export function parsePixelMatrix(raw) {
+  if (!raw) return null;
+  try {
+    const m = typeof raw === "string" ? JSON.parse(raw) : raw;
+    if (!Array.isArray(m) || m.length !== 16) return null;
+    if (!m.every((row) => Array.isArray(row) && row.length === 16)) return null;
+    return m;
+  } catch { return null; }
+}

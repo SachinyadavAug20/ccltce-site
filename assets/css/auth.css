@@ -208,3 +208,60 @@
   .dash-hero-actions .btn { flex: 1; text-align: center; }
   .auth-menu { min-width: 13rem; right: -1rem; }
 }
+
+/* ── pixel art editor overlay ── */
+.pe-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.82); display: grid; place-items: center; padding: 1rem;
+}
+.pe-modal {
+  width: min(34rem, 100%); max-height: 92vh; overflow-y: auto;
+  background: var(--panel); border: 3px solid #000;
+  box-shadow: inset 3px 3px 0 #3a3a3e, inset -3px -3px 0 #101012, 0 8px 0 rgba(0,0,0,0.6);
+  font-family: var(--mono);
+}
+.pe-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.9rem 1.1rem; border-bottom: 2px solid #09090b;
+}
+.pe-head h3 { font-family: var(--disp); font-size: 0.65rem; color: #fff; text-shadow: 2px 2px 0 #000; font-weight: 400; }
+.pe-close {
+  width: 2rem; height: 2rem; display: grid; place-items: center;
+  background: #383838; border: 2px solid #000; color: #e0e0e0;
+  font-family: var(--disp); font-size: 0.6rem;
+  box-shadow: inset -2px -2px 0 #1a1a1a, inset 2px 2px 0 #565656;
+}
+.pe-close:hover { background: #7f1d1d; color: #fff; }
+.pe-body { display: flex; gap: 1.2rem; padding: 1.1rem; flex-wrap: wrap; }
+.pe-canvas-wrap { flex: none; }
+.pe-canvas-wrap canvas {
+  width: 256px; height: 256px; image-rendering: pixelated;
+  border: 3px solid #000; box-shadow: inset 0 0 0 2px #3a3a3e;
+  background: #121212; cursor: crosshair; display: block;
+}
+.pe-side { flex: 1; min-width: 12rem; display: flex; flex-direction: column; gap: 0.8rem; }
+.pe-tools { display: flex; gap: 0.4rem; }
+.pe-tool {
+  width: 2.4rem; height: 2.4rem; display: grid; place-items: center;
+  background: #383838; border: 2px solid #000; font-size: 1rem;
+  box-shadow: inset -2px -2px 0 #1a1a1a, inset 2px 2px 0 #565656;
+}
+.pe-tool:hover { background: #4a4a4a; }
+.pe-tool.active { background: #1c1c1c; box-shadow: var(--bevel-in); color: var(--gold); }
+.pe-color-row { display: flex; align-items: center; gap: 0.6rem; }
+.pe-color-row input[type=color] {
+  width: 2.4rem; height: 2.4rem; padding: 0; border: 2px solid #000;
+  background: #101012; cursor: pointer;
+}
+.pe-color-label { font-size: 12px; color: var(--muted); }
+.pe-palette {
+  display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px;
+  padding: 0.4rem; background: #101012; border: 2px solid #000;
+}
+.pe-swatch {
+  width: 100%; aspect-ratio: 1; border: 1px solid #000; cursor: pointer;
+  transition: transform 0.08s;
+}
+.pe-swatch:hover { transform: scale(1.25); z-index: 1; position: relative; }
+.pe-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: auto; }
+.pe-actions .btn { font-size: 0.48rem; padding: 0.5rem 0.8rem; }

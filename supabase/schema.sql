@@ -14,6 +14,7 @@ create table if not exists public.profiles (
   role public.user_role not null default 'student',
   roll_no text,
   avatar_url text,
+  pixel_art text,
   last_login_at timestamptz,
   created_at timestamptz default now(),
   updated_at timestamptz default now()

@@ -1,7 +1,8 @@
 // Supabase email/password auth + role-aware UI helpers.
 // Loaded on every page via chrome.js. Uses window.SUPABASE_CONFIG from supabase-config.js.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { minecraftFace, navFace } from "./avatar.js";
+import { minecraftFace, navFace, pixelMatrixToSvg, parsePixelMatrix } from "./avatar.js";
+import { openPixelEditor } from "./pixeledit.js";
 
 // auth.css is only linked on auth pages — inject it everywhere so the nav menu styles work
 if (!document.querySelector('link[href*="auth.css"]')) {
@@ -55,6 +56,8 @@ export async function signOut() {
 
 function avatarSrc(profile, size) {
   if (profile && profile.avatar_url) return profile.avatar_url;
+  const px = parsePixelMatrix(profile && profile.pixel_art);
+  if (px) return pixelMatrixToSvg(px, size === "nav" ? 40 : size || 128);
   const seed = (profile && (profile.id || profile.email)) || "guest";
   return size === "nav" ? navFace(seed) : minecraftFace(seed, size || 80);
 }
@@ -320,77 +323,42 @@ function wireTeamForm(profile, root) {
 }
 
 async function wireAvatar(profile, root) {
-  const fileInput = $("#avatar-file", root);
-  const saveBtn = $("#avatar-save", root);
+  const openBtn = $("#pixel-open", root);
   const resetBtn = $("#avatar-reset", root);
-  const preview = $("#avatar-preview", root);
   const errEl = $("#avatar-error", root);
-  if (!fileInput || !saveBtn || !preview) return;
+  if (!openBtn) return;
 
-  let pendingFile = null;
+  const heroFace = root.querySelector(".dash-hero-face");
 
-  fileInput.addEventListener("change", () => {
-    const f = fileInput.files && fileInput.files[0];
-    if (!f) return;
-    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) {
-      errEl.textContent = "Use a PNG, JPEG or WebP image.";
-      errEl.hidden = false;
-      return;
-    }
-    if (f.size > 2 * 1024 * 1024) {
-      errEl.textContent = "Image must be under 2 MB.";
-      errEl.hidden = false;
-      return;
-    }
-    errEl.hidden = true;
-    pendingFile = f;
-    saveBtn.disabled = false;
-    const reader = new FileReader();
-    reader.onload = () => { preview.src = reader.result; };
-    reader.readAsDataURL(f);
-  });
-
-  saveBtn.addEventListener("click", async () => {
-    if (!pendingFile) return;
-    saveBtn.disabled = true;
-    errEl.hidden = true;
-    const path = profile.id + "/avatar-" + Date.now() + ".png";
-    const { error: upErr } = await supabase.storage.from("avatars").upload(path, pendingFile, { upsert: true, cacheControl: "3600" });
-    if (upErr) {
-      errEl.textContent = "Upload failed: " + errText(upErr) + " — is the avatars bucket created?";
-      errEl.hidden = false;
-      saveBtn.disabled = false;
-      return;
-    }
-    const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
-    const publicUrl = pub && pub.publicUrl;
-    const { error: dbErr } = await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("id", profile.id);
-    if (dbErr) {
-      errEl.textContent = "Saved to storage but profile update failed: " + errText(dbErr);
-      errEl.hidden = false;
-      saveBtn.disabled = false;
-      return;
-    }
-    profile.avatar_url = publicUrl;
-    showBanner("Avatar updated!", "ok");
-    // refresh nav faces
-    refreshNav();
+  openBtn.addEventListener("click", () => {
+    const initial = parsePixelMatrix(profile.pixel_art);
+    openPixelEditor(initial, async (matrix) => {
+      const json = JSON.stringify(matrix);
+      const { error } = await supabase.from("profiles").update({ pixel_art: json }).eq("id", profile.id);
+      if (error) {
+        errEl.textContent = errText(error);
+        errEl.hidden = false;
+        return;
+      }
+      profile.pixel_art = json;
+      profile.avatar_url = null;
+      if (heroFace) heroFace.src = pixelMatrixToSvg(matrix, 128);
+      showBanner("Pixel avatar saved!", "ok");
+      refreshNav();
+    });
   });
 
   if (resetBtn) {
     resetBtn.addEventListener("click", async () => {
-      const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", profile.id);
+      const { error } = await supabase.from("profiles").update({ avatar_url: null, pixel_art: null }).eq("id", profile.id);
       if (error) {
         errEl.textContent = errText(error);
         errEl.hidden = false;
         return;
       }
       profile.avatar_url = null;
-      const def = minecraftFace(profile.id || profile.email, 96);
-      preview.src = def;
-      pendingFile = null;
-      saveBtn.disabled = true;
-      fileInput.value = "";
+      profile.pixel_art = null;
+      if (heroFace) heroFace.src = minecraftFace(profile.id || profile.email, 128);
       showBanner("Reset to default Minecraft face.", "ok");
       refreshNav();
     });
@@ -465,16 +433,12 @@ async function initDashboard(profile) {
   // Profile & avatar
   html +=
     '<section class="auth-card dash-panel active" data-panel="avatar" role="tabpanel">' +
-    "<h3>Profile &amp; avatar</h3>" +
-    '<p class="dash-note">Your face is auto-generated from your account. Upload a picture to replace it.</p>' +
+    "<h3>Edit your avatar</h3>" +
+    '<p class="dash-note">Draw a 16×16 pixel face with any color. Saved to your profile — shows in the nav and everywhere.</p>' +
     '<div class="avatar-row">' +
-    '<img class="avatar-preview" id="avatar-preview" src="' + face + '" alt="Current avatar" width="96" height="96" />' +
     '<div class="avatar-controls">' +
-    '<label class="btn" for="avatar-file">Choose image…</label>' +
-    '<input id="avatar-file" type="file" accept="image/png,image/jpeg,image/webp" hidden />' +
-    '<button class="btn btn-primary" type="button" id="avatar-save" disabled>Upload avatar</button>' +
+    '<button class="btn btn-primary" type="button" id="pixel-open">Open pixel editor</button>' +
     '<button class="btn" type="button" id="avatar-reset">Use default face</button>' +
-    '<p class="dash-note" style="margin:0">PNG · JPEG · WebP · max 2 MB</p>' +
     "</div></div>" +
     '<p class="form-error" id="avatar-error" hidden></p>' +
     '<dl class="dash-meta"><dt>Role</dt><dd>' + escapeHtml(ROLE_LABEL[role] || role) + "</dd>" +
