@@ -55,9 +55,6 @@
     "</ul>" +
     '<span class="nav-tools">' +
     '<span class="nav-auth" data-auth-slot><a href="login.html">Login</a></span>' +
-    '<button class="sound-toggle" type="button" aria-pressed="false" aria-label="Play ambient sound" title="Play ambience">' +
-    '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6Z"/></svg>' +
-    '<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span></button>' +
     '<button class="nav-burger" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">' +
     "<span></span><span></span><span></span></button></span></nav>";
 

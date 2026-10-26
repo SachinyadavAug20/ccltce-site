@@ -3,6 +3,14 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { minecraftFace, navFace } from "./avatar.js";
 
+// auth.css is only linked on auth pages — inject it everywhere so the nav menu styles work
+if (!document.querySelector('link[href*="auth.css"]')) {
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = "assets/css/auth.css";
+  document.head.appendChild(link);
+}
+
 const cfg = window.SUPABASE_CONFIG || {};
 const hasConfig = Boolean(cfg.url && cfg.anonKey && !String(cfg.url).includes("YOUR_PROJECT"));
 export const supabase = hasConfig ? createClient(cfg.url, cfg.anonKey) : null;
@@ -224,6 +232,93 @@ function escapeHtml(s) {
   return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+// ── dashboard tabs ──
+function wireTabs(root) {
+  const tabs = root.querySelectorAll("[data-tab]");
+  const panels = root.querySelectorAll("[data-panel]");
+  tabs.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.tab;
+      tabs.forEach((b) => {
+        b.classList.toggle("active", b === btn);
+        b.setAttribute("aria-selected", b === btn);
+      });
+      panels.forEach((p) => p.classList.toggle("active", p.dataset.panel === id));
+      history.replaceState(null, "", "#" + id);
+    });
+  });
+}
+
+// ── dashboard stats ──
+async function loadStats(profile, isStaff) {
+  const set = (id, v) => { const el = $("#" + id); if (el) el.textContent = v; };
+  const [teams, regs, events, users] = await Promise.all([
+    supabase.from("teams").select("id", { count: "exact", head: true }).eq("leader_id", profile.id),
+    supabase.from("registrations").select("id", { count: "exact", head: true }),
+    supabase.from("events").select("id", { count: "exact", head: true }),
+    isStaff ? supabase.from("profiles").select("id", { count: "exact", head: true }) : Promise.resolve({ count: 0 }),
+  ]);
+  set("stat-teams", teams.count != null ? teams.count : "–");
+  set("stat-regs", regs.count != null ? regs.count : "–");
+  set("stat-events", events.count != null ? events.count : "–");
+  if (isStaff) set("stat-users", users.count != null ? users.count : "–");
+}
+
+// ── feedback form ──
+function wireFeedback(profile, root) {
+  const fb = $("#feedback-form", root);
+  if (!fb) return;
+  fb.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errEl = $("#feedback-error", fb);
+    const msg = $("#fb-msg", fb).value.trim();
+    if (!msg) return;
+    const { error } = await supabase.from("feedback").insert({ user_id: profile.id, message: msg });
+    if (error) {
+      errEl.textContent = errText(error);
+      errEl.hidden = false;
+      return;
+    }
+    errEl.hidden = true;
+    fb.reset();
+    showBanner("Feedback sent — thanks!", "ok");
+  });
+}
+
+// ── team form ──
+function wireTeamForm(profile, root) {
+  const teamForm = $("#team-form", root);
+  if (!teamForm) return;
+  const sel = $("#team-event", teamForm);
+  supabase.from("events").select("id, title").order("created_at").then(({ data }) => {
+    sel.innerHTML = (data || []).map((ev) => '<option value="' + escapeHtml(ev.id) + '">' + escapeHtml(ev.title) + "</option>").join("") || '<option value="">No events yet</option>';
+  });
+  teamForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errEl = $("#team-error", teamForm);
+    const name = $("#team-name", teamForm).value.trim();
+    const eventId = sel.value;
+    if (!name || !eventId) return;
+    const { data: team, error } = await supabase
+      .from("teams")
+      .insert({ event_id: eventId, team_name: name, leader_id: profile.id })
+      .select()
+      .single();
+    if (error) {
+      errEl.textContent = errText(error);
+      errEl.hidden = false;
+      return;
+    }
+    await supabase.from("team_members").insert({ team_id: team.id, user_id: profile.id, role_in_team: "leader" });
+    errEl.hidden = true;
+    teamForm.reset();
+    showBanner("Team “" + name + "” created!", "ok");
+    loadMyTeams(profile);
+    loadStats(profile, false);
+  });
+  loadMyTeams(profile);
+}
+
 async function wireAvatar(profile, root) {
   const fileInput = $("#avatar-file", root);
   const saveBtn = $("#avatar-save", root);
@@ -317,18 +412,59 @@ async function initDashboard(profile) {
 
   const role = profile.role || "student";
   const roleCls = role === "admin" ? "role-admin" : role === "coding_club_member" ? "role-club" : "role-student";
-  const face = avatarSrc(profile, 96);
+  const face = avatarSrc(profile, 128);
+  const name = profile.full_name || (profile.email || "Member").split("@")[0];
+  const memberSince = (profile.created_at || "").slice(0, 10);
+  const isStaff = role === "admin" || role === "coding_club_member";
+
   let html =
-    '<div class="auth-card dash-head" id="profile">' +
-    '<div class="dash-id">' +
-    '<img class="dash-avatar-img" src="' + face + '" alt="" width="96" height="96" />' +
-    '<div><h2>' + escapeHtml(profile.full_name || "Member") + "</h2>" +
-    '<p class="dash-email">' + escapeHtml(profile.email || "") + "</p></div></div>" +
+    // ── hero card ──
+    '<div class="dash-hero" id="profile">' +
+    '<div class="dash-hero-glow" aria-hidden="true"></div>' +
+    '<img class="dash-hero-face" src="' + face + '" alt="" width="112" height="112" />' +
+    '<div class="dash-hero-info">' +
+    '<h2 class="dash-hero-name">' + escapeHtml(name) + "</h2>" +
+    '<p class="dash-hero-email">' + escapeHtml(profile.email || "") + "</p>" +
+    '<div class="dash-hero-tags">' +
     '<span class="role-badge ' + roleCls + '">' + (ROLE_LABEL[role] || role) + "</span>" +
+    '<span class="dash-since">Joined ' + escapeHtml(memberSince) + "</span>" +
+    "</div></div>" +
+    '<div class="dash-hero-actions">' +
+    '<a class="btn" href="events.html">Events</a>' +
+    '<button class="btn" type="button" data-logout-dash>Log out</button>' +
+    "</div>" +
     "</div>";
 
+  // ── quick stats row ──
   html +=
-    '<section class="auth-card">' +
+    '<div class="dash-stats">' +
+    '<div class="dash-stat"><span class="dash-stat-val" id="stat-teams">–</span><span class="dash-stat-lbl">My teams</span></div>' +
+    '<div class="dash-stat"><span class="dash-stat-val" id="stat-regs">–</span><span class="dash-stat-lbl">Registrations</span></div>' +
+    '<div class="dash-stat"><span class="dash-stat-val" id="stat-events">–</span><span class="dash-stat-lbl">Events</span></div>' +
+    (isStaff
+      ? '<div class="dash-stat dash-stat-staff"><span class="dash-stat-val" id="stat-users">–</span><span class="dash-stat-lbl">Total users</span></div>'
+      : "") +
+    "</div>";
+
+  // ── tab nav ──
+  const tabs = [
+    ["avatar", "Profile"],
+    role === "student" ? ["teams", "Teams"] : null,
+    isStaff ? ["staff", "Staff"] : null,
+    ["feedback", "Feedback"],
+  ].filter(Boolean);
+
+  html += '<div class="dash-tabs" role="tablist">' +
+    tabs.map(([id, label], i) =>
+      '<button class="dash-tab' + (i === 0 ? " active" : "") + '" role="tab" data-tab="' + id + '" aria-selected="' + (i === 0) + '">' + label + "</button>"
+    ).join("") +
+    "</div>";
+
+  // ── tab panels ──
+
+  // Profile & avatar
+  html +=
+    '<section class="auth-card dash-panel active" data-panel="avatar" role="tabpanel">' +
     "<h3>Profile &amp; avatar</h3>" +
     '<p class="dash-note">Your face is auto-generated from your account. Upload a picture to replace it.</p>' +
     '<div class="avatar-row">' +
@@ -338,26 +474,18 @@ async function initDashboard(profile) {
     '<input id="avatar-file" type="file" accept="image/png,image/jpeg,image/webp" hidden />' +
     '<button class="btn btn-primary" type="button" id="avatar-save" disabled>Upload avatar</button>' +
     '<button class="btn" type="button" id="avatar-reset">Use default face</button>' +
+    '<p class="dash-note" style="margin:0">PNG · JPEG · WebP · max 2 MB</p>' +
     "</div></div>" +
     '<p class="form-error" id="avatar-error" hidden></p>' +
-    '<dl class="dash-meta" style="margin-top:1rem"><dt>Role</dt><dd>' + escapeHtml(ROLE_LABEL[role] || role) + "</dd>" +
-    "<dt>Member since</dt><dd>" + escapeHtml((profile.created_at || "").slice(0, 10)) + "</dd></dl>" +
-    '<button class="btn" type="button" data-logout-dash>Log out</button>' +
+    '<dl class="dash-meta"><dt>Role</dt><dd>' + escapeHtml(ROLE_LABEL[role] || role) + "</dd>" +
+    "<dt>Email</dt><dd>" + escapeHtml(profile.email || "") + "</dd>" +
+    "<dt>Member since</dt><dd>" + escapeHtml(memberSince) + "</dd></dl>" +
     "</section>";
 
-  html +=
-    '<section class="auth-card">' +
-    "<h3>Send feedback</h3>" +
-    '<form id="feedback-form" class="auth-form">' +
-    '<label for="fb-msg">Message</label>' +
-    '<textarea id="fb-msg" rows="4" required maxlength="2000" placeholder="What should we improve?"></textarea>' +
-    '<p class="form-error" id="feedback-error" hidden></p>' +
-    '<button class="btn btn-primary" type="submit">Submit feedback</button>' +
-    "</form></section>";
-
+  // Teams (students)
   if (role === "student") {
     html +=
-      '<section class="auth-card" id="teams">' +
+      '<section class="auth-card dash-panel" data-panel="teams" role="tabpanel" id="teams">' +
       "<h3>Create a team</h3>" +
       '<p class="dash-note">Max <b>4 members</b> per team. Pick an event, name your squad.</p>' +
       '<form id="team-form" class="auth-form">' +
@@ -368,87 +496,59 @@ async function initDashboard(profile) {
       '<p class="form-error" id="team-error" hidden></p>' +
       '<button class="btn btn-primary" type="submit">Create team</button>' +
       "</form>" +
+      '<div class="dash-subhead"><h4>My teams</h4></div>' +
       '<div id="my-teams" class="dash-list" aria-live="polite"></div>' +
       "</section>";
   }
 
-  if (role === "admin" || role === "coding_club_member") {
+  // Staff
+  if (isStaff) {
     html +=
-      '<section class="auth-card" id="staff">' +
+      '<section class="auth-card dash-panel" data-panel="staff" role="tabpanel" id="staff">' +
       "<h3>All registrations</h3>" +
       '<p class="dash-note">Every team registration across events.</p>' +
       '<div id="all-regs" class="dash-list" aria-live="polite"><p class="dash-empty">Loading…</p></div>' +
-      "</section>" +
-      '<section class="auth-card">' +
-      "<h3>Registered users</h3>" +
+      '<div class="dash-subhead"><h4>Registered users</h4></div>' +
       '<div id="all-users" class="dash-list" aria-live="polite"><p class="dash-empty">Loading…</p></div>' +
       "</section>";
   }
 
+  // Feedback (always last)
+  html +=
+    '<section class="auth-card dash-panel" data-panel="feedback" role="tabpanel" id="feedback">' +
+    "<h3>Send feedback</h3>" +
+    '<p class="dash-note">Help us improve the club site — bugs, ideas, anything.</p>' +
+    '<form id="feedback-form" class="auth-form">' +
+    '<label for="fb-msg">Message</label>' +
+    '<textarea id="fb-msg" rows="5" required maxlength="2000" placeholder="What should we improve?"></textarea>' +
+    '<p class="form-error" id="feedback-error" hidden></p>' +
+    '<button class="btn btn-primary" type="submit">Submit feedback</button>' +
+    "</form></section>";
+
   root.innerHTML = html;
 
+  // ── wire tabs ──
+  wireTabs(root);
+
+  // ── wire logout ──
   const outBtn = root.querySelector("[data-logout-dash]");
   if (outBtn) outBtn.addEventListener("click", () => signOut());
 
-  // avatar upload
+  // ── avatar ──
   wireAvatar(profile, root);
 
-  // feedback
-  const fb = $("#feedback-form", root);
-  if (fb) {
-    fb.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const errEl = $("#feedback-error", fb);
-      const msg = $("#fb-msg", fb).value.trim();
-      if (!msg) return;
-      const { error } = await supabase.from("feedback").insert({ user_id: profile.id, message: msg });
-      if (error) {
-        errEl.textContent = errText(error);
-        errEl.hidden = false;
-        return;
-      }
-      errEl.hidden = true;
-      fb.reset();
-      showBanner("Feedback sent — thanks!", "ok");
-    });
-  }
+  // ── stats + data ──
+  loadStats(profile, isStaff);
+  wireFeedback(profile, root);
 
-  // team form (students)
-  const teamForm = $("#team-form", root);
-  if (teamForm) {
-    const sel = $("#team-event", teamForm);
-    const { data: events } = await supabase.from("events").select("id, title").order("created_at");
-    sel.innerHTML = (events || []).map((ev) => '<option value="' + escapeHtml(ev.id) + '">' + escapeHtml(ev.title) + "</option>").join("") || '<option value="">No events yet</option>';
+  if (role === "student") wireTeamForm(profile, root);
+  if (isStaff) { loadAllRegs(); loadAllUsers(); }
 
-    teamForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const errEl = $("#team-error", teamForm);
-      const name = $("#team-name", teamForm).value.trim();
-      const eventId = sel.value;
-      if (!name || !eventId) return;
-      const { data: team, error } = await supabase
-        .from("teams")
-        .insert({ event_id: eventId, team_name: name, leader_id: profile.id })
-        .select()
-        .single();
-      if (error) {
-        errEl.textContent = errText(error);
-        errEl.hidden = false;
-        return;
-      }
-      await supabase.from("team_members").insert({ team_id: team.id, user_id: profile.id, role_in_team: "leader" });
-      errEl.hidden = true;
-      teamForm.reset();
-      showBanner("Team “" + name + "” created!", "ok");
-      loadMyTeams(profile);
-    });
-    loadMyTeams(profile);
-  }
-
-  // staff views
-  if (role === "admin" || role === "coding_club_member") {
-    loadAllRegs();
-    loadAllUsers();
+  // deep-link support (#teams, #staff, #profile, #feedback)
+  const hash = (location.hash || "").replace("#", "");
+  if (hash) {
+    const btn = root.querySelector('[data-tab="' + hash + '"]');
+    if (btn) btn.click();
   }
 }
 

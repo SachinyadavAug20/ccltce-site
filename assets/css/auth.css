@@ -106,24 +106,66 @@
 .auth-banner[data-kind="warn"] { border-color: #854d0e; background: #422006; color: #fde68a; }
 .auth-banner[data-kind="err"] { border-color: #7f1d1d; background: #450a0a; color: #fecaca; }
 
-/* dashboard */
+/* ── dashboard root ── */
 #dashboard-root { display: grid; gap: 1.1rem; }
-.dash-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-.dash-id { display: flex; align-items: center; gap: 1rem; min-width: 0; }
-.dash-avatar-img {
-  width: 96px; height: 96px; image-rendering: pixelated; flex: none;
-  border: 3px solid #000; box-shadow: inset 0 0 0 2px #3a3a3e;
+
+/* ── dashboard hero ── */
+.dash-hero {
+  position: relative; display: flex; align-items: center; gap: 1.3rem; flex-wrap: wrap;
+  padding: 1.6rem 1.5rem; background: var(--panel); border: 3px solid #000;
+  box-shadow: inset 3px 3px 0 #3a3a3e, inset -3px -3px 0 #101012, 0 6px 0 rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+.dash-hero-glow {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 50% 80% at 20% 50%, rgba(234,179,8,0.08), transparent 70%);
+}
+.dash-hero-face {
+  width: 112px; height: 112px; image-rendering: pixelated; flex: none; position: relative; z-index: 1;
+  border: 3px solid #000; box-shadow: inset 0 0 0 2px #3a3a3e, 0 0 0 2px #52525b;
   background: #1a1a1a;
 }
-.dash-id h2 { margin: 0; font-size: 0.85rem; }
-.dash-email { color: var(--muted); font-size: 12px; margin: 0.2rem 0 0; word-break: break-all; }
-.role-badge {
-  flex: none; padding: 0.4rem 0.7rem; font-family: var(--disp); font-size: 0.45rem;
-  text-transform: uppercase; border: 2px solid #000; color: #fff; text-shadow: 1px 1px 0 #000;
+.dash-hero-info { flex: 1; min-width: 12rem; position: relative; z-index: 1; }
+.dash-hero-name { font-family: var(--disp); font-size: clamp(0.8rem, 3vw, 1.1rem); color: #fff; text-shadow: 3px 3px 0 #09090b; margin: 0 0 0.3rem; }
+.dash-hero-email { font-size: 13px; color: var(--muted); margin: 0 0 0.6rem; word-break: break-all; }
+.dash-hero-tags { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.dash-since { font-size: 12px; color: var(--muted); }
+.dash-hero-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; position: relative; z-index: 1; }
+
+/* ── stats row ── */
+.dash-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); gap: 0.7rem; }
+.dash-stat {
+  display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 0.9rem 0.6rem;
+  background: var(--panel); border: 2px solid #000;
+  box-shadow: inset 2px 2px 0 #3a3a3e, inset -2px -2px 0 #101012;
+  font-family: var(--mono);
 }
-.role-badge.role-student { background: #166534; }
-.role-badge.role-club { background: #854d0e; }
-.role-badge.role-admin { background: #991b1b; }
+.dash-stat-val { font-family: var(--disp); font-size: 1.1rem; color: var(--gold); text-shadow: 2px 2px 0 #000; }
+.dash-stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.dash-stat-staff .dash-stat-val { color: var(--emerald-hi); }
+
+/* ── tabs ── */
+.dash-tabs {
+  display: flex; gap: 0; flex-wrap: wrap;
+  background: #101012; border: 3px solid #000;
+  box-shadow: inset 2px 2px 0 #000, inset -2px -2px 0 #3a3a3e;
+  padding: 0.3rem;
+}
+.dash-tab {
+  padding: 0.55rem 1rem; font-family: var(--disp); font-size: 0.52rem; color: #a1a1aa;
+  background: transparent; border: 0; text-shadow: 1px 1px 0 #000;
+  transition: background 0.1s steps(2), color 0.1s steps(2);
+}
+.dash-tab:hover { color: #f4f4f5; background: #1c1c1c; }
+.dash-tab.active {
+  color: var(--gold); background: #262626;
+  box-shadow: inset 2px 2px 0 #3a3a3e, inset -2px -2px 0 #101012;
+}
+.dash-panel { display: none; }
+.dash-panel.active { display: block; }
+
+.dash-subhead { margin-top: 1.2rem; padding-top: 0.8rem; border-top: 2px solid #09090b; }
+.dash-subhead h4 { font-family: var(--disp); font-size: 0.55rem; color: var(--gold); text-shadow: 1px 1px 0 #000; font-weight: 400; margin-bottom: 0.5rem; }
 
 /* avatar upload row */
 .avatar-row { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
@@ -161,6 +203,8 @@
 
 @media (max-width: 520px) {
   .auth-page { padding-top: 7.5rem; }
-  .dash-head { flex-direction: column; align-items: flex-start; }
+  .dash-hero { flex-direction: column; align-items: flex-start; }
+  .dash-hero-actions { width: 100%; }
+  .dash-hero-actions .btn { flex: 1; text-align: center; }
   .auth-menu { min-width: 13rem; right: -1rem; }
 }
