@@ -13,6 +13,7 @@ create table if not exists public.profiles (
   full_name text,
   role public.user_role not null default 'student',
   roll_no text,
+  avatar_url text,
   last_login_at timestamptz,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
@@ -239,7 +240,39 @@ drop policy if exists "feedback_select_staff" on public.feedback;
 create policy "feedback_select_staff" on public.feedback
   for select using (public.current_user_role() in ('admin', 'coding_club_member'));
 
--- ========== 7. Done ==========
+-- ========== 7. Avatar storage bucket ==========
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do nothing;
+
+-- users can upload/update only their own folder (id = their user id)
+drop policy if exists "avatar_insert_own" on storage.objects;
+create policy "avatar_insert_own" on storage.objects
+  for insert with check (
+    bucket_id = 'avatars'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+drop policy if exists "avatar_update_own" on storage.objects;
+create policy "avatar_update_own" on storage.objects
+  for update using (
+    bucket_id = 'avatars'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+drop policy if exists "avatar_delete_own" on storage.objects;
+create policy "avatar_delete_own" on storage.objects
+  for delete using (
+    bucket_id = 'avatars'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+-- public read for avatars
+drop policy if exists "avatar_public_read" on storage.objects;
+create policy "avatar_public_read" on storage.objects
+  for select using (bucket_id = 'avatars');
+
+-- ========== 8. Done ==========
 -- Next steps (Supabase Dashboard):
 --   1. Authentication > Providers > Email: enable (disable "Confirm email" for local testing if you want).
 --   2. Authentication > URL Configuration: add Site URL + Redirect URLs for prod.

@@ -53,7 +53,6 @@
     '<ul class="nav-links">' +
     LINKS.map(function (l) { return '<li><a href="' + l[0] + '">' + l[1] + "</a></li>"; }).join("") +
     "</ul>" +
-    '<span class="nav-cta"><a href="challenges.html">CCLTCE Week ' + svg("star", 13) + "</a></span>" +
     '<span class="nav-tools">' +
     '<span class="nav-auth" data-auth-slot><a href="login.html">Login</a></span>' +
     '<button class="sound-toggle" type="button" aria-pressed="false" aria-label="Play ambient sound" title="Play ambience">' +

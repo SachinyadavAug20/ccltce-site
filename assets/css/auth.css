@@ -1,24 +1,58 @@
 /* ---------- Supabase auth UI (Minecraft GUI forms) ---------- */
 
-/* nav auth slot */
-.nav-auth { display: flex; align-items: center; gap: 0.3rem; }
-.nav-auth a, .nav-auth .auth-who {
+/* nav auth — avatar trigger + dropdown */
+.nav-auth { display: flex; align-items: center; gap: 0.45rem; position: relative; }
+.nav-auth > a {
   display: flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.8rem;
   font-family: var(--disp); font-size: 0.6rem; color: #f2f2f2; background: #383838;
   border: 2px solid #000; box-shadow: inset -2px -2px 0 #1a1a1a, inset 2px 2px 0 #565656;
   text-shadow: 2px 2px 0 #000; white-space: nowrap;
   transition: background 0.12s steps(2), color 0.12s steps(2), transform 0.12s steps(2);
 }
-.nav-auth a:hover, .nav-auth .auth-who:hover { background: #4a4a4a; color: var(--gold); transform: translateY(-2px); }
-.nav-auth .auth-dot { width: 8px; height: 8px; background: var(--emerald-hi); border: 2px solid #000; flex: none; }
-.nav-auth .auth-out {
-  width: 2rem; height: 2rem; display: grid; place-items: center; color: #e0e0e0;
+.nav-auth > a:hover { background: #4a4a4a; color: var(--gold); transform: translateY(-2px); }
+
+.auth-user { position: relative; }
+.auth-trigger {
+  display: flex; align-items: center; gap: 0.3rem; padding: 0.28rem 0.4rem;
   background: #383838; border: 2px solid #000;
   box-shadow: inset -2px -2px 0 #1a1a1a, inset 2px 2px 0 #565656;
-  font-family: var(--disp); font-size: 0.55rem;
-  transition: background 0.12s steps(2), color 0.12s steps(2);
+  transition: background 0.12s steps(2), transform 0.12s steps(2);
 }
-.nav-auth .auth-out:hover { background: #7f1d1d; color: #fff; }
+.auth-trigger:hover { background: #4a4a4a; transform: translateY(-1px); }
+.auth-trigger[aria-expanded="true"] { background: #1c1c1c; box-shadow: var(--bevel-in); }
+.auth-face {
+  width: 28px; height: 28px; image-rendering: pixelated; border: 2px solid #000;
+  background: #1a1a1a; display: block;
+}
+.auth-chev { font-size: 0.55rem; color: var(--gold); font-family: var(--disp); line-height: 1; }
+
+.auth-menu {
+  position: absolute; top: calc(100% + 0.55rem); right: 0; z-index: 70;
+  min-width: 15rem; padding: 0.4rem;
+  background: #1c1c1c; border: 3px solid #000;
+  box-shadow: inset 2px 2px 0 #3a3a3e, inset -2px -2px 0 #09090b, 0 6px 0 rgba(0,0,0,0.55);
+  font-family: var(--mono);
+}
+.auth-menu[hidden] { display: none; }
+
+.auth-menu-head { display: flex; align-items: center; gap: 0.7rem; padding: 0.6rem 0.55rem; }
+.auth-menu-face { width: 40px; height: 40px; image-rendering: pixelated; border: 2px solid #000; flex: none; }
+.auth-menu-id { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.auth-menu-name { font-family: var(--disp); font-size: 0.55rem; color: #fff; text-shadow: 1px 1px 0 #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.auth-menu-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.auth-menu-head .role-badge { align-self: flex-start; margin-top: 0.15rem; }
+
+.auth-menu-sep { height: 2px; background: #000; margin: 0.3rem 0; box-shadow: 0 1px 0 #3a3a3e; }
+
+.auth-menu-item {
+  display: block; width: 100%; text-align: left; padding: 0.6rem 0.7rem;
+  font-family: var(--disp); font-size: 0.52rem; color: #e4e4e7;
+  background: transparent; border: 0; text-shadow: 1px 1px 0 #000;
+  transition: background 0.1s steps(2), color 0.1s steps(2);
+}
+.auth-menu-item:hover { background: #2e2e2e; color: var(--gold); }
+.auth-menu-danger { color: #fca5a5; }
+.auth-menu-danger:hover { background: #7f1d1d; color: #fff; }
 
 /* page layout */
 .auth-page { display: grid; place-items: start center; padding-top: 8.5rem; }
@@ -75,12 +109,11 @@
 /* dashboard */
 #dashboard-root { display: grid; gap: 1.1rem; }
 .dash-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-.dash-id { display: flex; align-items: center; gap: 0.9rem; min-width: 0; }
-.dash-avatar {
-  width: 3.2rem; height: 3.2rem; display: grid; place-items: center; flex: none;
-  font-family: var(--disp); font-size: 1.1rem; color: #000;
-  background: var(--gold); border: 3px solid #000;
-  box-shadow: inset -2px -2px 0 #a16207, inset 2px 2px 0 #fde047;
+.dash-id { display: flex; align-items: center; gap: 1rem; min-width: 0; }
+.dash-avatar-img {
+  width: 96px; height: 96px; image-rendering: pixelated; flex: none;
+  border: 3px solid #000; box-shadow: inset 0 0 0 2px #3a3a3e;
+  background: #1a1a1a;
 }
 .dash-id h2 { margin: 0; font-size: 0.85rem; }
 .dash-email { color: var(--muted); font-size: 12px; margin: 0.2rem 0 0; word-break: break-all; }
@@ -91,6 +124,16 @@
 .role-badge.role-student { background: #166534; }
 .role-badge.role-club { background: #854d0e; }
 .role-badge.role-admin { background: #991b1b; }
+
+/* avatar upload row */
+.avatar-row { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
+.avatar-preview {
+  width: 96px; height: 96px; image-rendering: pixelated; flex: none;
+  border: 3px solid #000; box-shadow: inset 0 0 0 2px #3a3a3e; background: #1a1a1a;
+}
+.avatar-controls { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+.avatar-controls label.btn { cursor: pointer; }
+.avatar-controls input[type=file] { display: none; }
 
 .dash-meta { display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 1.1rem; margin: 0 0 1rem; font-size: 13px; }
 .dash-meta dt { color: var(--muted); }
@@ -107,6 +150,9 @@
 .dash-sub { color: var(--muted); font-size: 12px; }
 .dash-empty { color: var(--muted); font-size: 13px; font-style: italic; }
 
+.dash-user-row { align-items: center; justify-content: flex-start; }
+.dash-user-face { width: 28px; height: 28px; image-rendering: pixelated; border: 2px solid #000; flex: none; }
+
 .auth-guard { text-align: center; }
 .auth-guard-title { font-family: var(--disp); font-size: 0.8rem; color: #fff; text-shadow: 2px 2px 0 #000; margin-bottom: 0.5rem; }
 .auth-guard-sub { color: var(--muted); font-size: 13px; margin-bottom: 1.1rem; }
@@ -116,4 +162,5 @@
 @media (max-width: 520px) {
   .auth-page { padding-top: 7.5rem; }
   .dash-head { flex-direction: column; align-items: flex-start; }
+  .auth-menu { min-width: 13rem; right: -1rem; }
 }

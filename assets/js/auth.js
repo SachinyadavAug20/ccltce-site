@@ -1,6 +1,7 @@
 // Supabase email/password auth + role-aware UI helpers.
 // Loaded on every page via chrome.js. Uses window.SUPABASE_CONFIG from supabase-config.js.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { minecraftFace, navFace } from "./avatar.js";
 
 const cfg = window.SUPABASE_CONFIG || {};
 const hasConfig = Boolean(cfg.url && cfg.anonKey && !String(cfg.url).includes("YOUR_PROJECT"));
@@ -44,6 +45,51 @@ export async function signOut() {
   window.location.href = "index.html";
 }
 
+function avatarSrc(profile, size) {
+  if (profile && profile.avatar_url) return profile.avatar_url;
+  const seed = (profile && (profile.id || profile.email)) || "guest";
+  return size === "nav" ? navFace(seed) : minecraftFace(seed, size || 80);
+}
+
+function closeAllMenus() {
+  $$("[data-auth-menu]").forEach((m) => { m.hidden = true; });
+  $$("[data-auth-trigger]").forEach((b) => b.setAttribute("aria-expanded", "false"));
+}
+
+function wireDropdown(slot, profile) {
+  const trigger = slot.querySelector("[data-auth-trigger]");
+  const menu = slot.querySelector("[data-auth-menu]");
+  if (!trigger || !menu) return;
+
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const open = !menu.hidden;
+    closeAllMenus();
+    if (!open) {
+      menu.hidden = false;
+      trigger.setAttribute("aria-expanded", "true");
+    }
+  });
+
+  menu.addEventListener("click", (e) => {
+    const a = e.target.closest("a");
+    if (a) {
+      closeAllMenus();
+      return;
+    }
+    if (e.target.closest("[data-logout]")) {
+      signOut();
+    }
+  });
+}
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("[data-auth-slot]")) closeAllMenus();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeAllMenus();
+});
+
 function updateNavAuth(profile) {
   $$("[data-auth-slot]").forEach((slot) => {
     if (!profile) {
@@ -51,14 +97,34 @@ function updateNavAuth(profile) {
       return;
     }
     const role = ROLE_LABEL[profile.role] || "Member";
+    const roleCls = profile.role === "admin" ? "role-admin" : profile.role === "coding_club_member" ? "role-club" : "role-student";
+    const name = profile.full_name || (profile.email || "You").split("@")[0];
+    const face = avatarSrc(profile, "nav");
     slot.innerHTML =
-      '<a class="auth-who" href="dashboard.html" title="' + role + '">' +
-      '<span class="auth-dot" aria-hidden="true"></span>' +
-      (profile.full_name || profile.email || "You").split(" ")[0] +
-      "</a>" +
-      '<button class="auth-out" type="button" data-logout title="Log out" aria-label="Log out">✕</button>';
-    const out = slot.querySelector("[data-logout]");
-    if (out) out.addEventListener("click", () => signOut());
+      '<div class="auth-user">' +
+      '<button class="auth-trigger" type="button" data-auth-trigger aria-haspopup="true" aria-expanded="false" aria-label="Account menu">' +
+      '<img class="auth-face" src="' + face + '" alt="" width="28" height="28" />' +
+      '<span class="auth-chev" aria-hidden="true">▾</span>' +
+      "</button>" +
+      '<div class="auth-menu" data-auth-menu hidden role="menu">' +
+      '<div class="auth-menu-head">' +
+      '<img class="auth-menu-face" src="' + face + '" alt="" width="40" height="40" />' +
+      '<div class="auth-menu-id">' +
+      '<span class="auth-menu-name">' + escapeHtml(name) + "</span>" +
+      '<span class="auth-menu-email">' + escapeHtml(profile.email || "") + "</span>" +
+      '<span class="role-badge ' + roleCls + '">' + role + "</span>" +
+      "</div></div>" +
+      '<div class="auth-menu-sep" role="separator"></div>' +
+      '<a class="auth-menu-item" href="dashboard.html" role="menuitem">Dashboard</a>' +
+      '<a class="auth-menu-item" href="dashboard.html#profile" role="menuitem">Profile &amp; avatar</a>' +
+      (profile.role === "student" ? '<a class="auth-menu-item" href="dashboard.html#teams" role="menuitem">My teams</a>' : "") +
+      (profile.role === "admin" || profile.role === "coding_club_member"
+        ? '<a class="auth-menu-item" href="dashboard.html#staff" role="menuitem">Registrations</a>'
+        : "") +
+      '<div class="auth-menu-sep" role="separator"></div>' +
+      '<button class="auth-menu-item auth-menu-danger" type="button" data-logout role="menuitem">Log out</button>' +
+      "</div></div>";
+    wireDropdown(slot, profile);
   });
 }
 
@@ -158,6 +224,84 @@ function escapeHtml(s) {
   return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+async function wireAvatar(profile, root) {
+  const fileInput = $("#avatar-file", root);
+  const saveBtn = $("#avatar-save", root);
+  const resetBtn = $("#avatar-reset", root);
+  const preview = $("#avatar-preview", root);
+  const errEl = $("#avatar-error", root);
+  if (!fileInput || !saveBtn || !preview) return;
+
+  let pendingFile = null;
+
+  fileInput.addEventListener("change", () => {
+    const f = fileInput.files && fileInput.files[0];
+    if (!f) return;
+    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) {
+      errEl.textContent = "Use a PNG, JPEG or WebP image.";
+      errEl.hidden = false;
+      return;
+    }
+    if (f.size > 2 * 1024 * 1024) {
+      errEl.textContent = "Image must be under 2 MB.";
+      errEl.hidden = false;
+      return;
+    }
+    errEl.hidden = true;
+    pendingFile = f;
+    saveBtn.disabled = false;
+    const reader = new FileReader();
+    reader.onload = () => { preview.src = reader.result; };
+    reader.readAsDataURL(f);
+  });
+
+  saveBtn.addEventListener("click", async () => {
+    if (!pendingFile) return;
+    saveBtn.disabled = true;
+    errEl.hidden = true;
+    const path = profile.id + "/avatar-" + Date.now() + ".png";
+    const { error: upErr } = await supabase.storage.from("avatars").upload(path, pendingFile, { upsert: true, cacheControl: "3600" });
+    if (upErr) {
+      errEl.textContent = "Upload failed: " + errText(upErr) + " — is the avatars bucket created?";
+      errEl.hidden = false;
+      saveBtn.disabled = false;
+      return;
+    }
+    const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+    const publicUrl = pub && pub.publicUrl;
+    const { error: dbErr } = await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("id", profile.id);
+    if (dbErr) {
+      errEl.textContent = "Saved to storage but profile update failed: " + errText(dbErr);
+      errEl.hidden = false;
+      saveBtn.disabled = false;
+      return;
+    }
+    profile.avatar_url = publicUrl;
+    showBanner("Avatar updated!", "ok");
+    // refresh nav faces
+    refreshNav();
+  });
+
+  if (resetBtn) {
+    resetBtn.addEventListener("click", async () => {
+      const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", profile.id);
+      if (error) {
+        errEl.textContent = errText(error);
+        errEl.hidden = false;
+        return;
+      }
+      profile.avatar_url = null;
+      const def = minecraftFace(profile.id || profile.email, 96);
+      preview.src = def;
+      pendingFile = null;
+      saveBtn.disabled = true;
+      fileInput.value = "";
+      showBanner("Reset to default Minecraft face.", "ok");
+      refreshNav();
+    });
+  }
+}
+
 async function initDashboard(profile) {
   const root = $("#dashboard-root");
   if (!root || !supabase) return;
@@ -173,10 +317,11 @@ async function initDashboard(profile) {
 
   const role = profile.role || "student";
   const roleCls = role === "admin" ? "role-admin" : role === "coding_club_member" ? "role-club" : "role-student";
+  const face = avatarSrc(profile, 96);
   let html =
-    '<div class="auth-card dash-head">' +
+    '<div class="auth-card dash-head" id="profile">' +
     '<div class="dash-id">' +
-    '<span class="dash-avatar" aria-hidden="true">' + escapeHtml((profile.full_name || profile.email || "?").slice(0, 1).toUpperCase()) + "</span>" +
+    '<img class="dash-avatar-img" src="' + face + '" alt="" width="96" height="96" />' +
     '<div><h2>' + escapeHtml(profile.full_name || "Member") + "</h2>" +
     '<p class="dash-email">' + escapeHtml(profile.email || "") + "</p></div></div>" +
     '<span class="role-badge ' + roleCls + '">' + (ROLE_LABEL[role] || role) + "</span>" +
@@ -184,8 +329,18 @@ async function initDashboard(profile) {
 
   html +=
     '<section class="auth-card">' +
-    "<h3>Your profile</h3>" +
-    '<dl class="dash-meta"><dt>Role</dt><dd>' + escapeHtml(ROLE_LABEL[role] || role) + "</dd>" +
+    "<h3>Profile &amp; avatar</h3>" +
+    '<p class="dash-note">Your face is auto-generated from your account. Upload a picture to replace it.</p>' +
+    '<div class="avatar-row">' +
+    '<img class="avatar-preview" id="avatar-preview" src="' + face + '" alt="Current avatar" width="96" height="96" />' +
+    '<div class="avatar-controls">' +
+    '<label class="btn" for="avatar-file">Choose image…</label>' +
+    '<input id="avatar-file" type="file" accept="image/png,image/jpeg,image/webp" hidden />' +
+    '<button class="btn btn-primary" type="button" id="avatar-save" disabled>Upload avatar</button>' +
+    '<button class="btn" type="button" id="avatar-reset">Use default face</button>' +
+    "</div></div>" +
+    '<p class="form-error" id="avatar-error" hidden></p>' +
+    '<dl class="dash-meta" style="margin-top:1rem"><dt>Role</dt><dd>' + escapeHtml(ROLE_LABEL[role] || role) + "</dd>" +
     "<dt>Member since</dt><dd>" + escapeHtml((profile.created_at || "").slice(0, 10)) + "</dd></dl>" +
     '<button class="btn" type="button" data-logout-dash>Log out</button>' +
     "</section>";
@@ -202,7 +357,7 @@ async function initDashboard(profile) {
 
   if (role === "student") {
     html +=
-      '<section class="auth-card">' +
+      '<section class="auth-card" id="teams">' +
       "<h3>Create a team</h3>" +
       '<p class="dash-note">Max <b>4 members</b> per team. Pick an event, name your squad.</p>' +
       '<form id="team-form" class="auth-form">' +
@@ -219,7 +374,7 @@ async function initDashboard(profile) {
 
   if (role === "admin" || role === "coding_club_member") {
     html +=
-      '<section class="auth-card">' +
+      '<section class="auth-card" id="staff">' +
       "<h3>All registrations</h3>" +
       '<p class="dash-note">Every team registration across events.</p>' +
       '<div id="all-regs" class="dash-list" aria-live="polite"><p class="dash-empty">Loading…</p></div>' +
@@ -234,6 +389,9 @@ async function initDashboard(profile) {
 
   const outBtn = root.querySelector("[data-logout-dash]");
   if (outBtn) outBtn.addEventListener("click", () => signOut());
+
+  // avatar upload
+  wireAvatar(profile, root);
 
   // feedback
   const fb = $("#feedback-form", root);
@@ -338,7 +496,7 @@ async function loadAllRegs() {
 async function loadAllUsers() {
   const box = $("#all-users");
   if (!box || !supabase) return;
-  const { data, error } = await supabase.from("profiles").select("id, email, full_name, role, created_at").order("created_at", { ascending: false });
+  const { data, error } = await supabase.from("profiles").select("id, email, full_name, role, avatar_url, created_at").order("created_at", { ascending: false });
   if (error || !data || !data.length) {
     box.innerHTML = '<p class="dash-empty">' + (error ? "No access (check RLS)." : "No users yet.") + "</p>";
     return;
@@ -346,7 +504,9 @@ async function loadAllUsers() {
   box.innerHTML = data
     .map(
       (u) =>
-        '<div class="dash-row"><b>' + escapeHtml(u.full_name || u.email) + "</b>" +
+        '<div class="dash-row dash-user-row">' +
+        '<img class="dash-user-face" src="' + avatarSrc(u, 32) + '" alt="" width="28" height="28" />' +
+        "<b>" + escapeHtml(u.full_name || u.email) + "</b>" +
         '<span class="dash-sub">' + escapeHtml(u.email) + " · " + escapeHtml(u.role) + "</span></div>"
     )
     .join("");
