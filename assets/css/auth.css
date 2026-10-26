@@ -265,3 +265,36 @@
 .pe-swatch:hover { transform: scale(1.25); z-index: 1; position: relative; }
 .pe-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: auto; }
 .pe-actions .btn { font-size: 0.48rem; padding: 0.5rem 0.8rem; }
+
+/* ── members directory ── */
+.members-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: 0.7rem; margin-top: 0.5rem;
+}
+.member-card {
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem 0.7rem;
+  background: #101012; border: 2px solid #000;
+  box-shadow: inset 2px 2px 0 #2a2a2e, inset -2px -2px 0 #09090b;
+  transition: transform 0.1s, border-color 0.1s;
+}
+.member-card:hover { transform: translateY(-2px); border-color: var(--stone-hi); }
+.member-face {
+  width: 64px; height: 64px; image-rendering: pixelated;
+  border: 2px solid #000; box-shadow: inset 0 0 0 1px #3a3a3e; background: #1a1a1a;
+}
+.member-name {
+  font-family: var(--disp); font-size: 0.48rem; color: #f4f4f5; text-shadow: 1px 1px 0 #000;
+  text-align: center; line-height: 1.5; word-break: break-word;
+}
+
+/* ── profile modal ── */
+.profile-modal { width: min(22rem, 100%); }
+.profile-body {
+  display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+  padding: 1.5rem 1.2rem; text-align: center;
+}
+.profile-face {
+  width: 112px; height: 112px; image-rendering: pixelated;
+  border: 3px solid #000; box-shadow: inset 0 0 0 2px #3a3a3e; background: #1a1a1a;
+}
+.profile-name { font-family: var(--disp); font-size: 0.8rem; color: #fff; text-shadow: 2px 2px 0 #000; margin: 0; }
+.profile-body .dash-meta { text-align: left; width: 100%; }

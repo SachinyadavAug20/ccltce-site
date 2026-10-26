@@ -417,6 +417,7 @@ async function initDashboard(profile) {
   // ── tab nav ──
   const tabs = [
     ["avatar", "Profile"],
+    ["members", "Members"],
     role === "student" ? ["teams", "Teams"] : null,
     isStaff ? ["staff", "Staff"] : null,
     ["feedback", "Feedback"],
@@ -444,6 +445,14 @@ async function initDashboard(profile) {
     '<dl class="dash-meta"><dt>Role</dt><dd>' + escapeHtml(ROLE_LABEL[role] || role) + "</dd>" +
     "<dt>Email</dt><dd>" + escapeHtml(profile.email || "") + "</dd>" +
     "<dt>Member since</dt><dd>" + escapeHtml(memberSince) + "</dd></dl>" +
+    "</section>";
+
+  // Members directory (everyone can view)
+  html +=
+    '<section class="auth-card dash-panel" data-panel="members" role="tabpanel" id="members">' +
+    "<h3>Club members</h3>" +
+    '<p class="dash-note">Core team &amp; club members. Click anyone to view their profile.</p>' +
+    '<div id="members-grid" class="members-grid" aria-live="polite"><p class="dash-empty">Loading…</p></div>' +
     "</section>";
 
   // Teams (students)
@@ -507,6 +516,7 @@ async function initDashboard(profile) {
 
   if (role === "student") wireTeamForm(profile, root);
   if (isStaff) { loadAllRegs(); loadAllUsers(); }
+  loadMembers();
 
   // deep-link support (#teams, #staff, #profile, #feedback)
   const hash = (location.hash || "").replace("#", "");
@@ -560,7 +570,7 @@ async function loadAllRegs() {
 async function loadAllUsers() {
   const box = $("#all-users");
   if (!box || !supabase) return;
-  const { data, error } = await supabase.from("profiles").select("id, email, full_name, role, avatar_url, created_at").order("created_at", { ascending: false });
+  const { data, error } = await supabase.from("profiles").select("id, email, full_name, role, avatar_url, pixel_art, created_at").order("created_at", { ascending: false });
   if (error || !data || !data.length) {
     box.innerHTML = '<p class="dash-empty">' + (error ? "No access (check RLS)." : "No users yet.") + "</p>";
     return;
@@ -574,6 +584,63 @@ async function loadAllUsers() {
         '<span class="dash-sub">' + escapeHtml(u.email) + " · " + escapeHtml(u.role) + "</span></div>"
     )
     .join("");
+}
+
+// ── Members directory (public profiles) ──
+async function loadMembers() {
+  const grid = $("#members-grid");
+  if (!grid || !supabase) return;
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, email, full_name, role, avatar_url, pixel_art, created_at")
+    .in("role", ["coding_club_member", "admin"])
+    .order("created_at");
+  if (error || !data || !data.length) {
+    grid.innerHTML = '<p class="dash-empty">' + (error ? "No access." : "No club members yet.") + "</p>";
+    return;
+  }
+  grid.innerHTML = data
+    .map((u) => {
+      const roleCls = u.role === "admin" ? "role-admin" : "role-club";
+      return (
+        '<button class="member-card" type="button" data-member-id="' + escapeHtml(u.id) + '">' +
+        '<img class="member-face" src="' + avatarSrc(u, 80) + '" alt="" width="64" height="64" />' +
+        '<span class="member-name">' + escapeHtml(u.full_name || u.email) + "</span>" +
+        '<span class="role-badge ' + roleCls + '">' + (ROLE_LABEL[u.role] || u.role) + "</span>" +
+        "</button>"
+      );
+    })
+    .join("");
+
+  grid.querySelectorAll("[data-member-id]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const u = data.find((x) => x.id === btn.dataset.memberId);
+      if (u) openProfileModal(u);
+    });
+  });
+}
+
+function openProfileModal(u) {
+  const roleCls = u.role === "admin" ? "role-admin" : u.role === "coding_club_member" ? "role-club" : "role-student";
+  const overlay = document.createElement("div");
+  overlay.className = "pe-overlay";
+  overlay.innerHTML =
+    '<div class="pe-modal profile-modal" role="dialog" aria-label="Profile">' +
+    '<div class="pe-head"><h3>Profile</h3><button class="pe-close" type="button" aria-label="Close">✕</button></div>' +
+    '<div class="profile-body">' +
+    '<img class="profile-face" src="' + avatarSrc(u, 128) + '" alt="" width="112" height="112" />' +
+    '<h2 class="profile-name">' + escapeHtml(u.full_name || u.email) + "</h2>" +
+    '<span class="role-badge ' + roleCls + '">' + (ROLE_LABEL[u.role] || u.role) + "</span>" +
+    '<dl class="dash-meta" style="margin-top:1rem"><dt>Email</dt><dd>' + escapeHtml(u.email || "—") + "</dd>" +
+    "<dt>Member since</dt><dd>" + escapeHtml((u.created_at || "").slice(0, 10)) + "</dd></dl>" +
+    "</div></div>";
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  overlay.querySelector(".pe-close").addEventListener("click", close);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+  document.addEventListener("keydown", function esc(e) {
+    if (e.key === "Escape") { close(); document.removeEventListener("keydown", esc); }
+  });
 }
 
 async function init() {
