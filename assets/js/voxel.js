@@ -9,9 +9,15 @@
     pickaxe: { top: "#9a9a9a", side: "#5a5a5a", front: "#bc7b44" },
   };
   var ov, renderer, scene, cam, mesh, drag, vx = 0, vy = 0, spin = 0.004, alive = false, lastFocus;
+  var threeP = null;
 
-  function ensure() {
+  // Three.js is loaded on demand (same cached module the narrative uses on desktop)
+  async function ensure() {
     if (ov) return true;
+    if (!window.THREE) {
+      if (!threeP) threeP = import("../vendor/three.module.js").then(function (m) { window.THREE = m; return m; });
+      try { await threeP; } catch (e) { threeP = null; return false; }
+    }
     if (!window.THREE) return false;
     ov = document.createElement("div");
     ov.className = "vox-overlay";
@@ -85,8 +91,8 @@
     requestAnimationFrame(loop);
   }
 
-  function open(kind) {
-    if (!ensure()) return;
+  async function open(kind) {
+    if (!(await ensure())) return;
     buildMesh(kind);
     lastFocus = document.activeElement;
     ov.hidden = false;

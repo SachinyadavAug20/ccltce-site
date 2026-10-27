@@ -395,11 +395,81 @@ function wireThreadForm() {
 }
 
 // ── leaderboard ──
+const CROWN_SVG =
+  '<svg class="pod-crown" viewBox="0 0 16 12" width="30" height="23" aria-hidden="true" shape-rendering="crispEdges">' +
+  '<polygon points="0,12 0,4 3,7 5,2 8,6 11,2 13,7 16,4 16,12" fill="#eab308" stroke="#000" stroke-width="0.7" />' +
+  '<rect x="1" y="9" width="14" height="2.4" fill="#b45309" stroke="#000" stroke-width="0.5" />' +
+  '<rect x="7" y="6.4" width="2" height="2" fill="#ff004d" stroke="#000" stroke-width="0.4" />' +
+  "</svg>";
+
+const POD_RANK_WORD = { 1: "1ST", 2: "2ND", 3: "3RD" };
+
+function podiumSlotHtml(u, rank) {
+  const xp = Number(u.xp) || 0;
+  const isMe = me && u.id === me.id;
+  const name = esc(u.full_name || u.email || "Member");
+  const delay = rank === 2 ? "0s" : rank === 1 ? "0.1s" : "0.2s";
+  const size = rank === 1 ? 96 : 72;
+  const px = rank === 1 ? 88 : 68;
+  return (
+    '<div class="pod-slot pod-' + rank + (isMe ? " pod-you" : "") + '" style="--d:' + delay + '"' +
+    ' role="button" tabindex="0" data-open="' + esc(u.id) + '"' +
+    ' aria-label="Rank ' + rank + ", " + name + " — view profile" + '">' +
+    (rank === 1 ? CROWN_SVG : "") +
+    '<div class="pod-avatar">' +
+    '<img src="' + esc(avatarSrc(u, size)) + '" alt="" width="' + px + '" height="' + px + '" decoding="async" />' +
+    (isMe ? '<span class="pod-you-tag">YOU</span>' : "") +
+    "</div>" +
+    '<span class="pod-name">' + name + "</span>" +
+    '<span class="pod-meta">' +
+    '<span class="lv-chip">Lv ' + levelOf(xp) + "</span>" +
+    '<span class="pod-xp" data-xp="' + xp + '">0 XP</span>' +
+    "</span>" +
+    '<div class="pod-base"><span>' + POD_RANK_WORD[rank] + "</span></div>" +
+    "</div>"
+  );
+}
+
+function countUpXp(el, to) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    el.textContent = to + " XP";
+    return;
+  }
+  const t0 = performance.now();
+  const dur = 750;
+  (function tick(now) {
+    const p = Math.min(1, (now - t0) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(to * eased) + " XP";
+    if (p < 1) requestAnimationFrame(tick);
+  })(t0);
+}
+
+function wirePodium() {
+  const podium = $("#board-podium");
+  if (!podium || podium.dataset.wired) return;
+  podium.dataset.wired = "1";
+  const byId = (id) => (podium._byId && podium._byId.get(id)) || memberById(id);
+  podium.addEventListener("click", (e) => {
+    const slot = e.target.closest("[data-open]");
+    const u = slot && byId(slot.dataset.open);
+    if (u) openProfileModal(u, me);
+  });
+  podium.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const slot = e.target.closest("[data-open]");
+    const u = slot && byId(slot.dataset.open);
+    if (u) { e.preventDefault(); openProfileModal(u, me); }
+  });
+}
+
 async function loadBoard() {
   const list = $("#board-list");
   const self = $("#board-self");
+  const podium = $("#board-podium");
   if (!list || !supabase) return;
   list.innerHTML = skelRows(6);
+  if (podium) { podium.hidden = true; podium.innerHTML = ""; }
   const { data, error } = await supabase
     .from("profiles")
     .select("id, full_name, email, role, avatar_url, pixel_art, xp")
@@ -439,15 +509,28 @@ async function loadBoard() {
     }
   }
 
-  list.innerHTML = rows
+  // top-3 podium (semantic DOM order 1,2,3 — CSS reorders to 2·1·3)
+  if (podium) {
+    wirePodium();
+    podium._byId = new Map(rows.map((u) => [u.id, u]));
+    podium.classList.toggle("partial", rows.length < 3);
+    podium.innerHTML = rows.slice(0, 3).map((u, i) => podiumSlotHtml(u, i + 1)).join("");
+    podium.hidden = false;
+    podium.querySelectorAll(".pod-xp[data-xp]").forEach((el) => countUpXp(el, Number(el.dataset.xp) || 0));
+  }
+
+  const rest = rows.slice(3);
+  if (!rest.length) { list.innerHTML = ""; list.hidden = true; return; }
+  list.hidden = false;
+  list.innerHTML = rest
     .map((u, i) => {
+      const rank = i + 4;
       const xp = Number(u.xp) || 0;
-      const medal = i === 0 ? "g1" : i === 1 ? "g2" : i === 2 ? "g3" : "";
       const isMe = me && u.id === me.id;
       const roleCls = u.role === "admin" ? "role-admin" : u.role === "coding_club_member" ? "role-club" : "role-student";
       return (
-        '<div class="board-row ' + medal + (isMe ? " board-me" : "") + '">' +
-        '<span class="board-rank">' + (i + 1) + "</span>" +
+        '<div class="board-row' + (isMe ? " board-me" : "") + '" style="--i:' + Math.min(i, 12) + '">' +
+        '<span class="board-rank">' + rank + "</span>" +
         '<img class="board-face" src="' + esc(avatarSrc(u, 40)) + '" alt="" width="36" height="36" loading="lazy" decoding="async" />' +
         '<span class="board-id">' +
         '<b>' + esc(u.full_name || u.email || "Member") + "</b>" +

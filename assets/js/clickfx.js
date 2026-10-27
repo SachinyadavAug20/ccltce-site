@@ -96,5 +96,6 @@
     if (el) sparks(el);
   }, { passive: true });
 
-  if (!reduce) motes(16);
+  // ambient motes: desktop pointers only — phones get a cleaner, cheaper screen
+  if (!reduce && window.innerWidth > 899 && !matchMedia("(pointer: coarse)").matches) motes(16);
 })();

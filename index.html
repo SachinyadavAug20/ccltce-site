@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>CCLTCE — Coding Club, LTCOE</title>
   <meta name="description" content="Coding Club LTCE (CCLTCE) — build, ship and break things. Events, challenges, resources and the core team." />
   <meta name="theme-color" content="#141414" />
@@ -14,7 +14,16 @@
   <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png" />
   <link rel="manifest" href="site.webmanifest" />
-  <link rel="modulepreload" href="assets/vendor/three.module.js" />
+  <script>
+    /* Three.js (656KB) is desktop-only — narrative.js lazy-imports it on desktop;
+       warm the fetch early here, skip entirely on phones/tablets. */
+    if (!matchMedia("(max-width: 899px), (pointer: coarse)").matches) {
+      var _threePre = document.createElement("link");
+      _threePre.rel = "modulepreload";
+      _threePre.href = "assets/vendor/three.module.js";
+      document.head.appendChild(_threePre);
+    }
+  </script>
   <link rel="preload" as="image" href="assets/img/ccltce-logo.webp" type="image/webp" fetchpriority="high" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="CCLTCE — Coding Club, LTCOE" />
