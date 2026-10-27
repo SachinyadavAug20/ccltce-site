@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Community — CCLTCE</title>
+  <meta name="description" content="Every CCLTCE account in one place — browse members, message each other and team up for upcoming events." />
+  <meta name="theme-color" content="#141414" />
+  <meta name="color-scheme" content="dark" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/nav.css" />
+  <link rel="stylesheet" href="assets/css/brand.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+  <link rel="stylesheet" href="assets/css/footer.css" />
+  <link rel="stylesheet" href="assets/css/gamify.css" />
+  <link rel="stylesheet" href="assets/css/mobile.css" />
+  <link rel="stylesheet" href="assets/css/auth.css" />
+  <link rel="stylesheet" href="assets/css/community.css" />
+</head>
+<body>
+
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav-wrap"></header>
+
+  <main id="main">
+    <section class="page-head">
+      <h1>Community</h1>
+      <p>Every account on the site &mdash; browse, message, and team up before the next event drops.</p>
+    </section>
+
+    <section class="auth-card comm-root" id="community-root">
+      <div class="dash-tabs comm-tabs" role="tablist" id="comm-tabs">
+        <button class="dash-tab active" role="tab" data-ctab="directory" aria-selected="true">Directory</button>
+        <button class="dash-tab" role="tab" data-ctab="inbox" aria-selected="false">Messages</button>
+        <button class="dash-tab" role="tab" data-ctab="teams" aria-selected="false">Team-ups</button>
+      </div>
+
+      <section class="comm-panel active" data-cpanel="directory" role="tabpanel">
+        <p class="dash-note">Click anyone to open their full profile. Message them or send a team-up invite for a future event.</p>
+        <input id="comm-search" class="comm-search" type="search" placeholder="Search name, role, bio…" maxlength="80" />
+        <div id="comm-grid" class="members-grid" aria-live="polite"><p class="dash-empty">Loading members…</p></div>
+      </section>
+
+      <section class="comm-panel" data-cpanel="inbox" role="tabpanel">
+        <div id="comm-inbox-guard" class="auth-guard" hidden>
+          <p class="auth-guard-title">Log in to message</p>
+          <p class="auth-guard-sub">Members can DM each other to plan teams and events.</p>
+          <div class="auth-actions"><a class="btn btn-primary" href="login.html">Log in</a></div>
+        </div>
+        <div id="comm-inbox" class="inbox" hidden>
+          <div class="inbox-list-wrap">
+            <div class="inbox-head"><h3>Conversations</h3></div>
+            <div id="inbox-list" class="inbox-list" aria-live="polite"><p class="dash-empty">No messages yet.</p></div>
+          </div>
+          <div class="inbox-thread-wrap">
+            <div class="inbox-head"><h3 id="thread-title">Select a conversation</h3></div>
+            <div id="thread-body" class="thread-body"><p class="dash-empty">Pick someone from the directory or an existing chat.</p></div>
+            <form id="thread-form" class="thread-form" hidden>
+              <input id="thread-input" type="text" maxlength="2000" placeholder="Write a message…" autocomplete="off" />
+              <button class="btn btn-primary" type="submit">Send</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="comm-panel" data-cpanel="teams" role="tabpanel">
+        <div id="comm-teams-guard" class="auth-guard" hidden>
+          <p class="auth-guard-title">Log in to team up</p>
+          <p class="auth-guard-sub">Send and accept team-up invites so you&rsquo;re ready when events open.</p>
+          <div class="auth-actions"><a class="btn btn-primary" href="login.html">Log in</a></div>
+        </div>
+        <div id="comm-teams" hidden>
+          <div class="comm-subhead"><h4>Invites received</h4></div>
+          <div id="invites-in" class="dash-list" aria-live="polite"><p class="dash-empty">None yet.</p></div>
+          <div class="comm-subhead"><h4>Invites sent</h4></div>
+          <div id="invites-out" class="dash-list" aria-live="polite"><p class="dash-empty">None yet.</p></div>
+          <div class="comm-subhead"><h4>Accepted squads</h4></div>
+          <div id="squads-list" class="dash-list" aria-live="polite"><p class="dash-empty">No accepted team-ups yet.</p></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer></footer>
+
+  <script defer src="assets/vendor/gsap.min.js"></script>
+  <script defer src="assets/js/chrome.js"></script>
+  <script defer src="assets/js/motion.js"></script>
+  <script defer src="assets/js/clickfx.js"></script>
+  <script defer src="assets/js/sfx.js"></script>
+  <script defer src="assets/js/term-vfs.js"></script>
+  <script defer src="assets/js/terminal.js"></script>
+  <script defer src="assets/js/hud.js"></script>
+  <script defer src="assets/js/eastereggs.js"></script>
+  <script defer src="assets/js/voxel.js"></script>
+  <script defer src="assets/js/physics.js"></script>
+  <script defer src="assets/js/gamify.js"></script>
+  <script defer src="assets/js/mobileTabs.js"></script>
+  <script type="module" src="assets/js/community.js"></script>
+</body>
+</html>

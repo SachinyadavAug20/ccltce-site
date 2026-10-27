@@ -42,6 +42,7 @@
   const LINKS = [
     ["events.html", "Events"],
     ["team.html", "Team"],
+    ["community.html", "Community"],
     ["notices.html", "Notices"],
     ["resources.html", "Resources"],
     ["dashboard.html", "Dashboard"],
@@ -76,6 +77,7 @@
     '<span class="foot-brand">' + FOOT_LOGO + "Coding Club &middot; LTCE</span>" +
     '<nav class="foot-links" aria-label="Footer">' +
     '<a href="events.html">Events</a><a href="team.html">Team</a>' +
+    '<a href="community.html">Community</a>' +
     '<a href="notices.html">Notices</a><a href="challenges.html">Challenges</a>' +
     '<a href="resources.html">Resources</a><a href="achievements.html">Achievements</a>' +
     '<a href="dashboard.html">Dashboard</a>' +

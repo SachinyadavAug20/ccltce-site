@@ -12,6 +12,17 @@ if (!document.querySelector('link[href*="auth.css"]')) {
   document.head.appendChild(link);
 }
 
+// Ensure config is loaded even when another module (community.js) imports us first
+if (!window.SUPABASE_CONFIG) {
+  await new Promise((resolve) => {
+    const s = document.createElement("script");
+    s.src = "assets/js/supabase-config.js";
+    s.onload = resolve;
+    s.onerror = resolve;
+    document.head.appendChild(s);
+  });
+}
+
 const cfg = window.SUPABASE_CONFIG || {};
 const hasConfig = Boolean(cfg.url && cfg.anonKey && !String(cfg.url).includes("YOUR_PROJECT"));
 export const supabase = hasConfig ? createClient(cfg.url, cfg.anonKey) : null;
@@ -62,6 +73,7 @@ function avatarSrc(profile, size) {
   const seed = (profile && (profile.id || profile.email)) || "guest";
   return size === "nav" ? navFace(seed) : minecraftFace(seed, size || 80);
 }
+export { avatarSrc };
 
 function closeAllMenus() {
   $$("[data-auth-menu]").forEach((m) => { m.hidden = true; });
@@ -930,6 +942,7 @@ async function enhanceTeamPage() {
   });
   window.__CCLTCE_PROFILES_BY_NAME = byName;
 
+  // replace static SVG faces with live pixel/seed faces
   const applyFaces = () => {
     document.querySelectorAll(".tree-node[data-name], .t-card[data-name]").forEach((el) => {
       const key = (el.dataset.name || "").trim().toLowerCase();
@@ -945,14 +958,41 @@ async function enhanceTeamPage() {
     });
   };
 
-  // tree/cards may render after this async fetch — retry briefly
   applyFaces();
   let tries = 0;
   const t = setInterval(() => {
     applyFaces();
     if (++tries > 20) clearInterval(t);
   }, 250);
-  // clicks open the live profile modal via teamFx.open() → CCLTCE_OPEN_PROFILE
+
+  // capture-phase: open the rich live modal BEFORE teamFx's bubble handler
+  const openLive = (el) => {
+    const key = (el.dataset.name || "").trim().toLowerCase();
+    const p = byName.get(key);
+    if (!p) return false;
+    openProfileModal(p, _sessionUser);
+    return true;
+  };
+  if (!enhanceTeamPage._wired) {
+    enhanceTeamPage._wired = true;
+    document.addEventListener("click", (e) => {
+      const node = e.target.closest(".tree-node[data-name], .t-card[data-name]");
+      if (!node || e.target.closest("a, button.t-btn, .tf-btn")) return;
+      if (openLive(node)) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    }, true);
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      const node = e.target.closest && e.target.closest(".tree-node[data-name], .t-card[data-name]");
+      if (!node || e.target.closest("a")) return;
+      if (openLive(node)) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    }, true);
+  }
 }
 
 window.CCLTCE_OPEN_PROFILE = openProfileModal;
