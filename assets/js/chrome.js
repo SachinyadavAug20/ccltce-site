@@ -44,8 +44,6 @@
     ["team.html", "Team"],
     ["community.html", "Community"],
     ["notices.html", "Notices"],
-    ["resources.html", "Resources"],
-    ["dashboard.html", "Dashboard"],
   ];
 
   const NAV =
@@ -63,7 +61,7 @@
     '<div class="mobile-menu" id="mobile-menu" hidden>' +
     '<a href="index.html">Home</a>' +
     LINKS.map(function (l) { return '<a href="' + l[0] + '">' + l[1] + "</a>"; }).join("") +
-    '<a href="challenges.html">Challenges</a><a href="achievements.html">Achievements</a></div>';
+    "</div>";
 
   const SOCIALS = [
     ["github", "https://github.com/CCLTCE", "GitHub", "ic-gh"],
@@ -78,9 +76,7 @@
     '<nav class="foot-links" aria-label="Footer">' +
     '<a href="events.html">Events</a><a href="team.html">Team</a>' +
     '<a href="community.html">Community</a>' +
-    '<a href="notices.html">Notices</a><a href="challenges.html">Challenges</a>' +
-    '<a href="resources.html">Resources</a><a href="achievements.html">Achievements</a>' +
-    '<a href="dashboard.html">Dashboard</a>' +
+    '<a href="notices.html">Notices</a>' +
     "</nav>" +
     '<span class="foot-social">' +
     SOCIALS.map(function (s) {

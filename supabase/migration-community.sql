@@ -54,8 +54,8 @@ create table public.messages (
   body text not null check (char_length(body) between 1 and 2000),
   created_at timestamptz not null default now()
 );
-create index if exists idx_messages_channel on public.messages (channel_id, created_at);
-create index if exists idx_messages_user on public.messages (user_id);
+create index if not exists idx_messages_channel on public.messages (channel_id, created_at);
+create index if not exists idx_messages_user on public.messages (user_id);
 
 alter table public.messages enable row level security;
 alter table public.channels enable row level security;
