@@ -37,6 +37,12 @@ function flash(msg, kind) {
   flash._t = setTimeout(() => { el.hidden = true; }, 5000);
 }
 
+function skelRows(n) {
+  let s = "";
+  for (let i = 0; i < n; i++) s += '<div class="skel-row" aria-hidden="true"></div>';
+  return s;
+}
+
 let me = null;
 let members = [];
 let allEvents = [];
@@ -44,6 +50,8 @@ let channels = [];
 let activeChannel = null; // { id, slug, name, purpose }
 let chanSub = null;
 let chanSeen = {}; // slug -> ISO ts of last read
+let lastMsgAt = null; // newest rendered message ts (incremental polling)
+const msgIds = new Set(); // rendered message ids — dedupe realtime vs own send
 
 function loadSeen() {
   try { chanSeen = JSON.parse(localStorage.getItem("ccltce_chat_seen") || "{}"); } catch { chanSeen = {}; }
@@ -73,9 +81,16 @@ function wireTabs() {
 }
 
 // ── directory ──
+let memberHay = null; // id -> lowercase search haystack, built once
+
+function memberById(id) {
+  return members.find((x) => x.id === id);
+}
+
 async function loadDirectory() {
   const grid = $("#comm-grid");
   if (!grid || !supabase) return;
+  grid.innerHTML = skelRows(8);
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
@@ -86,26 +101,84 @@ async function loadDirectory() {
     return;
   }
   members = data;
+  memberHay = new Map();
+  members.forEach((u) =>
+    memberHay.set(u.id, [u.full_name, u.email, u.role, u.bio].filter(Boolean).join(" ").toLowerCase())
+  );
   renderDirectory(members);
+  wireDirectory();
+  wireSearch();
+}
 
+// one delegated listener pair for the whole grid instead of 2 per card
+function wireDirectory() {
+  const grid = $("#comm-grid");
+  if (!grid || grid.dataset.wired) return;
+  grid.dataset.wired = "1";
+  grid.addEventListener("click", (e) => {
+    const card = e.target.closest(".member-card");
+    if (!card) return;
+    const u = memberById(card.dataset.id);
+    if (!u) return;
+    const act = e.target.closest("[data-act]");
+    if (act) {
+      e.stopPropagation();
+      if (act.dataset.act === "view") return openProfileModal(u, me);
+      if (act.dataset.act === "teamup") {
+        if (!me) { flash("Log in to send team-up invites.", "warn"); return void (location.href = "login.html"); }
+        return openInviteModal(u);
+      }
+    }
+    openProfileModal(u, me);
+  });
+  grid.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const card = e.target.closest(".member-card");
+    if (!card || e.target !== card) return;
+    e.preventDefault();
+    const u = memberById(card.dataset.id);
+    if (u) openProfileModal(u, me);
+  });
+}
+
+// filter by toggling hidden — no innerHTML rebuild, no re-downloaded faces
+function wireSearch() {
   const search = $("#comm-search");
-  if (search) {
-    search.addEventListener("input", () => {
-      const q = search.value.trim().toLowerCase();
-      if (!q) return renderDirectory(members);
-      renderDirectory(members.filter((u) => {
-        const hay = [u.full_name, u.email, u.role, u.bio].filter(Boolean).join(" ").toLowerCase();
-        return hay.includes(q);
-      }));
-    });
-  }
+  if (!search || search.dataset.wired) return;
+  search.dataset.wired = "1";
+  let t = 0;
+  search.addEventListener("input", () => {
+    clearTimeout(t);
+    t = setTimeout(() => filterDirectory(search.value.trim().toLowerCase()), 120);
+  });
+}
+
+function filterDirectory(q) {
+  const grid = $("#comm-grid");
+  if (!grid || !memberHay) return;
+  let shown = 0;
+  grid.querySelectorAll(".member-card").forEach((card) => {
+    const ok = !q || (memberHay.get(card.dataset.id) || "").includes(q);
+    card.hidden = !ok;
+    if (ok) shown++;
+  });
+  let none = grid.querySelector(".comm-no-match");
+  if (!shown) {
+    if (!none) {
+      none = document.createElement("p");
+      none.className = "dash-empty comm-no-match";
+      none.textContent = "No matches.";
+      grid.appendChild(none);
+    }
+    none.hidden = false;
+  } else if (none) none.hidden = true;
 }
 
 function renderDirectory(list) {
   const grid = $("#comm-grid");
   if (!grid) return;
   if (!list.length) {
-    grid.innerHTML = '<p class="dash-empty">No matches.</p>';
+    grid.innerHTML = '<p class="dash-empty">No accounts yet.</p>';
     return;
   }
   grid.innerHTML = list
@@ -114,7 +187,7 @@ function renderDirectory(list) {
       const isSelf = me && u.id === me.id;
       return (
         '<div class="member-card" data-id="' + esc(u.id) + '" role="button" tabindex="0">' +
-        '<img class="member-face" src="' + esc(avatarSrc(u, 80)) + '" alt="" width="64" height="64" />' +
+        '<img class="member-face" src="' + esc(avatarSrc(u, 80)) + '" alt="" width="64" height="64" loading="lazy" decoding="async" />' +
         '<span class="member-name">' + esc(u.full_name || u.email || "Member") + "</span>" +
         '<span class="role-badge ' + roleCls + '">' + esc(ROLE_LABEL[u.role] || u.role) + "</span>" +
         (u.bio ? '<span class="comm-bio-hint">' + esc(String(u.bio).slice(0, 60)) + (String(u.bio).length > 60 ? "…" : "") + "</span>" : "") +
@@ -127,29 +200,6 @@ function renderDirectory(list) {
       );
     })
     .join("");
-
-  grid.querySelectorAll(".member-card").forEach((card) => {
-    const u = members.find((x) => x.id === card.dataset.id);
-    if (!u) return;
-    card.addEventListener("click", async (e) => {
-      const act = e.target.closest("[data-act]");
-      if (act) {
-        e.stopPropagation();
-        if (act.dataset.act === "view") return openProfileModal(u, me);
-        if (act.dataset.act === "teamup") {
-          if (!me) { flash("Log in to send team-up invites.", "warn"); return location.href = "login.html"; }
-          return openInviteModal(u);
-        }
-      }
-      openProfileModal(u, me);
-    });
-    card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        openProfileModal(u, me);
-      }
-    });
-  });
 }
 
 function switchTab(id) {
@@ -230,7 +280,7 @@ async function openChannel(c) {
   if (title && c.purpose) title.title = c.purpose;
   if (form) form.hidden = false;
   const body = $("#thread-body");
-  if (body) body.innerHTML = '<p class="dash-empty">Loading…</p>';
+  if (body) body.innerHTML = skelRows(4);
   renderChannelList([]);
   await loadMessages();
   subscribeChannel();
@@ -251,30 +301,47 @@ async function loadMessages() {
   renderThread(data || []);
 }
 
+function chatRowHtml(m) {
+  const u = members.find((x) => x.id === m.user_id);
+  const mine = me && m.user_id === me.id;
+  const who = u ? (u.full_name || u.email) : "Member";
+  const t = (m.created_at || "").slice(0, 16).replace("T", " ");
+  return (
+    '<div class="chat-row' + (mine ? " chat-mine" : "") + '" data-mid="' + esc(m.id) + '">' +
+    '<img class="chat-face" src="' + esc(avatarSrc(u || { id: m.user_id }, 32)) + '" alt="" width="28" height="28" loading="lazy" decoding="async" />' +
+    '<div class="chat-msg">' +
+    '<div class="chat-meta"><b>' + esc(who) + '</b><span class="chat-time">' + esc(t) + "</span></div>" +
+    '<div class="chat-body">' + linkify(m.body) + "</div>" +
+    "</div></div>"
+  );
+}
+
 function renderThread(msgs) {
   const body = $("#thread-body");
   if (!body) return;
+  msgIds.clear();
+  lastMsgAt = null;
   if (!msgs.length) {
     body.innerHTML = '<p class="dash-empty">No messages yet — break the ice. Text &amp; links only.</p>';
     return;
   }
-  body.innerHTML = msgs
-    .map((m) => {
-      const u = members.find((x) => x.id === m.user_id);
-      const mine = me && m.user_id === me.id;
-      const who = u ? (u.full_name || u.email) : "Member";
-      const t = (m.created_at || "").slice(0, 16).replace("T", " ");
-      return (
-        '<div class="chat-row' + (mine ? " chat-mine" : "") + '">' +
-        '<img class="chat-face" src="' + esc(avatarSrc(u || { id: m.user_id }, 32)) + '" alt="" width="28" height="28" />' +
-        '<div class="chat-msg">' +
-        '<div class="chat-meta"><b>' + esc(who) + '</b><span class="chat-time">' + esc(t) + "</span></div>" +
-        '<div class="chat-body">' + linkify(m.body) + "</div>" +
-        "</div></div>"
-      );
-    })
-    .join("");
+  body.innerHTML = msgs.map(chatRowHtml).join("");
+  msgs.forEach((m) => msgIds.add(m.id));
+  lastMsgAt = msgs[msgs.length - 1].created_at || null;
   body.scrollTop = body.scrollHeight;
+}
+
+// append a single row (realtime / own send / incremental poll) — never re-render the thread
+function appendMsg(m) {
+  const body = $("#thread-body");
+  if (!body || !m || !m.id || msgIds.has(m.id)) return;
+  msgIds.add(m.id);
+  if (m.created_at && (!lastMsgAt || m.created_at > lastMsgAt)) lastMsgAt = m.created_at;
+  const ph = body.querySelector(".dash-empty");
+  if (ph) ph.remove();
+  const near = body.scrollHeight - body.scrollTop - body.clientHeight < 140;
+  body.insertAdjacentHTML("beforeend", chatRowHtml(m));
+  if (near || (me && m.user_id === me.id)) body.scrollTop = body.scrollHeight;
 }
 
 function subscribeChannel() {
@@ -289,7 +356,7 @@ function subscribeChannel() {
       (payload) => {
         if (!activeChannel || activeChannel.id !== chId) return;
         markSeen(activeChannel.slug);
-        loadMessages();
+        appendMsg(payload.new);
       }
     )
     .subscribe();
@@ -307,18 +374,22 @@ function wireThreadForm() {
     // text + links only — strip control chars and any raw HTML-looking markup
     body = body.replace(/[\u0000-\u0008\u000B-\u001F]/g, "");
     if (body.length > 2000) body = body.slice(0, 2000);
-    const { error } = await supabase.from("messages").insert({
-      channel_id: activeChannel.id,
-      user_id: me.id,
-      body,
-    });
+    const { data: row, error } = await supabase
+      .from("messages")
+      .insert({
+        channel_id: activeChannel.id,
+        user_id: me.id,
+        body,
+      })
+      .select()
+      .single();
     if (error) {
       flash("Send failed — is migration-community.sql running?", "err");
       return;
     }
     input.value = "";
     markSeen(activeChannel.slug);
-    await loadMessages();
+    appendMsg(row); // realtime delivery deduped by id
     awardXp(5, "chat message");
   });
 }
@@ -328,6 +399,7 @@ async function loadBoard() {
   const list = $("#board-list");
   const self = $("#board-self");
   if (!list || !supabase) return;
+  list.innerHTML = skelRows(6);
   const { data, error } = await supabase
     .from("profiles")
     .select("id, full_name, email, role, avatar_url, pixel_art, xp")
@@ -353,7 +425,7 @@ async function loadBoard() {
       const into = xp % 100;
       self.innerHTML =
         '<span class="board-rank board-rank-you">#' + (myIdx + 1) + "</span>" +
-        '<img src="' + esc(avatarSrc(u, 40)) + '" alt="" width="36" height="36" />' +
+        '<img src="' + esc(avatarSrc(u, 40)) + '" alt="" width="36" height="36" loading="lazy" decoding="async" />' +
         '<span class="board-you-name">' + esc(u.full_name || "You") + "</span>" +
         '<span class="lv-chip">Lv ' + levelOf(xp) + " · " + rankOf(xp) + "</span>" +
         '<span class="board-xp">' + xp + " XP</span>" +
@@ -376,7 +448,7 @@ async function loadBoard() {
       return (
         '<div class="board-row ' + medal + (isMe ? " board-me" : "") + '">' +
         '<span class="board-rank">' + (i + 1) + "</span>" +
-        '<img class="board-face" src="' + esc(avatarSrc(u, 40)) + '" alt="" width="36" height="36" />' +
+        '<img class="board-face" src="' + esc(avatarSrc(u, 40)) + '" alt="" width="36" height="36" loading="lazy" decoding="async" />' +
         '<span class="board-id">' +
         '<b>' + esc(u.full_name || u.email || "Member") + "</b>" +
         '<span class="role-badge ' + roleCls + '">' + esc(ROLE_LABEL[u.role] || u.role) + "</span>" +
@@ -457,7 +529,7 @@ function renderInvites(sel, list, isIncoming) {
           : '<span class="invite-status">' + esc(i.status) + "</span>";
       return (
         '<div class="invite-row">' +
-        '<img src="' + esc(avatarSrc(u || { id: otherId }, 32)) + '" alt="" width="36" height="36" />' +
+        '<img src="' + esc(avatarSrc(u || { id: otherId }, 32)) + '" alt="" width="36" height="36" loading="lazy" decoding="async" />' +
         "<div>" +
         '<div class="who">' + esc(u ? (u.full_name || u.email) : "Member") + "</div>" +
         '<div class="meta">' + esc(ev || "Future event") + (i.note ? " — " + esc(i.note) : "") + "</div>" +
@@ -535,11 +607,20 @@ async function openInviteModal(toUser) {
   });
 }
 
-// poll the open channel lightly when visible (realtime is primary)
-setInterval(() => {
+// poll the open channel lightly when visible (realtime is primary) — incremental only
+setInterval(async () => {
   if (!me || document.hidden || !activeChannel) return;
   const inbox = $('[data-cpanel="inbox"]');
-  if (inbox && inbox.classList.contains("active")) loadMessages();
+  if (!inbox || !inbox.classList.contains("active")) return;
+  if (!lastMsgAt) return loadMessages();
+  const { data } = await supabase
+    .from("messages")
+    .select("*")
+    .eq("channel_id", activeChannel.id)
+    .gt("created_at", lastMsgAt)
+    .order("created_at", { ascending: true })
+    .limit(50);
+  (data || []).forEach(appendMsg);
 }, 10000);
 
 async function init() {

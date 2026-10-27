@@ -55,3 +55,15 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
 })();
+
+// pause paint-heavy infinite animations (text-shadow glow) once scrolled offscreen
+(function () {
+  if (!("IntersectionObserver" in window)) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var els = document.querySelectorAll(".hero-title, .hero-title em");
+  if (!els.length) return;
+  var io = new IntersectionObserver(function (en) {
+    en.forEach(function (e) { e.target.classList.toggle("anim-off", !e.isIntersecting); });
+  });
+  els.forEach(function (el) { io.observe(el); });
+})();

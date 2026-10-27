@@ -8,15 +8,14 @@
   <meta name="theme-color" content="#141414" />
   <meta name="color-scheme" content="dark" />
   <link rel="canonical" href="https://ccltce.github.io/" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="preload" href="assets/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png" />
   <link rel="manifest" href="site.webmanifest" />
   <link rel="modulepreload" href="assets/vendor/three.module.js" />
-  <link rel="preload" as="image" href="assets/img/ccltce-logo.png" fetchpriority="high" />
+  <link rel="preload" as="image" href="assets/img/ccltce-logo.webp" type="image/webp" fetchpriority="high" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="CCLTCE — Coding Club, LTCOE" />
   <meta property="og:title" content="Coding Club — CCLTCE | LTCOE" />
@@ -51,7 +50,10 @@
     <div id="narrative-scroll">
       <div class="narrative-viewport">
         <section class="hero-overlay">
-          <img class="hero-logo" src="assets/img/ccltce-logo.png" alt="CCLTCE — Coding Club at LTCOE emblem" width="400" height="400" fetchpriority="high" decoding="async" />
+          <picture>
+            <source type="image/webp" srcset="assets/img/ccltce-logo.webp" />
+            <img class="hero-logo" src="assets/img/ccltce-logo.png" alt="CCLTCE — Coding Club at LTCOE emblem" width="400" height="400" fetchpriority="high" decoding="async" />
+          </picture>
           <p class="hero-badge"><span class="hb-gem">◈</span> DEPT. OF COMPUTER ENGINEERING <span class="hb-gem">◈</span></p>
           <h1 class="hero-title">Coding <em>Club</em></h1>
           <div class="hero-sub">

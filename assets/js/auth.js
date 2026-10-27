@@ -1,8 +1,27 @@
 // Supabase email/password auth + role-aware UI helpers.
-// Loaded on every page via chrome.js. Uses window.SUPABASE_CONFIG from supabase-config.js.
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+// Loaded on every page via chrome.js. Supabase is vendored locally (no CDN round-trip);
+// chrome.js injects lib+config in parallel and we await both, self-loading if needed.
 import { minecraftFace, navFace, pixelMatrixToSvg, parsePixelMatrix, faceMatrix16 } from "./avatar.js";
 import { openPixelEditor } from "./pixeledit.js";
+
+function loadScript(src) {
+  return new Promise((resolve) => {
+    const s = document.createElement("script");
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = resolve;
+    document.head.appendChild(s);
+  });
+}
+
+if (!window.supabase || !window.supabase.createClient) {
+  if (window.__CCLTCE_LIB__) await window.__CCLTCE_LIB__;
+  else await loadScript("assets/vendor/supabase.min.js");
+}
+if (!window.SUPABASE_CONFIG) {
+  if (window.__CCLTCE_CFG__) await window.__CCLTCE_CFG__;
+  else await loadScript("assets/js/supabase-config.js");
+}
 
 // auth.css is only linked on auth pages — inject it everywhere so the nav menu styles work
 if (!document.querySelector('link[href*="auth.css"]')) {
@@ -12,20 +31,10 @@ if (!document.querySelector('link[href*="auth.css"]')) {
   document.head.appendChild(link);
 }
 
-// Ensure config is loaded even when another module (community.js) imports us first
-if (!window.SUPABASE_CONFIG) {
-  await new Promise((resolve) => {
-    const s = document.createElement("script");
-    s.src = "assets/js/supabase-config.js";
-    s.onload = resolve;
-    s.onerror = resolve;
-    document.head.appendChild(s);
-  });
-}
-
 const cfg = window.SUPABASE_CONFIG || {};
 const hasConfig = Boolean(cfg.url && cfg.anonKey && !String(cfg.url).includes("YOUR_PROJECT"));
-export const supabase = hasConfig ? createClient(cfg.url, cfg.anonKey) : null;
+const createClient = (window.supabase && window.supabase.createClient) || null;
+export const supabase = hasConfig && createClient ? createClient(cfg.url, cfg.anonKey) : null;
 
 const ROLE_LABEL = { student: "Student", coding_club_member: "Club Member", admin: "Admin" };
 const $ = (s, r) => (r || document).querySelector(s);
@@ -94,6 +103,7 @@ function syncHudToProfile(profile) {
 // passively push earned local HUD xp into the shared leaderboard (capped per call by the RPC)
 async function pushLocalXpToDb(profile) {
   if (!supabase || !profile || profile.xp == null || !window.CCLTCE_HUD) return;
+  if (window.CCLTCE_HUD.flush) window.CCLTCE_HUD.flush(); // land batched local writes first
   const diff = window.CCLTCE_HUD.xp() - (Number(profile.xp) || 0);
   if (diff <= 0) return;
   const got = await awardXp(Math.min(diff, 100), null);
@@ -158,12 +168,23 @@ function maybeWelcomeBack(profile) {
   if (age >= 0 && age < 15 * 60 * 1000) showCongrats(profile.full_name);
 }
 
+// profile row cache — getSession() is local (no /auth/v1/user roundtrip);
+// the row is returned by reference so in-page updates (Object.assign) stay live
+const _pfCache = { at: 0, id: null, row: null };
+const PF_TTL = 20000;
+
 export async function getProfile() {
   if (!supabase) return null;
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session && session.user;
   if (!user) return null;
+  if (_pfCache.row && _pfCache.id === user.id && Date.now() - _pfCache.at < PF_TTL) return _pfCache.row;
   const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
-  return data || { id: user.id, email: user.email, role: "student" };
+  const row = data || { id: user.id, email: user.email, role: "student" };
+  _pfCache.at = Date.now();
+  _pfCache.id = user.id;
+  _pfCache.row = row;
+  return row;
 }
 
 export async function signOut() {
