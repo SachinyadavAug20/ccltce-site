@@ -7,9 +7,8 @@
   <meta name="description" content="Every CCLTCE account in one place — browse members, message each other and team up for upcoming events." />
   <meta name="theme-color" content="#141414" />
   <meta name="color-scheme" content="dark" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="preload" href="assets/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png" />
@@ -42,6 +41,7 @@
         <button class="dash-tab active" role="tab" data-ctab="directory" aria-selected="true">Directory</button>
         <button class="dash-tab" role="tab" data-ctab="inbox" aria-selected="false">Chats</button>
         <button class="dash-tab" role="tab" data-ctab="teams" aria-selected="false">Team-ups</button>
+        <button class="dash-tab" role="tab" data-ctab="board" aria-selected="false">Leaderboard</button>
       </div>
 
       <section class="comm-panel active" data-cpanel="directory" role="tabpanel">
@@ -70,6 +70,12 @@
             </form>
           </div>
         </div>
+      </section>
+
+      <section class="comm-panel" data-cpanel="board" role="tabpanel">
+        <p class="dash-note">Earn XP everywhere — chat, team-ups, profiles, feedback. Top of the server wins bragging rights.</p>
+        <div id="board-self" class="board-self" hidden></div>
+        <div id="board-list" class="board-list" aria-live="polite"><p class="dash-empty">Loading leaderboard…</p></div>
       </section>
 
       <section class="comm-panel" data-cpanel="teams" role="tabpanel">

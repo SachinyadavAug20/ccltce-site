@@ -38,7 +38,7 @@ const TEMPLATES = {
       data-bio="${escape(m.bio || "")}" data-item="${escape(m.item || "")}" data-accent="${escape(m.accent || "#17DD62")}"
       data-portfolio="${escape(m.portfolio)}" data-github="${escape(handle(m.github))}"
       data-twitter="${escape(handle(m.twitter))}" data-linkedin="${escape(handle(m.linkedin))}">
-      <div class="t-head"><img src="assets/img/${escape(m.image)}" alt="" width="96" height="96" /></div>
+      <div class="t-head"><img src="assets/img/${escape(m.image)}" alt="" width="96" height="96" loading="lazy" decoding="async" /></div>
       <span class="t-badge"><i></i>${escape(m.role)}</span>
       <div class="t-info">
         <h3>${escape(m.name)}</h3>
@@ -95,9 +95,14 @@ const STATS = [
 ];
 
 async function loadData() {
-  const res = await fetch("data/content.json");
-  if (!res.ok) throw new Error("content unavailable");
-  return res.json();
+  if (!window.__CCLTCE_CONTENT__) {
+    window.__CCLTCE_CONTENT__ = fetch("data/content.json")
+      .then((r) => (r.ok ? r.json() : {}))
+      .catch(() => ({}));
+  }
+  const data = await window.__CCLTCE_CONTENT__;
+  if (!data || !Object.keys(data).length) throw new Error("content unavailable");
+  return data;
 }
 
 function renderStats(data) {

@@ -1,6 +1,23 @@
 /* ---------- Minecraft design system — dual typography ---------- */
-/* Fonts are loaded from each page's <head> (preconnect + stylesheet) so the CSS never
-   stalls on a nested @import round-trip before the first paint. */
+/* Fonts are self-hosted (assets/fonts) — no render-blocking third-party CSS,
+   preloaded from each page's <head> so text paints on the first frame. */
+
+@font-face {
+  font-family: "Press Start 2P";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/press-start-2p-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/jetbrains-mono-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 :root {
   --bg: #141414;
@@ -31,6 +48,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; border-radius: 0 !important; }
+picture { display: contents; } /* WebP-first <picture> wrappers lay out exactly like their <img> */
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body { user-select: none; -webkit-user-select: none; }
 input, textarea, select, .term-out, .golf-code { user-select: text; -webkit-user-select: text; }
@@ -80,5 +98,37 @@ body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-even
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }
+
+/* ── perf: pause paint-heavy infinite animations once scrolled offscreen (motion.js) ── */
+.anim-off, .anim-off::before, .anim-off::after { animation-play-state: paused !important; }
+
+/* ── perf: ambient pixel motes — compositor-only, no JS/GSAP per-frame work (clickfx.js) ── */
+.fx-mote { animation: fxMote var(--fx-dur, 6s) ease-in-out var(--fx-delay, 0s) infinite; }
+@keyframes fxMote {
+  0%, 100% { transform: translate(var(--fx-x, 0px), var(--fx-y, 0px)); opacity: var(--fx-o0, 0.12); }
+  50% {
+    transform: translate(calc(var(--fx-x, 0px) + var(--fx-dx, 0px)), calc(var(--fx-y, 0px) + var(--fx-dy, 0px)));
+    opacity: var(--fx-o1, 0.3);
+  }
+}
+
+/* ── perf: offscreen list content skips layout/paint until near the viewport ── */
+.member-card, .board-row, .invite-row, .chat-row,
+.t-card, .res-card, .event, .notice-item, .challenge, .ach {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 132px;
+}
+.board-row { contain-intrinsic-size: auto 56px; }
+.chat-row { contain-intrinsic-size: auto 64px; }
+.member-card[hidden] { display: none; }
+
+/* ── skeleton rows for initial fetches ── */
+.skel-row {
+  height: 14px; margin: 10px 0; border: 2px solid #000;
+  background: linear-gradient(90deg, #1b1b1b 25%, #262626 50%, #1b1b1b 75%);
+  background-size: 200% 100%;
+  animation: skelShimmer 1.2s linear infinite;
+}
+@keyframes skelShimmer { to { background-position: -200% 0; } }

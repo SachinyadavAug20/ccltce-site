@@ -35,8 +35,12 @@
     return out + "</g>";
   }
 
-  const LOGO = '<img class="brand-logo" src="assets/img/ccltce-logo.png" alt="" width="400" height="400" />';
-  const FOOT_LOGO = '<img class="brand-logo foot-logo" src="assets/img/ccltce-logo.png" alt="" width="400" height="400" />';
+  // WebP-first logo with PNG fallback (196KB → 28KB for the 99% case)
+  const LOGO_PIC =
+    '<picture><source type="image/webp" srcset="assets/img/ccltce-logo.webp" />' +
+    '<img class="brand-logo" src="assets/img/ccltce-logo.png" alt="" width="400" height="400" /></picture>';
+  const LOGO = LOGO_PIC;
+  const FOOT_LOGO = LOGO_PIC.replace('class="brand-logo"', 'class="brand-logo foot-logo" loading="lazy" decoding="async"');
   const WORDMARK = '<svg class="wordmark" viewBox="0 0 146 24" role="img" aria-label="Coding Club">' + wordLine("CODING CLUB", 5, 18, 11, "wm-l2") + "</svg>";
 
   const LINKS = [
@@ -96,17 +100,29 @@
     });
   }
 
-  function loadAuth() {
-    // config is a classic script; auth is an ES module that depends on it
-    var cfg = document.createElement("script");
-    cfg.src = "assets/js/supabase-config.js";
-    cfg.onload = function () {
+  function injectScript(src) {
+    return new Promise(function (resolve) {
       var s = document.createElement("script");
-      s.type = "module";
-      s.src = "assets/js/auth.js";
+      s.src = src;
+      s.onload = s.onerror = resolve;
       document.body.appendChild(s);
-    };
-    document.body.appendChild(cfg);
+    });
+  }
+
+  function loadAuth() {
+    // warm the Supabase connection before auth.js even parses (saves a DNS+TLS round trip)
+    var pc = document.createElement("link");
+    pc.rel = "preconnect";
+    pc.href = "https://lzxkzvdnqhipbyrcchge.supabase.co";
+    document.head.appendChild(pc);
+
+    // library + config fetch in parallel; auth.js awaits both (self-loads if it wins the race)
+    window.__CCLTCE_LIB__ = injectScript("assets/vendor/supabase.min.js");
+    window.__CCLTCE_CFG__ = injectScript("assets/js/supabase-config.js");
+    var m = document.createElement("script");
+    m.type = "module";
+    m.src = "assets/js/auth.js";
+    document.body.appendChild(m);
   }
 
   function mount() {

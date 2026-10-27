@@ -8,6 +8,19 @@
     ["⚔", "Challenges", "challenges.html"], ["R", "Resources", "resources.html"], ["N", "Notices", "notices.html"],
     ["★", "Achievements", "achievements.html"], ["$", "Open shell (Ctrl+`)", null], ["W", "CCLTCE Week", "challenges.html"]];
   var fill, tip, slots, rail, toast, toastT;
+  // batch localStorage writes — clicks earn XP constantly; don't hit storage every time
+  var xpDirty = false, relicsDirty = false, saveT = 0;
+  function flush() {
+    if (saveT) { clearTimeout(saveT); saveT = 0; }
+    if (xpDirty) { try { localStorage.setItem("ccltce-xp", String(xp)); } catch (e) {} xpDirty = false; }
+    if (relicsDirty) { try { localStorage.setItem("ccltce-relics", JSON.stringify(relics)); } catch (e) {} relicsDirty = false; }
+  }
+  function scheduleSave() {
+    if (saveT) return;
+    saveT = setTimeout(flush, 400);
+  }
+  window.addEventListener("pagehide", flush);
+  document.addEventListener("visibilitychange", function () { if (document.hidden) flush(); });
   var RANKS = [[1, "Guest Explorer"], [5, "Script Kiddie"], [10, "Bug Hunter"], [25, "Kernel Crafter"], [50, "Redstone Sage"]];
   function rank() {
     var r = RANKS[0][1];
@@ -74,7 +87,8 @@
   function addXP(n) {
     var before = level();
     xp += n;
-    localStorage.setItem("ccltce-xp", String(xp));
+    xpDirty = true;
+    scheduleSave();
     paint();
     if (level() > before) {
       if (window.CCLTCE_SFX) CCLTCE_SFX.levelUp();
@@ -88,7 +102,8 @@
   function relic(name) {
     if (relics.indexOf(name) > -1) return;
     relics.push(name);
-    localStorage.setItem("ccltce-relics", JSON.stringify(relics));
+    relicsDirty = true;
+    scheduleSave();
     paintSlots();
   }
   function mount() {
@@ -141,5 +156,5 @@
     });
     slots[0].classList.add("sel");
   }
-  window.CCLTCE_HUD = { mount: mount, addXP: addXP, relic: relic, level: level, rank: rank, need: need, xp: function () { return xp; } };
+  window.CCLTCE_HUD = { mount: mount, addXP: addXP, relic: relic, level: level, rank: rank, need: need, xp: function () { return xp; }, flush: flush };
 })();

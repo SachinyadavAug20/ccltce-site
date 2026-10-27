@@ -126,6 +126,55 @@
 .fb-github { display: flex; flex-wrap: wrap; gap: 0.55rem; margin: 0.9rem 0 0.2rem; }
 .fb-github .btn { font-size: 0.48rem; padding: 0.6rem 0.9rem; }
 
+/* ── level chip (nav menu, dashboard hero, leaderboard) ── */
+.lv-chip {
+  display: inline-block; padding: 0.2rem 0.5rem;
+  font-family: var(--disp); font-size: 0.4rem; font-weight: 400;
+  color: #141414; background: var(--gold);
+  border: 2px solid #000; text-shadow: none;
+  box-shadow: inset -1px -1px 0 rgba(0,0,0,0.25);
+}
+.auth-menu-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; margin-top: 0.15rem; }
+.auth-menu-badges .role-badge { margin-top: 0; }
+
+/* ── signup welcome modal ── */
+.welcome-overlay { z-index: 95; }
+.welcome-modal {
+  position: relative; overflow: hidden;
+  width: min(30rem, calc(100vw - 2rem));
+  background: #141414; border: 3px solid #000;
+  box-shadow: inset 2px 2px 0 #2a2a2e, inset -2px -2px 0 #09090b, 0 10px 0 rgba(0,0,0,0.55);
+  animation: welcomeIn 0.35s steps(4);
+}
+@keyframes welcomeIn {
+  from { transform: translateY(1.2rem); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.welcome-body { position: relative; z-index: 2; padding: 1.6rem 1.4rem 1.5rem; text-align: center; }
+.welcome-flag {
+  display: inline-block; padding: 0.3rem 0.7rem; margin-bottom: 0.9rem;
+  font-family: var(--disp); font-size: 0.42rem; color: #141414;
+  background: var(--emerald); border: 2px solid #000; text-shadow: none;
+}
+.welcome-title {
+  font-family: var(--disp); font-size: 0.95rem; line-height: 1.6; color: var(--gold);
+  text-shadow: 2px 2px 0 #000; font-weight: 400; margin: 0 0 0.8rem;
+}
+.welcome-sub { font-size: 13.5px; line-height: 1.65; color: var(--muted); margin: 0 0 1.2rem; }
+.welcome-sub b { color: #f4f4f5; }
+.welcome-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+.welcome-actions .btn { font-size: 0.5rem; padding: 0.75rem 1.1rem; }
+.welcome-modal .pe-close { position: absolute; top: 0.55rem; right: 0.55rem; z-index: 3; }
+.welcome-confetti { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.welcome-confetti i {
+  position: absolute; top: -10px; width: 8px; height: 8px;
+  animation: confettiFall linear infinite;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(-10px) rotate(0); opacity: 1; }
+  100% { transform: translateY(340px) rotate(540deg); opacity: 0; }
+}
+
 /* ── dashboard root ── */
 #dashboard-root { display: grid; gap: 1.1rem; }
 

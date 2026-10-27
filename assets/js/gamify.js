@@ -2,6 +2,13 @@
 (function () {
   var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // single shared fetch of data/content.json (main.js awaits the same promise)
+  window.__CCLTCE_CONTENT__ =
+    window.__CCLTCE_CONTENT__ ||
+    fetch("data/content.json")
+      .then(function (r) { return r.ok ? r.json() : {}; })
+      .catch(function () { return {}; });
+
   function boot(data) {
     if (window.CCLTCE_VFS) CCLTCE_VFS.load(data || {});
     if (window.CCLTCE_TERM) CCLTCE_TERM.mount();
@@ -32,8 +39,5 @@
     }
   }
 
-  fetch("data/content.json")
-    .then(function (r) { return r.ok ? r.json() : {}; })
-    .catch(function () { return {}; })
-    .then(boot);
+  window.__CCLTCE_CONTENT__.then(boot);
 })();

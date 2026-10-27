@@ -25,20 +25,21 @@
   function kill(el) { if (el.parentNode) el.parentNode.removeChild(el); }
   function rnd(a, b) { return a + Math.random() * (b - a); }
 
-  // Ambient dust: small, randomly spread, alive (drift + flicker loops)
+  // Ambient dust: compositor-only CSS animation (no per-frame JS/GSAP tweens)
   function motes(n) {
     for (var i = 0; i < n; i++) {
       var s = Math.round(rnd(3, 6));
-      var el = chip(rnd(0, innerWidth - s), rnd(0, innerHeight - s), s, ORE[(Math.random() * ORE.length) | 0]);
-      el.style.opacity = 0;
-      gsap.to(el, {
-        x: "+=" + rnd(-70, 70), y: "+=" + rnd(-50, 50),
-        duration: rnd(4, 9), ease: "sine.inOut", yoyo: true, repeat: -1, delay: -rnd(0, 6),
-      });
-      gsap.to(el, {
-        opacity: rnd(0.14, 0.4), duration: rnd(1.4, 3.2),
-        ease: "steps(3)", yoyo: true, repeat: -1, delay: -rnd(0, 3),
-      });
+      var x = rnd(0, innerWidth - s), y = rnd(0, innerHeight - s);
+      var el = chip(x, y, s, ORE[(Math.random() * ORE.length) | 0]);
+      el.className = "fx-mote";
+      el.style.setProperty("--fx-x", Math.round(x) + "px");
+      el.style.setProperty("--fx-y", Math.round(y) + "px");
+      el.style.setProperty("--fx-dx", Math.round(rnd(-70, 70)) + "px");
+      el.style.setProperty("--fx-dy", Math.round(rnd(-50, 50)) + "px");
+      el.style.setProperty("--fx-o0", rnd(0.1, 0.22).toFixed(2));
+      el.style.setProperty("--fx-o1", rnd(0.24, 0.42).toFixed(2));
+      el.style.setProperty("--fx-dur", rnd(4, 9).toFixed(2) + "s");
+      el.style.setProperty("--fx-delay", (-rnd(0, 6)).toFixed(2) + "s");
     }
   }
 
