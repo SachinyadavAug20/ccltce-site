@@ -19,6 +19,7 @@ export const supabase = hasConfig ? createClient(cfg.url, cfg.anonKey) : null;
 const ROLE_LABEL = { student: "Student", coding_club_member: "Club Member", admin: "Admin" };
 const $ = (s, r) => (r || document).querySelector(s);
 const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+let _sessionUser = null;
 
 function showBanner(msg, kind) {
   let el = $(".auth-banner");
@@ -145,6 +146,7 @@ async function refreshNav() {
     return null;
   }
   const profile = await getProfile();
+  _sessionUser = profile;
   updateNavAuth(profile);
   return profile;
 }
@@ -365,6 +367,48 @@ async function wireAvatar(profile, root) {
   }
 }
 
+function wirePublicProfile(profile, root) {
+  const form = $("#public-profile-form", root);
+  if (!form || !supabase) return;
+  wireLinkEditor(root);
+
+  const previewBtn = $("#open-full-profile", root);
+  if (previewBtn) {
+    previewBtn.addEventListener("click", () => openProfileModal(profile, profile));
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errEl = $("#pp-error", form);
+    errEl.hidden = true;
+    const full_name = $("#pp-name", form).value.trim();
+    const email = $("#pp-email", form).value.trim();
+    const bio = $("#pp-bio", form).value.trim();
+    const links = collectLinks(root);
+    if (!full_name) { errEl.textContent = "Display name is required."; errEl.hidden = false; return; }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errEl.textContent = "Enter a valid email.";
+      errEl.hidden = false;
+      return;
+    }
+    const patch = { full_name, bio: bio || null, links };
+    if (email) patch.email = email;
+    const { error } = await supabase.from("profiles").update(patch).eq("id", profile.id);
+    if (error) {
+      errEl.textContent = errText(error);
+      errEl.hidden = false;
+      return;
+    }
+    Object.assign(profile, patch);
+    const heroName = root.querySelector(".dash-hero-name");
+    const heroEmail = root.querySelector(".dash-hero-email");
+    if (heroName) heroName.textContent = full_name;
+    if (heroEmail && email) heroEmail.textContent = email;
+    refreshNav();
+    showBanner("Public profile saved!", "ok");
+  });
+}
+
 async function initDashboard(profile) {
   const root = $("#dashboard-root");
   if (!root || !supabase) return;
@@ -417,6 +461,7 @@ async function initDashboard(profile) {
   // ── tab nav ──
   const tabs = [
     ["avatar", "Profile"],
+    ["public-profile", "Public profile"],
     ["members", "Members"],
     role === "student" ? ["teams", "Teams"] : null,
     isStaff ? ["staff", "Staff"] : null,
@@ -446,6 +491,26 @@ async function initDashboard(profile) {
     "<dt>Email</dt><dd>" + escapeHtml(profile.email || "") + "</dd>" +
     "<dt>Member since</dt><dd>" + escapeHtml(memberSince) + "</dd></dl>" +
     "</section>";
+
+  // Public profile (name, bio, links)
+  const dashLinks = normLinks(profile.links);
+  html +=
+    '<section class="auth-card dash-panel" data-panel="public-profile" role="tabpanel" id="public-profile">' +
+    "<h3>Public profile</h3>" +
+    '<p class="dash-note">What teammates see when they open your card — name, bio and links (Instagram, LinkedIn, LeetCode…).</p>' +
+    '<button class="btn" type="button" id="open-full-profile">Preview my profile</button>' +
+    '<form id="public-profile-form" class="auth-form" style="margin-top:1rem">' +
+    '<label for="pp-name">Display name</label>' +
+    '<input id="pp-name" type="text" maxlength="80" value="' + escapeHtml(profile.full_name || "") + '" />' +
+    '<label for="pp-email">Email</label>' +
+    '<input id="pp-email" type="email" maxlength="200" value="' + escapeHtml(profile.email || "") + '" />' +
+    '<label for="pp-bio">Bio</label>' +
+    '<textarea id="pp-bio" rows="3" maxlength="500" placeholder="One or two lines about you…">' + escapeHtml(profile.bio || "") + "</textarea>" +
+    "<label>Links</label>" +
+    renderLinkEditor(dashLinks) +
+    '<p class="form-error" id="pp-error" hidden></p>' +
+    '<button class="btn btn-primary" type="submit">Save public profile</button>' +
+    "</form></section>";
 
   // Members directory (everyone can view)
   html +=
@@ -509,6 +574,7 @@ async function initDashboard(profile) {
 
   // ── avatar ──
   wireAvatar(profile, root);
+  wirePublicProfile(profile, root);
 
   // ── stats + data ──
   loadStats(profile, isStaff);
@@ -570,7 +636,7 @@ async function loadAllRegs() {
 async function loadAllUsers() {
   const box = $("#all-users");
   if (!box || !supabase) return;
-  const { data, error } = await supabase.from("profiles").select("id, email, full_name, role, avatar_url, pixel_art, created_at").order("created_at", { ascending: false });
+  const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
   if (error || !data || !data.length) {
     box.innerHTML = '<p class="dash-empty">' + (error ? "No access (check RLS)." : "No users yet.") + "</p>";
     return;
@@ -592,7 +658,7 @@ async function loadMembers() {
   if (!grid || !supabase) return;
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, email, full_name, role, avatar_url, pixel_art, created_at")
+    .select("*")
     .in("role", ["coding_club_member", "admin"])
     .order("created_at");
   if (error || !data || !data.length) {
@@ -620,20 +686,173 @@ async function loadMembers() {
   });
 }
 
-function openProfileModal(u) {
+// ── link presets (label → base URL builder; empty base = paste full URL) ──
+const LINK_PRESETS = [
+  { key: "instagram", label: "Instagram", placeholder: "https://instagram.com/username" },
+  { key: "linkedin",  label: "LinkedIn",  placeholder: "https://linkedin.com/in/username" },
+  { key: "x",         label: "X / Twitter", placeholder: "https://x.com/username" },
+  { key: "discord",   label: "Discord",   placeholder: "discord.gg/invite or username" },
+  { key: "leetcode",  label: "LeetCode",  placeholder: "https://leetcode.com/username" },
+  { key: "codeforces",label: "Codeforces",placeholder: "https://codeforces.com/profile/username" },
+  { key: "gfg",       label: "GeeksforGeeks", placeholder: "https://geeksforgeeks.org/user/username" },
+  { key: "github",    label: "GitHub",    placeholder: "https://github.com/username" },
+  { key: "youtube",   label: "YouTube",   placeholder: "https://youtube.com/@username" },
+  { key: "website",   label: "Website",   placeholder: "https://yoursite.com" },
+  { key: "email",     label: "Email",     placeholder: "you@example.com" },
+  { key: "custom",    label: "Custom…",   placeholder: "Label + full URL" },
+];
+
+function normLinks(raw) {
+  if (!raw) return [];
+  let v = raw;
+  if (typeof v === "string") {
+    try { v = JSON.parse(v); } catch { return []; }
+  }
+  if (!Array.isArray(v)) return [];
+  return v
+    .filter((l) => l && (l.url || l.handle) && l.label)
+    .map((l) => ({ label: String(l.label).slice(0, 40), url: String(l.url || l.handle).trim().slice(0, 300) }))
+    .slice(0, 24);
+}
+
+function linkChipHtml(l) {
+  const safe = escapeHtml(l.url);
+  const isMail = /^mailto:/i.test(l.url) || (!/^https?:\/\//i.test(l.url) && l.url.includes("@") && !l.url.includes(" "));
+  const href = isMail && !/^mailto:/i.test(l.url) ? "mailto:" + safe : safe;
+  const external = /^https?:\/\//i.test(href);
+  return (
+    '<a class="pf-chip" href="' + href + '"' +
+    (external ? ' target="_blank" rel="noopener noreferrer"' : "") +
+    ' title="' + escapeHtml(l.url) + '">' +
+    '<span class="pf-chip-label">' + escapeHtml(l.label) + "</span>" +
+    "</a>"
+  );
+}
+
+function renderLinkEditor(links) {
+  const rows = links.map((l, i) => linkRowHtml(l.label, l.url, i)).join("");
+  return (
+    '<div class="pf-links-ed" id="pf-links">' +
+    (rows || "") +
+    "</div>" +
+    '<div class="pf-link-add">' +
+    '<select id="pf-link-preset" aria-label="Link type">' +
+    LINK_PRESETS.map((p) => '<option value="' + p.key + '">' + escapeHtml(p.label) + "</option>").join("") +
+    "</select>" +
+    '<input id="pf-link-custom-label" type="text" maxlength="40" placeholder="Custom label" hidden />' +
+    '<input id="pf-link-url" type="text" maxlength="300" placeholder="' + escapeHtml(LINK_PRESETS[0].placeholder) + '" />' +
+    '<button class="btn" type="button" id="pf-link-add">Add link</button>' +
+    "</div>"
+  );
+}
+
+function linkRowHtml(label, url, i) {
+  return (
+    '<div class="pf-link-row" data-i="' + i + '">' +
+    '<input class="pf-link-label" type="text" maxlength="40" value="' + escapeHtml(label || "") + '" placeholder="Label" />' +
+    '<input class="pf-link-url" type="text" maxlength="300" value="' + escapeHtml(url || "") + '" placeholder="https://…" />' +
+    '<button class="pf-link-rm" type="button" aria-label="Remove link">✕</button>' +
+    "</div>"
+  );
+}
+
+function collectLinks(root) {
+  const rows = $$("#pf-links .pf-link-row", root);
+  const out = [];
+  rows.forEach((row) => {
+    const label = $(".pf-link-label", row).value.trim();
+    const url = $(".pf-link-url", row).value.trim();
+    if (label && url) out.push({ label: label.slice(0, 40), url: url.slice(0, 300) });
+  });
+  return out.slice(0, 24);
+}
+
+function wireLinkEditor(root) {
+  const preset = $("#pf-link-preset", root);
+  const customLbl = $("#pf-link-custom-label", root);
+  const urlIn = $("#pf-link-url", root);
+  const addBtn = $("#pf-link-add", root);
+  const box = $("#pf-links", root);
+  if (!preset || !addBtn) return;
+
+  const syncPreset = () => {
+    const p = LINK_PRESETS.find((x) => x.key === preset.value);
+    const isCustom = preset.value === "custom";
+    if (customLbl) customLbl.hidden = !isCustom;
+    if (urlIn && p) urlIn.placeholder = p.placeholder;
+  };
+  preset.addEventListener("change", syncPreset);
+  syncPreset();
+
+  addBtn.addEventListener("click", () => {
+    let label = preset.options[preset.selectedIndex].text;
+    if (preset.value === "custom") label = (customLbl && customLbl.value.trim()) || "";
+    const url = urlIn.value.trim();
+    if (!label || !url) { showBanner("Add a label and URL for the link.", "warn"); return; }
+    const i = box.children.length;
+    box.insertAdjacentHTML("beforeend", linkRowHtml(label, url, i));
+    urlIn.value = "";
+    if (customLbl) customLbl.value = "";
+  });
+
+  box.addEventListener("click", (e) => {
+    const rm = e.target.closest(".pf-link-rm");
+    if (rm) rm.closest(".pf-link-row").remove();
+  });
+}
+
+export async function openProfileModal(u, me) {
+  if (!u) return;
+  const who = me || _sessionUser;
+  const isSelf = Boolean(who && u.id && who.id === u.id);
   const roleCls = u.role === "admin" ? "role-admin" : u.role === "coding_club_member" ? "role-club" : "role-student";
+  const links = normLinks(u.links);
+  const bio = u.bio || "";
+  const name = u.full_name || (u.email || "Member").split("@")[0];
+  const memberSince = (u.created_at || "").slice(0, 10);
+
   const overlay = document.createElement("div");
   overlay.className = "pe-overlay";
   overlay.innerHTML =
-    '<div class="pe-modal profile-modal" role="dialog" aria-label="Profile">' +
-    '<div class="pe-head"><h3>Profile</h3><button class="pe-close" type="button" aria-label="Close">✕</button></div>' +
+    '<div class="pe-modal profile-modal" role="dialog" aria-modal="true" aria-label="Profile">' +
+    '<div class="pe-head"><h3>' + (isSelf ? "Your profile" : "Profile") + "</h3>" +
+    '<button class="pe-close" type="button" aria-label="Close">✕</button></div>' +
     '<div class="profile-body">' +
     '<img class="profile-face" src="' + avatarSrc(u, 128) + '" alt="" width="112" height="112" />' +
-    '<h2 class="profile-name">' + escapeHtml(u.full_name || u.email) + "</h2>" +
+    '<h2 class="profile-name">' + escapeHtml(name) + "</h2>" +
     '<span class="role-badge ' + roleCls + '">' + (ROLE_LABEL[u.role] || u.role) + "</span>" +
-    '<dl class="dash-meta" style="margin-top:1rem"><dt>Email</dt><dd>' + escapeHtml(u.email || "—") + "</dd>" +
-    "<dt>Member since</dt><dd>" + escapeHtml((u.created_at || "").slice(0, 10)) + "</dd></dl>" +
+    (bio ? '<p class="pf-bio">' + escapeHtml(bio) + "</p>" : isSelf ? '<p class="pf-bio pf-bio-empty">No bio yet — add one so teammates know you.</p>' : "") +
+    (links.length
+      ? '<div class="pf-chips">' + links.map(linkChipHtml).join("") + "</div>"
+      : isSelf
+        ? '<div class="pf-chips pf-chips-empty"><span class="pf-muted">No links yet — Instagram, LinkedIn, LeetCode…</span></div>'
+        : "") +
+    '<dl class="dash-meta pf-meta">' +
+    "<dt>Email</dt><dd>" + escapeHtml(u.email || "—") + "</dd>" +
+    "<dt>Member since</dt><dd>" + escapeHtml(memberSince) + "</dd>" +
+    "</dl>" +
+    (isSelf
+      ? '<div class="pf-actions">' +
+        '<button class="btn btn-primary" type="button" id="pf-edit-toggle">Edit profile</button>' +
+        '<a class="btn" href="dashboard.html#profile">Pixel avatar</a>' +
+        "</div>" +
+        '<form class="auth-form pf-edit" id="pf-edit" hidden>' +
+        '<label for="pf-name">Display name</label>' +
+        '<input id="pf-name" type="text" maxlength="80" value="' + escapeHtml(u.full_name || "") + '" />' +
+        '<label for="pf-email">Email</label>' +
+        '<input id="pf-email" type="email" maxlength="200" value="' + escapeHtml(u.email || "") + '" />' +
+        '<label for="pf-bio-in">Bio</label>' +
+        '<textarea id="pf-bio-in" rows="3" maxlength="500" placeholder="One or two lines about you…">' + escapeHtml(bio) + "</textarea>" +
+        "<label>Links</label>" +
+        renderLinkEditor(links) +
+        '<p class="form-error" id="pf-error" hidden></p>' +
+        '<div class="pf-edit-actions">' +
+        '<button class="btn btn-primary" type="submit">Save profile</button>' +
+        '<button class="btn" type="button" id="pf-edit-cancel">Cancel</button>' +
+        "</div></form>"
+      : "") +
     "</div></div>";
+
   document.body.appendChild(overlay);
   const close = () => overlay.remove();
   overlay.querySelector(".pe-close").addEventListener("click", close);
@@ -641,7 +860,102 @@ function openProfileModal(u) {
   document.addEventListener("keydown", function esc(e) {
     if (e.key === "Escape") { close(); document.removeEventListener("keydown", esc); }
   });
+
+  if (!isSelf || !supabase) return;
+
+  const editBtn = overlay.querySelector("#pf-edit-toggle");
+  const form = overlay.querySelector("#pf-edit");
+  const cancel = overlay.querySelector("#pf-edit-cancel");
+  const errEl = overlay.querySelector("#pf-error");
+
+  wireLinkEditor(overlay);
+
+  editBtn.addEventListener("click", () => {
+    form.hidden = false;
+    editBtn.hidden = true;
+    overlay.querySelector("#pf-name").focus();
+  });
+  cancel.addEventListener("click", () => { form.hidden = true; editBtn.hidden = false; });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errEl.hidden = true;
+    const full_name = overlay.querySelector("#pf-name").value.trim();
+    const email = overlay.querySelector("#pf-email").value.trim();
+    const bioNew = overlay.querySelector("#pf-bio-in").value.trim();
+    const linksNew = collectLinks(overlay);
+    if (!full_name) { errEl.textContent = "Display name is required."; errEl.hidden = false; return; }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errEl.textContent = "Enter a valid email or leave it blank.";
+      errEl.hidden = false;
+      return;
+    }
+    const patch = { full_name, bio: bioNew || null, links: linksNew };
+    if (email) patch.email = email;
+    const { error } = await supabase.from("profiles").update(patch).eq("id", u.id);
+    if (error) {
+      errEl.textContent = errText(error);
+      errEl.hidden = false;
+      return;
+    }
+    Object.assign(u, patch);
+    if (who && who.id === u.id) {
+      who.full_name = full_name;
+      who.bio = bioNew || null;
+      who.links = linksNew;
+      if (email) who.email = email;
+      refreshNav();
+    }
+    showBanner("Profile saved!", "ok");
+    close();
+    openProfileModal(u, who);
+  });
 }
+
+// ── team page: live avatars + openable profiles ──
+async function enhanceTeamPage() {
+  if (!supabase) return;
+  const onTeam = document.getElementById("team-tree") || document.querySelector(".grid.team");
+  if (!onTeam) return;
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("*")
+    .in("role", ["coding_club_member", "admin"]);
+  if (!data || !data.length) return;
+
+  const byName = new Map();
+  data.forEach((p) => {
+    if (p.full_name) byName.set(p.full_name.trim().toLowerCase(), p);
+  });
+  window.__CCLTCE_PROFILES_BY_NAME = byName;
+
+  const applyFaces = () => {
+    document.querySelectorAll(".tree-node[data-name], .t-card[data-name]").forEach((el) => {
+      const key = (el.dataset.name || "").trim().toLowerCase();
+      const p = byName.get(key);
+      if (!p) return;
+      const img = el.querySelector(".tn-avatar img, .t-head img");
+      if (img) {
+        img.src = avatarSrc(p, 64);
+        img.removeAttribute("srcset");
+      }
+      el.classList.add("has-live-profile");
+      el.dataset.liveId = p.id;
+    });
+  };
+
+  // tree/cards may render after this async fetch — retry briefly
+  applyFaces();
+  let tries = 0;
+  const t = setInterval(() => {
+    applyFaces();
+    if (++tries > 20) clearInterval(t);
+  }, 250);
+  // clicks open the live profile modal via teamFx.open() → CCLTCE_OPEN_PROFILE
+}
+
+window.CCLTCE_OPEN_PROFILE = openProfileModal;
 
 async function init() {
   if (!hasConfig) {
@@ -666,8 +980,12 @@ async function init() {
   wireLogin();
   wireRegister();
   if ($("#dashboard-root")) await initDashboard(profile);
+  enhanceTeamPage();
 
-  supabase.auth.onAuthStateChange(() => { refreshNav(); });
+  supabase.auth.onAuthStateChange(async () => {
+    const p = await refreshNav();
+    if ($("#dashboard-root")) await initDashboard(p);
+  });
 }
 
 init();
