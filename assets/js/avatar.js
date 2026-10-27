@@ -221,3 +221,23 @@ export function parsePixelMatrix(raw) {
     return m;
   } catch { return null; }
 }
+
+// current seed face as an editable 16×16 matrix (nearest-neighbour upscale of the 9×10 grid)
+export function faceMatrix16(seedStr) {
+  const { grid, G } = buildFace(seedStr || "ccltce");
+  const H = grid.length;
+  const m = [];
+  for (let y = 0; y < 16; y++) {
+    const sy = Math.min(H - 1, Math.round(y * (H - 1) / 15));
+    m[y] = [];
+    for (let x = 0; x < 16; x++) {
+      const sx = Math.min(G - 1, Math.round(x * (G - 1) / 15));
+      m[y][x] = grid[sy][sx];
+    }
+  }
+  return m;
+}
+
+// procedural preset skins — faceMatrix16("skin-N") / minecraftFace("skin-N")
+export const SKIN_PRESET_COUNT = 2000;
+export function skinPresetSeed(i) { return "skin-" + (i % SKIN_PRESET_COUNT); }

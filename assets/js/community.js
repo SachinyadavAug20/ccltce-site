@@ -1,4 +1,4 @@
-// Community — directory, DMs and pre-event team-ups.
+// Community — directory, open chat channels (text + links only) and pre-event team-ups.
 // ES module; depends on auth.js (loaded by chrome.js) exports.
 import { supabase, getProfile, openProfileModal, avatarSrc } from "./auth.js";
 
@@ -10,6 +10,14 @@ const ROLE_LABEL = { student: "Student", coding_club_member: "Club Member", admi
 function esc(s) {
   return String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+  );
+}
+
+// text + links only: escape everything, then turn bare URLs into anchors
+function linkify(body) {
+  const safe = esc(body);
+  return safe.replace(/(https?:\/\/[^\s<>"']+)/g, (m) =>
+    '<a href="' + m + '" target="_blank" rel="noopener noreferrer">' + m + "</a>"
   );
 }
 
@@ -32,7 +40,18 @@ function flash(msg, kind) {
 let me = null;
 let members = [];
 let allEvents = [];
-let activeThread = null; // other user's profile
+let channels = [];
+let activeChannel = null; // { id, slug, name, purpose }
+let chanSub = null;
+let chanSeen = {}; // slug -> ISO ts of last read
+
+function loadSeen() {
+  try { chanSeen = JSON.parse(localStorage.getItem("ccltce_chat_seen") || "{}"); } catch { chanSeen = {}; }
+}
+function markSeen(slug) {
+  chanSeen[slug] = new Date().toISOString();
+  try { localStorage.setItem("ccltce_chat_seen", JSON.stringify(chanSeen)); } catch {}
+}
 
 // ── tabs ──
 function wireTabs() {
@@ -46,7 +65,7 @@ function wireTabs() {
       });
       $$(".comm-panel").forEach((p) => p.classList.toggle("active", p.dataset.cpanel === id));
       history.replaceState(null, "", "#" + id);
-      if (id === "inbox" && me) loadInbox();
+      if (id === "inbox" && me) loadChannelsPanel();
       if (id === "teams" && me) loadTeamUps();
     });
   });
@@ -102,8 +121,7 @@ function renderDirectory(list) {
         '<button class="btn" type="button" data-act="view">Profile</button>' +
         (isSelf
           ? ""
-          : '<button class="btn" type="button" data-act="msg">Message</button>' +
-            '<button class="btn btn-primary" type="button" data-act="teamup">Team up</button>') +
+          : '<button class="btn btn-primary" type="button" data-act="teamup">Team up</button>') +
         "</div></div>"
       );
     })
@@ -116,15 +134,8 @@ function renderDirectory(list) {
       const act = e.target.closest("[data-act]");
       if (act) {
         e.stopPropagation();
-        const a = act.dataset.act;
-        if (a === "view") return openProfileModal(u, me);
-        if (a === "msg") {
-          if (!me) { flash("Log in to send messages.", "warn"); return location.href = "login.html"; }
-          await openThread(u);
-          switchTab("inbox");
-          return;
-        }
-        if (a === "teamup") {
+        if (act.dataset.act === "view") return openProfileModal(u, me);
+        if (act.dataset.act === "teamup") {
           if (!me) { flash("Log in to send team-up invites.", "warn"); return location.href = "login.html"; }
           return openInviteModal(u);
         }
@@ -145,8 +156,8 @@ function switchTab(id) {
   if (btn) btn.click();
 }
 
-// ── inbox / DMs ──
-async function loadInbox() {
+// ── open chat channels ──
+async function loadChannelsPanel() {
   const guard = $("#comm-inbox-guard");
   const box = $("#comm-inbox");
   if (!me) {
@@ -157,97 +168,130 @@ async function loadInbox() {
   if (guard) guard.hidden = true;
   if (box) box.hidden = false;
 
-  const { data, error } = await supabase
-    .from("messages")
-    .select("*")
-    .or(`from_id.eq.${me.id},to_id.eq.${me.id}`)
-    .order("created_at", { ascending: true });
+  const [{ data: chans, error }, { data: recent }] = await Promise.all([
+    supabase.from("channels").select("*").order("created_at"),
+    supabase.from("messages").select("channel_id,created_at").order("created_at", { ascending: false }).limit(300),
+  ]);
   if (error) {
     $("#inbox-list").innerHTML = '<p class="dash-empty">Run supabase/migration-community.sql first.</p>';
     return;
   }
-  renderInboxList(data || []);
-  if (activeThread) renderThread(data || [], activeThread);
+  channels = chans || [];
+  renderChannelList(recent || []);
+  if (!activeChannel && channels.length) await openChannel(channels[0]);
+  else if (activeChannel) loadMessages();
 }
 
-function renderInboxList(messages) {
+function renderChannelList(recent) {
   const list = $("#inbox-list");
   if (!list) return;
-  const byPartner = new Map();
-  messages.forEach((m) => {
-    const pid = m.from_id === me.id ? m.to_id : m.from_id;
-    const prev = byPartner.get(pid);
-    if (!prev || m.created_at > prev.created_at) byPartner.set(pid, m);
-  });
-  if (!byPartner.size) {
-    list.innerHTML = '<p class="dash-empty">No messages yet — say hi from the directory.</p>';
+  if (!channels.length) {
+    list.innerHTML = '<p class="dash-empty">No channels yet — run migration-community.sql.</p>';
     return;
   }
-  const parts = [];
-  byPartner.forEach((last, pid) => {
-    const u = members.find((x) => x.id === pid);
-    const name = u ? (u.full_name || u.email) : "Member";
-    const unread = last.from_id !== me.id && !last.read_at;
-    parts.push(
-      '<button class="inbox-item' + (unread ? " inbox-item-unread" : "") +
-      (activeThread && activeThread.id === pid ? " active" : "") +
-      '" type="button" data-pid="' + esc(pid) + '">' +
-      '<img src="' + esc(avatarSrc(u || { id: pid }, 32)) + '" alt="" width="32" height="32" />' +
-      '<span class="inbox-item-meta">' +
-      '<span class="inbox-item-name">' + esc(name) + "</span>" +
-      '<span class="inbox-item-sub">' + esc(String(last.body || "").slice(0, 42)) + "</span>" +
-      "</span></button>"
-    );
+  const unread = {};
+  recent.forEach((m) => {
+    const c = channels.find((x) => x.id === m.channel_id);
+    if (!c) return;
+    const seenAt = chanSeen[c.slug];
+    if (!seenAt || m.created_at > seenAt) unread[c.slug] = (unread[c.slug] || 0) + 1;
   });
-  list.innerHTML = parts.join("");
-  list.querySelectorAll("[data-pid]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const u = members.find((x) => x.id === btn.dataset.pid) || { id: btn.dataset.pid, full_name: "Member" };
-      await openThread(u);
+  list.innerHTML = channels
+    .map((c) => {
+      const n = unread[c.slug] || 0;
+      return (
+        '<button class="inbox-item' + (activeChannel && activeChannel.id === c.id ? " active" : "") +
+        '" type="button" data-ch="' + esc(c.id) + '">' +
+        '<span class="chan-hash">#</span>' +
+        '<span class="inbox-item-meta">' +
+        '<span class="inbox-item-name">' + esc(c.name) + "</span>" +
+        '<span class="inbox-item-sub">' + esc(c.purpose || "") + "</span>" +
+        "</span>" +
+        (n ? '<span class="chan-unread">' + (n > 99 ? "99+" : n) + "</span>" : "") +
+        "</button>"
+      );
+    })
+    .join("");
+  list.querySelectorAll("[data-ch]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const c = channels.find((x) => x.id === btn.dataset.ch);
+      if (c) openChannel(c);
     });
   });
 }
 
-async function openThread(u) {
-  activeThread = u;
+async function openChannel(c) {
+  activeChannel = c;
+  markSeen(c.slug);
   const title = $("#thread-title");
-  const body = $("#thread-body");
   const form = $("#thread-form");
-  if (title) title.textContent = u.full_name || u.email || "Conversation";
+  if (title) title.textContent = "# " + c.name;
+  if (title && c.purpose) title.title = c.purpose;
   if (form) form.hidden = false;
-  await loadInbox();
+  const body = $("#thread-body");
+  if (body) body.innerHTML = '<p class="dash-empty">Loading…</p>';
+  renderChannelList([]);
+  await loadMessages();
+  subscribeChannel();
 }
 
-function renderThread(messages, other) {
-  const body = $("#thread-body");
-  if (!body) return;
-  const thread = messages
-    .filter((m) =>
-      (m.from_id === me.id && m.to_id === other.id) ||
-      (m.from_id === other.id && m.to_id === me.id)
-    )
-    .sort((a, b) => a.created_at.localeCompare(b.created_at));
-  if (!thread.length) {
-    body.innerHTML = '<p class="dash-empty">No messages yet — break the ice.</p>';
+async function loadMessages() {
+  if (!activeChannel) return;
+  const { data, error } = await supabase
+    .from("messages")
+    .select("*")
+    .eq("channel_id", activeChannel.id)
+    .order("created_at", { ascending: true })
+    .limit(200);
+  if (error) {
+    $("#thread-body").innerHTML = '<p class="dash-empty">Run supabase/migration-community.sql first.</p>';
     return;
   }
-  body.innerHTML = thread
+  renderThread(data || []);
+}
+
+function renderThread(msgs) {
+  const body = $("#thread-body");
+  if (!body) return;
+  if (!msgs.length) {
+    body.innerHTML = '<p class="dash-empty">No messages yet — break the ice. Text &amp; links only.</p>';
+    return;
+  }
+  body.innerHTML = msgs
     .map((m) => {
-      const mine = m.from_id === me.id;
+      const u = members.find((x) => x.id === m.user_id);
+      const mine = me && m.user_id === me.id;
+      const who = u ? (u.full_name || u.email) : "Member";
       const t = (m.created_at || "").slice(0, 16).replace("T", " ");
       return (
-        '<div class="bubble ' + (mine ? "bubble-mine" : "bubble-theirs") + '">' +
-        esc(m.body) + '<span class="bubble-time">' + esc(t) + "</span></div>"
+        '<div class="chat-row' + (mine ? " chat-mine" : "") + '">' +
+        '<img class="chat-face" src="' + esc(avatarSrc(u || { id: m.user_id }, 32)) + '" alt="" width="28" height="28" />' +
+        '<div class="chat-msg">' +
+        '<div class="chat-meta"><b>' + esc(who) + '</b><span class="chat-time">' + esc(t) + "</span></div>" +
+        '<div class="chat-body">' + linkify(m.body) + "</div>" +
+        "</div></div>"
       );
     })
     .join("");
   body.scrollTop = body.scrollHeight;
+}
 
-  // mark incoming as read
-  const unreadIds = thread.filter((m) => m.from_id === other.id && !m.read_at).map((m) => m.id);
-  if (unreadIds.length) {
-    supabase.from("messages").update({ read_at: new Date().toISOString() }).in("id", unreadIds).then(() => {});
-  }
+function subscribeChannel() {
+  if (chanSub) { supabase.removeChannel(chanSub); chanSub = null; }
+  if (!activeChannel) return;
+  const chId = activeChannel.id;
+  chanSub = supabase
+    .channel("chat-" + chId)
+    .on(
+      "postgres_changes",
+      { event: "INSERT", schema: "public", table: "messages", filter: "channel_id=eq." + chId },
+      (payload) => {
+        if (!activeChannel || activeChannel.id !== chId) return;
+        markSeen(activeChannel.slug);
+        loadMessages();
+      }
+    )
+    .subscribe();
 }
 
 function wireThreadForm() {
@@ -255,21 +299,25 @@ function wireThreadForm() {
   if (!form || !supabase) return;
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (!me || !activeThread) return;
+    if (!me || !activeChannel) return;
     const input = $("#thread-input");
-    const body = input.value.trim();
+    let body = input.value.trim();
     if (!body) return;
+    // text + links only — strip control chars and any raw HTML-looking markup
+    body = body.replace(/[\u0000-\u0008\u000B-\u001F]/g, "");
+    if (body.length > 2000) body = body.slice(0, 2000);
     const { error } = await supabase.from("messages").insert({
-      from_id: me.id,
-      to_id: activeThread.id,
-      body: body.slice(0, 2000),
+      channel_id: activeChannel.id,
+      user_id: me.id,
+      body,
     });
     if (error) {
       flash("Send failed — is migration-community.sql running?", "err");
       return;
     }
     input.value = "";
-    await loadInbox();
+    markSeen(activeChannel.slug);
+    await loadMessages();
   });
 }
 
@@ -415,22 +463,22 @@ async function openInviteModal(toUser) {
   });
 }
 
-// poll inbox lightly when visible
+// poll the open channel lightly when visible (realtime is primary)
 setInterval(() => {
-  if (!me || document.hidden) return;
+  if (!me || document.hidden || !activeChannel) return;
   const inbox = $('[data-cpanel="inbox"]');
-  if (inbox && inbox.classList.contains("active")) loadInbox();
-}, 8000);
+  if (inbox && inbox.classList.contains("active")) loadMessages();
+}, 10000);
 
 async function init() {
   if (!supabase) {
     $("#comm-grid").innerHTML = '<p class="dash-empty">Supabase not configured.</p>';
     return;
   }
+  loadSeen();
   wireTabs();
   wireThreadForm();
   me = await getProfile();
-  // pull events early for invite modal
   const { data: events } = await supabase.from("events").select("id, title").order("created_at");
   allEvents = events || [];
   await loadDirectory();

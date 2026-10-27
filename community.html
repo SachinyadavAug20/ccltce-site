@@ -40,32 +40,32 @@
     <section class="auth-card comm-root" id="community-root">
       <div class="dash-tabs comm-tabs" role="tablist" id="comm-tabs">
         <button class="dash-tab active" role="tab" data-ctab="directory" aria-selected="true">Directory</button>
-        <button class="dash-tab" role="tab" data-ctab="inbox" aria-selected="false">Messages</button>
+        <button class="dash-tab" role="tab" data-ctab="inbox" aria-selected="false">Chats</button>
         <button class="dash-tab" role="tab" data-ctab="teams" aria-selected="false">Team-ups</button>
       </div>
 
       <section class="comm-panel active" data-cpanel="directory" role="tabpanel">
-        <p class="dash-note">Click anyone to open their full profile. Message them or send a team-up invite for a future event.</p>
+        <p class="dash-note">Click anyone to open their full profile. Team up for future events, or jump into an open channel — chats are public, text &amp; links only.</p>
         <input id="comm-search" class="comm-search" type="search" placeholder="Search name, role, bio…" maxlength="80" />
         <div id="comm-grid" class="members-grid" aria-live="polite"><p class="dash-empty">Loading members…</p></div>
       </section>
 
       <section class="comm-panel" data-cpanel="inbox" role="tabpanel">
         <div id="comm-inbox-guard" class="auth-guard" hidden>
-          <p class="auth-guard-title">Log in to message</p>
-          <p class="auth-guard-sub">Members can DM each other to plan teams and events.</p>
+          <p class="auth-guard-title">Log in to chat</p>
+          <p class="auth-guard-sub">Open channels for everyone — text and links only. No DMs, no calls.</p>
           <div class="auth-actions"><a class="btn btn-primary" href="login.html">Log in</a></div>
         </div>
         <div id="comm-inbox" class="inbox" hidden>
           <div class="inbox-list-wrap">
-            <div class="inbox-head"><h3>Conversations</h3></div>
-            <div id="inbox-list" class="inbox-list" aria-live="polite"><p class="dash-empty">No messages yet.</p></div>
+            <div class="inbox-head"><h3>Channels</h3></div>
+            <div id="inbox-list" class="inbox-list" aria-live="polite"><p class="dash-empty">Loading channels…</p></div>
           </div>
           <div class="inbox-thread-wrap">
-            <div class="inbox-head"><h3 id="thread-title">Select a conversation</h3></div>
-            <div id="thread-body" class="thread-body"><p class="dash-empty">Pick someone from the directory or an existing chat.</p></div>
+            <div class="inbox-head"><h3 id="thread-title">#general</h3></div>
+            <div id="thread-body" class="thread-body"><p class="dash-empty">Pick a channel.</p></div>
             <form id="thread-form" class="thread-form" hidden>
-              <input id="thread-input" type="text" maxlength="2000" placeholder="Write a message…" autocomplete="off" />
+              <input id="thread-input" type="text" maxlength="2000" placeholder="Message — text and links only…" autocomplete="off" />
               <button class="btn btn-primary" type="submit">Send</button>
             </form>
           </div>

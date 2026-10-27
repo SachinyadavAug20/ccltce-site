@@ -1,6 +1,7 @@
 // 16×16 pixel-art avatar editor. Pure vanilla, no build.
 // Stores a 16×16 matrix of hex colors (null = transparent/empty).
 // Exports: openPixelEditor(initial, onSave), pixelMatrixToSvg(matrix, size)
+import { faceMatrix16, minecraftFace, skinPresetSeed, SKIN_PRESET_COUNT } from "./avatar.js";
 
 const GRID = 16;
 const PALETTE = [
@@ -78,10 +79,17 @@ export function openPixelEditor(initial, onSave) {
     '<div class="pe-palette" id="pe-palette"></div>' +
     '<div class="pe-actions">' +
     '<button class="btn" type="button" id="pe-clear">Clear</button>' +
-    '<button class="btn" type="button" id="pe-random">Random</button>' +
+    '<button class="btn" type="button" id="pe-random">Noise</button>' +
+    '<button class="btn btn-primary" type="button" id="pe-random-skin">🎲 Random skin</button>' +
     '<button class="btn btn-primary" type="button" id="pe-save">Save</button>' +
     "</div>" +
-    "</div></div></div>";
+    "</div>" + // pe-side
+    '<div class="pe-presets">' +
+    '<div class="pe-presets-head"><span>Preset gallery — ' + SKIN_PRESET_COUNT + ' skins</span>' +
+    '<button class="btn" type="button" id="pe-more-presets">Load more</button></div>' +
+    '<div class="pe-preset-grid" id="pe-preset-grid" aria-label="Preset avatars"></div>' +
+    "</div>" +
+    "</div></div>"; // pe-body, pe-modal
 
   document.body.appendChild(overlay);
   const canvas = overlay.querySelector("#pe-canvas");
@@ -208,6 +216,49 @@ export function openPixelEditor(initial, onSave) {
     }
     draw();
   });
+
+  // full random preset skin → loads entire 16×16 face into the editor
+  overlay.querySelector("#pe-random-skin").addEventListener("click", () => {
+    const i = Math.floor(Math.random() * SKIN_PRESET_COUNT);
+    loadMatrix(faceMatrix16(skinPresetSeed(i)));
+  });
+
+  // preset gallery — lazily rendered page of thumbs, click to load fully
+  const grid = overlay.querySelector("#pe-preset-grid");
+  let presetOffset = 0;
+  const PAGE = 24;
+  function renderPresets() {
+    const frag = document.createDocumentFragment();
+    for (let n = 0; n < PAGE && presetOffset < SKIN_PRESET_COUNT; n++, presetOffset++) {
+      const i = presetOffset;
+      const seed = skinPresetSeed(i);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "pe-preset";
+      btn.title = "Skin #" + i;
+      btn.innerHTML = '<img src="' + minecraftFace(seed, 40) + '" alt="skin ' + i + '" width="40" height="40" loading="lazy" />';
+      btn.addEventListener("click", () => loadMatrix(faceMatrix16(seed)));
+      frag.appendChild(btn);
+    }
+    grid.appendChild(frag);
+    const more = overlay.querySelector("#pe-more-presets");
+    if (presetOffset >= SKIN_PRESET_COUNT) {
+      more.textContent = "That's all " + SKIN_PRESET_COUNT + "!";
+      more.disabled = true;
+    }
+  }
+  overlay.querySelector("#pe-more-presets").addEventListener("click", renderPresets);
+  renderPresets();
+
+  function loadMatrix(m) {
+    for (let y = 0; y < GRID; y++) {
+      for (let x = 0; x < GRID; x++) {
+        matrix[y][x] = (m && m[y] && m[y][x]) || null;
+      }
+    }
+    draw();
+    canvas.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
 
   overlay.querySelector("#pe-save").addEventListener("click", () => {
     onSave(matrix.map((row) => row.slice()));

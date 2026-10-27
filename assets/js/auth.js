@@ -1,7 +1,7 @@
 // Supabase email/password auth + role-aware UI helpers.
 // Loaded on every page via chrome.js. Uses window.SUPABASE_CONFIG from supabase-config.js.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { minecraftFace, navFace, pixelMatrixToSvg, parsePixelMatrix } from "./avatar.js";
+import { minecraftFace, navFace, pixelMatrixToSvg, parsePixelMatrix, faceMatrix16 } from "./avatar.js";
 import { openPixelEditor } from "./pixeledit.js";
 
 // auth.css is only linked on auth pages — inject it everywhere so the nav menu styles work
@@ -142,9 +142,6 @@ function updateNavAuth(profile) {
       '<a class="auth-menu-item" href="dashboard.html" role="menuitem">Dashboard</a>' +
       '<a class="auth-menu-item" href="dashboard.html#profile" role="menuitem">Profile &amp; avatar</a>' +
       (profile.role === "student" ? '<a class="auth-menu-item" href="dashboard.html#teams" role="menuitem">My teams</a>' : "") +
-      (profile.role === "admin" || profile.role === "coding_club_member"
-        ? '<a class="auth-menu-item" href="dashboard.html#staff" role="menuitem">Registrations</a>'
-        : "") +
       '<div class="auth-menu-sep" role="separator"></div>' +
       '<button class="auth-menu-item auth-menu-danger" type="button" data-logout role="menuitem">Log out</button>' +
       "</div></div>";
@@ -281,16 +278,32 @@ async function loadStats(profile, isStaff) {
   if (isStaff) set("stat-users", users.count != null ? users.count : "–");
 }
 
-// ── feedback form ──
+// ── feedback form (event suggestions, stored with user identity) ──
 function wireFeedback(profile, root) {
   const fb = $("#feedback-form", root);
   if (!fb) return;
+  // related-event dropdown
+  const evSel = $("#fb-event", fb);
+  supabase.from("events").select("id, title").order("created_at").then(({ data }) => {
+    if (evSel && data && data.length) {
+      evSel.innerHTML =
+        '<option value="">— none / general —</option>' +
+        data.map((ev) => '<option value="' + escapeHtml(ev.id) + '">' + escapeHtml(ev.title) + "</option>").join("");
+    }
+  });
   fb.addEventListener("submit", async (e) => {
     e.preventDefault();
     const errEl = $("#feedback-error", fb);
     const msg = $("#fb-msg", fb).value.trim();
     if (!msg) return;
-    const { error } = await supabase.from("feedback").insert({ user_id: profile.id, message: msg });
+    const event_id = evSel && evSel.value ? evSel.value : null;
+    const kind = $("#fb-kind", fb).value;
+    const insert = { user_id: profile.id, message: msg, event_id, category: "event" };
+    let { error } = await supabase.from("feedback").insert(insert);
+    if (error && /column|schema/i.test(error.message || "")) {
+      // migration not run yet — fall back to base columns so feedback still lands
+      ({ error } = await supabase.from("feedback").insert({ user_id: profile.id, message: "[" + kind + "] " + msg }));
+    }
     if (error) {
       errEl.textContent = errText(error);
       errEl.hidden = false;
@@ -298,7 +311,7 @@ function wireFeedback(profile, root) {
     }
     errEl.hidden = true;
     fb.reset();
-    showBanner("Feedback sent — thanks!", "ok");
+    showBanner("Suggestion recorded as " + (profile.full_name || "you") + " — thanks!", "ok");
   });
 }
 
@@ -345,7 +358,8 @@ async function wireAvatar(profile, root) {
   const heroFace = root.querySelector(".dash-hero-face");
 
   openBtn.addEventListener("click", () => {
-    const initial = parsePixelMatrix(profile.pixel_art);
+    const initial = parsePixelMatrix(profile.pixel_art) ||
+      faceMatrix16(profile.id || profile.email);
     openPixelEditor(initial, async (matrix) => {
       const json = JSON.stringify(matrix);
       const { error } = await supabase.from("profiles").update({ pixel_art: json }).eq("id", profile.id);
@@ -476,7 +490,6 @@ async function initDashboard(profile) {
     ["public-profile", "Public profile"],
     ["members", "Members"],
     role === "student" ? ["teams", "Teams"] : null,
-    isStaff ? ["staff", "Staff"] : null,
     ["feedback", "Feedback"],
   ].filter(Boolean);
 
@@ -551,28 +564,27 @@ async function initDashboard(profile) {
       "</section>";
   }
 
-  // Staff
-  if (isStaff) {
-    html +=
-      '<section class="auth-card dash-panel" data-panel="staff" role="tabpanel" id="staff">' +
-      "<h3>All registrations</h3>" +
-      '<p class="dash-note">Every team registration across events.</p>' +
-      '<div id="all-regs" class="dash-list" aria-live="polite"><p class="dash-empty">Loading…</p></div>' +
-      '<div class="dash-subhead"><h4>Registered users</h4></div>' +
-      '<div id="all-users" class="dash-list" aria-live="polite"><p class="dash-empty">Loading…</p></div>' +
-      "</section>";
-  }
-
-  // Feedback (always last)
+  // Feedback & GitHub (always last)
   html +=
     '<section class="auth-card dash-panel" data-panel="feedback" role="tabpanel" id="feedback">' +
-    "<h3>Send feedback</h3>" +
-    '<p class="dash-note">Help us improve the club site — bugs, ideas, anything.</p>' +
+    "<h3>Feedback</h3>" +
+    '<p class="dash-note">Bugs &amp; feature requests go to GitHub — event suggestions stay here, stored with your name (not anonymous).</p>' +
+    '<div class="fb-github">' +
+    '<a class="btn btn-primary" target="_blank" rel="noopener" href="https://github.com/SachinyadavAug20/ccltce-site/issues/new?labels=bug&title=%5BBug%5D%20">Report a bug</a>' +
+    '<a class="btn btn-primary" target="_blank" rel="noopener" href="https://github.com/SachinyadavAug20/ccltce-site/issues/new?labels=enhancement&title=%5BFeature%5D%20">Request a feature</a>' +
+    '<a class="btn" target="_blank" rel="noopener" href="https://github.com/SachinyadavAug20/ccltce-site/issues">All issues</a>' +
+    "</div>" +
+    '<div class="dash-subhead"><h4>Event suggestions</h4></div>' +
+    '<p class="dash-note">Submitting as <b>' + escapeHtml(profile.full_name || profile.email || "you") + "</b> — organizers see who sent it.</p>" +
     '<form id="feedback-form" class="auth-form">' +
+    '<label for="fb-kind">Type</label>' +
+    '<select id="fb-kind"><option value="idea">Event idea</option><option value="improvement">Improvement suggestion</option><option value="other">Other (event-related)</option></select>' +
+    '<label for="fb-event">Related event (optional)</label>' +
+    '<select id="fb-event"><option value="">— none / general —</option></select>' +
     '<label for="fb-msg">Message</label>' +
-    '<textarea id="fb-msg" rows="5" required maxlength="2000" placeholder="What should we improve?"></textarea>' +
+    '<textarea id="fb-msg" rows="5" required maxlength="2000" placeholder="What event should we run next? What should improve?"></textarea>' +
     '<p class="form-error" id="feedback-error" hidden></p>' +
-    '<button class="btn btn-primary" type="submit">Submit feedback</button>' +
+    '<button class="btn btn-primary" type="submit">Submit suggestion</button>' +
     "</form></section>";
 
   root.innerHTML = html;
@@ -593,10 +605,9 @@ async function initDashboard(profile) {
   wireFeedback(profile, root);
 
   if (role === "student") wireTeamForm(profile, root);
-  if (isStaff) { loadAllRegs(); loadAllUsers(); }
   loadMembers();
 
-  // deep-link support (#teams, #staff, #profile, #feedback)
+  // deep-link support (#teams, #profile, #feedback)
   const hash = (location.hash || "").replace("#", "");
   if (hash) {
     const btn = root.querySelector('[data-tab="' + hash + '"]');
@@ -621,45 +632,6 @@ async function loadMyTeams(profile) {
       (t) =>
         '<div class="dash-row"><b>' + escapeHtml(t.team_name) + "</b>" +
         '<span class="dash-sub">' + escapeHtml((t.events && t.events.title) || "—") + "</span></div>"
-    )
-    .join("");
-}
-
-async function loadAllRegs() {
-  const box = $("#all-regs");
-  if (!box || !supabase) return;
-  const { data } = await supabase
-    .from("registrations")
-    .select("id, status, registered_at, teams(team_name, events(title), leader_id)")
-    .order("registered_at", { ascending: false });
-  if (!data || !data.length) {
-    box.innerHTML = '<p class="dash-empty">No registrations yet.</p>';
-    return;
-  }
-  box.innerHTML = data
-    .map(
-      (r) =>
-        '<div class="dash-row"><b>' + escapeHtml(r.teams && r.teams.team_name) + "</b>" +
-        '<span class="dash-sub">' + escapeHtml((r.teams && r.teams.events && r.teams.events.title) || "—") + " · " + escapeHtml(r.status) + "</span></div>"
-    )
-    .join("");
-}
-
-async function loadAllUsers() {
-  const box = $("#all-users");
-  if (!box || !supabase) return;
-  const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
-  if (error || !data || !data.length) {
-    box.innerHTML = '<p class="dash-empty">' + (error ? "No access (check RLS)." : "No users yet.") + "</p>";
-    return;
-  }
-  box.innerHTML = data
-    .map(
-      (u) =>
-        '<div class="dash-row dash-user-row">' +
-        '<img class="dash-user-face" src="' + avatarSrc(u, 32) + '" alt="" width="28" height="28" />' +
-        "<b>" + escapeHtml(u.full_name || u.email) + "</b>" +
-        '<span class="dash-sub">' + escapeHtml(u.email) + " · " + escapeHtml(u.role) + "</span></div>"
     )
     .join("");
 }
@@ -997,6 +969,54 @@ async function enhanceTeamPage() {
 
 window.CCLTCE_OPEN_PROFILE = openProfileModal;
 
+// ── global chat notify: toast whenever ANY message drops in ANY channel ──
+let _chatNotifyWired = false;
+const _chanNameCache = new Map();
+const _userNameCache = new Map();
+async function chatNotifyLabel(table, id) {
+  const cache = table === "channels" ? _chanNameCache : _userNameCache;
+  if (cache.has(id)) return cache.get(id);
+  const col = table === "channels" ? "name" : "full_name,email";
+  const { data } = await supabase.from(table).select(col).eq("id", id).single();
+  const label = table === "channels"
+    ? "#" + ((data && data.name) || "chat").toLowerCase()
+    : ((data && (data.full_name || data.email)) || "Someone");
+  cache.set(id, label);
+  return label;
+}
+function wireChatNotify() {
+  if (!supabase || _chatNotifyWired) return;
+  _chatNotifyWired = true;
+  supabase
+    .channel("global-chat-notify")
+    .on(
+      "postgres_changes",
+      { event: "INSERT", schema: "public", table: "messages" },
+      async (payload) => {
+        const m = payload.new;
+        if (!m || !m.body) return;
+        if (_sessionUser && m.user_id === _sessionUser.id) return;
+        try {
+          const [who, ch] = await Promise.all([
+            chatNotifyLabel("profiles", m.user_id),
+            chatNotifyLabel("channels", m.channel_id),
+          ]);
+          const snippet = String(m.body).length > 70 ? String(m.body).slice(0, 70) + "…" : m.body;
+          showBanner("💬 " + who + " in " + ch + ": " + snippet, "chat");
+          const b = $(".auth-banner[data-kind=chat]");
+          if (b && !b.dataset.wired) {
+            b.dataset.wired = "1";
+            b.title = "Click to open chats";
+            b.addEventListener("click", () => { location.href = "community.html#inbox"; });
+          }
+        } catch {
+          showBanner("💬 New message in chat", "chat");
+        }
+      }
+    )
+    .subscribe();
+}
+
 async function init() {
   if (!hasConfig) {
     updateNavAuth(null);
@@ -1019,6 +1039,7 @@ async function init() {
   const profile = await refreshNav();
   wireLogin();
   wireRegister();
+  wireChatNotify();
   if ($("#dashboard-root")) await initDashboard(profile);
   enhanceTeamPage();
 
