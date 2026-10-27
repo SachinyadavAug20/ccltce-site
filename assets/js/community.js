@@ -1,6 +1,6 @@
 // Community — directory, open chat channels (text + links only) and pre-event team-ups.
 // ES module; depends on auth.js (loaded by chrome.js) exports.
-import { supabase, getProfile, openProfileModal, avatarSrc } from "./auth.js";
+import { supabase, getProfile, openProfileModal, avatarSrc, awardXp, levelOf, rankOf } from "./auth.js";
 
 const $ = (s, r) => (r || document).querySelector(s);
 const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
@@ -67,6 +67,7 @@ function wireTabs() {
       history.replaceState(null, "", "#" + id);
       if (id === "inbox" && me) loadChannelsPanel();
       if (id === "teams" && me) loadTeamUps();
+      if (id === "board") loadBoard();
     });
   });
 }
@@ -318,7 +319,75 @@ function wireThreadForm() {
     input.value = "";
     markSeen(activeChannel.slug);
     await loadMessages();
+    awardXp(5, "chat message");
   });
+}
+
+// ── leaderboard ──
+async function loadBoard() {
+  const list = $("#board-list");
+  const self = $("#board-self");
+  if (!list || !supabase) return;
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, full_name, email, role, avatar_url, pixel_art, xp")
+    .order("xp", { ascending: false })
+    .order("created_at", { ascending: true });
+  if (error || !data) {
+    list.innerHTML = '<p class="dash-empty">Leaderboard unavailable — run supabase/migration-fun.sql.</p>';
+    if (self) self.hidden = true;
+    return;
+  }
+  const rows = data.slice(0, 100);
+  if (!rows.length) {
+    list.innerHTML = '<p class="dash-empty">No members yet.</p>';
+    return;
+  }
+
+  // your standing card
+  const myIdx = me ? rows.findIndex((u) => u.id === me.id) : -1;
+  if (self) {
+    if (myIdx >= 0) {
+      const u = rows[myIdx];
+      const xp = Number(u.xp) || 0;
+      const into = xp % 100;
+      self.innerHTML =
+        '<span class="board-rank board-rank-you">#' + (myIdx + 1) + "</span>" +
+        '<img src="' + esc(avatarSrc(u, 40)) + '" alt="" width="36" height="36" />' +
+        '<span class="board-you-name">' + esc(u.full_name || "You") + "</span>" +
+        '<span class="lv-chip">Lv ' + levelOf(xp) + " · " + rankOf(xp) + "</span>" +
+        '<span class="board-xp">' + xp + " XP</span>" +
+        '<span class="board-bar"><span style="width:' + into + '%"></span></span>';
+      self.hidden = false;
+    } else if (me) {
+      self.innerHTML = '<span class="board-you-name">You&rsquo;re not ranked yet — send a chat to start climbing.</span>';
+      self.hidden = false;
+    } else {
+      self.hidden = true;
+    }
+  }
+
+  list.innerHTML = rows
+    .map((u, i) => {
+      const xp = Number(u.xp) || 0;
+      const medal = i === 0 ? "g1" : i === 1 ? "g2" : i === 2 ? "g3" : "";
+      const isMe = me && u.id === me.id;
+      const roleCls = u.role === "admin" ? "role-admin" : u.role === "coding_club_member" ? "role-club" : "role-student";
+      return (
+        '<div class="board-row ' + medal + (isMe ? " board-me" : "") + '">' +
+        '<span class="board-rank">' + (i + 1) + "</span>" +
+        '<img class="board-face" src="' + esc(avatarSrc(u, 40)) + '" alt="" width="36" height="36" />' +
+        '<span class="board-id">' +
+        '<b>' + esc(u.full_name || u.email || "Member") + "</b>" +
+        '<span class="role-badge ' + roleCls + '">' + esc(ROLE_LABEL[u.role] || u.role) + "</span>" +
+        "</span>" +
+        '<span class="lv-chip">Lv ' + levelOf(xp) + "</span>" +
+        '<span class="board-title">' + esc(rankOf(xp)) + "</span>" +
+        '<span class="board-xp">' + xp + " XP</span>" +
+        "</div>"
+      );
+    })
+    .join("");
 }
 
 // ── team-ups ──
@@ -406,6 +475,8 @@ function renderInvites(sel, list, isIncoming) {
         .eq("id", btn.dataset.inv);
       if (error) return flash("Update failed — run migration-community.sql.", "err");
       flash(btn.dataset.st === "accepted" ? "Team-up accepted!" : "Invite declined.", "ok");
+      if (btn.dataset.st === "accepted") awardXp(25, "team-up accepted");
+      else awardXp(5, "invite handled");
       loadTeamUps();
     });
   });
@@ -458,6 +529,7 @@ async function openInviteModal(toUser) {
     }
     close();
     flash("Team-up invite sent to " + (toUser.full_name || "member") + "!", "ok");
+    awardXp(5, "team-up invite sent");
     switchTab("teams");
     loadTeamUps();
   });
@@ -486,6 +558,8 @@ async function init() {
   const hash = (location.hash || "").replace("#", "");
   if (hash === "inbox" && me) switchTab("inbox");
   else if (hash === "teams" && me) switchTab("teams");
+  else if (hash === "board") switchTab("board");
+  else loadBoard(); // default: warm the leaderboard so switching is instant
 }
 
 init();

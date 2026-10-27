@@ -52,6 +52,112 @@ function errText(e) {
   return (e && e.message) || "Something went wrong. Try again.";
 }
 
+// ── shared level system (DB xp on profiles) ──
+const RANKS = [
+  [1, "Guest Explorer"], [5, "Script Kiddie"], [10, "Bug Hunter"],
+  [25, "Kernel Crafter"], [50, "Redstone Sage"], [100, "Diamond Dev"],
+];
+export function levelOf(xp) { return 1 + Math.floor((Number(xp) || 0) / 100); }
+export function rankOf(xp) {
+  const lv = levelOf(xp);
+  let r = RANKS[0][1];
+  RANKS.forEach((p) => { if (lv >= p[0]) r = p[1]; });
+  return r;
+}
+function paintLevelChips() {
+  const xp = (_sessionUser && Number(_sessionUser.xp)) || 0;
+  $$("[data-level-chip]").forEach((el) => {
+    el.textContent = "Lv " + levelOf(xp) + " · " + rankOf(xp);
+    el.title = xp + " XP";
+  });
+}
+// award DB XP (+ celebrate on the HUD rail). Returns new xp or null.
+export async function awardXp(n, reason) {
+  if (!supabase || !n) return null;
+  const { data, error } = await supabase.rpc("add_xp", { amount: n });
+  if (error || typeof data !== "number") return null;
+  if (_sessionUser) _sessionUser.xp = data;
+  if (window.CCLTCE_HUD && window.CCLTCE_HUD.xp() < data) {
+    window.CCLTCE_HUD.addXP(data - window.CCLTCE_HUD.xp());
+  }
+  paintLevelChips();
+  if (reason) showBanner("★ +" + n + " XP — " + reason, "ok");
+  return data;
+}
+function syncHudToProfile(profile) {
+  if (!window.CCLTCE_HUD || !profile || profile.xp == null) return;
+  const db = Number(profile.xp) || 0;
+  const local = window.CCLTCE_HUD.xp();
+  if (db > local) window.CCLTCE_HUD.addXP(db - local);
+}
+
+// passively push earned local HUD xp into the shared leaderboard (capped per call by the RPC)
+async function pushLocalXpToDb(profile) {
+  if (!supabase || !profile || profile.xp == null || !window.CCLTCE_HUD) return;
+  const diff = window.CCLTCE_HUD.xp() - (Number(profile.xp) || 0);
+  if (diff <= 0) return;
+  const got = await awardXp(Math.min(diff, 100), null);
+  if (got == null && !pushLocalXpToDb._warned) {
+    pushLocalXpToDb._warned = true;
+    console.info("Leaderboard sync inactive — run supabase/migration-fun.sql.");
+  }
+}
+
+// ── signup celebration ──
+function showCongrats(name) {
+  if (document.querySelector(".pe-overlay.welcome-overlay")) return;
+  try { sessionStorage.setItem("ccltce-congrats", "1"); } catch {}
+  const first = String(name || "").trim().split(/\s+/)[0] || "friend";
+  const overlay = document.createElement("div");
+  overlay.className = "pe-overlay welcome-overlay";
+  overlay.innerHTML =
+    '<div class="pe-modal welcome-modal" role="dialog" aria-modal="true" aria-label="Welcome to the community">' +
+    '<div class="welcome-confetti" aria-hidden="true"></div>' +
+    '<div class="welcome-body">' +
+    '<span class="welcome-flag">ACCOUNT CREATED</span>' +
+    '<h3 class="welcome-title">Congratulations,<br />' + escapeHtml(first) + '!</h3>' +
+    '<p class="welcome-sub">You&rsquo;re officially <b>in the community</b> — 100 XP banked, Lv 1 started.<br />' +
+    'Meet the other members, open chats and team up before the next event.</p>' +
+    '<div class="welcome-actions">' +
+    '<a class="btn btn-primary" href="community.html" data-welcome-go>👥 Meet the community</a>' +
+    '<a class="btn" href="dashboard.html" data-welcome-go>Go to dashboard</a>' +
+    "</div>" +
+    '<button class="pe-close" type="button" aria-label="Close">✕</button>' +
+    "</div></div>";
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  overlay.querySelector(".pe-close").addEventListener("click", close);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+  overlay.querySelectorAll("[data-welcome-go]").forEach((a) => a.addEventListener("click", close));
+  document.addEventListener("keydown", function esc(e) {
+    if (e.key === "Escape") { close(); document.removeEventListener("keydown", esc); }
+  });
+  spawnConfetti(overlay.querySelector(".welcome-confetti"));
+}
+
+function spawnConfetti(host) {
+  if (!host || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const colors = ["#eab308", "#17dd62", "#ff004d", "#29adff", "#ff77a8", "#ffec27"];
+  for (let i = 0; i < 36; i++) {
+    const p = document.createElement("i");
+    p.style.left = Math.random() * 100 + "%";
+    p.style.background = colors[i % colors.length];
+    p.style.animationDelay = Math.random() * 1.4 + "s";
+    p.style.animationDuration = 1.6 + Math.random() * 1.6 + "s";
+    host.appendChild(p);
+  }
+}
+
+// first login after an email-confirm signup → celebrate too
+function maybeWelcomeBack(profile) {
+  if (!profile || !profile.created_at) return;
+  let seen = null;
+  try { seen = sessionStorage.getItem("ccltce-congrats"); } catch {}
+  if (seen) return;
+  const age = Date.now() - new Date(profile.created_at).getTime();
+  if (age >= 0 && age < 15 * 60 * 1000) showCongrats(profile.full_name);
+}
+
 export async function getProfile() {
   if (!supabase) return null;
   const { data: { user } } = await supabase.auth.getUser();
@@ -136,7 +242,10 @@ function updateNavAuth(profile) {
       '<div class="auth-menu-id">' +
       '<span class="auth-menu-name">' + escapeHtml(name) + "</span>" +
       '<span class="auth-menu-email">' + escapeHtml(profile.email || "") + "</span>" +
+      '<span class="auth-menu-badges">' +
       '<span class="role-badge ' + roleCls + '">' + role + "</span>" +
+      '<span class="lv-chip" data-level-chip title="' + (Number(profile.xp) || 0) + ' XP">Lv ' + levelOf(profile.xp) + " · " + rankOf(profile.xp) + "</span>" +
+      "</span>" +
       "</div></div>" +
       '<div class="auth-menu-sep" role="separator"></div>' +
       '<a class="auth-menu-item" href="dashboard.html" role="menuitem">Dashboard</a>' +
@@ -157,6 +266,11 @@ async function refreshNav() {
   const profile = await getProfile();
   _sessionUser = profile;
   updateNavAuth(profile);
+  if (profile) {
+    syncHudToProfile(profile);
+    pushLocalXpToDb(profile);
+    paintLevelChips();
+  }
   return profile;
 }
 
@@ -233,8 +347,10 @@ function wireRegister() {
       return;
     }
     if (data && data.session) {
-      showBanner("Account created! Redirecting…", "ok");
-      setTimeout(() => { window.location.href = "dashboard.html"; }, 600);
+      showCongrats(full_name);
+      setTimeout(() => {
+        if (!document.querySelector(".welcome-overlay")) window.location.href = "dashboard.html";
+      }, 12000);
     } else {
       showBanner("Almost there — check your email to confirm your account, then log in.", "ok");
       setTimeout(() => { window.location.href = "login.html"; }, 2200);
@@ -312,6 +428,7 @@ function wireFeedback(profile, root) {
     errEl.hidden = true;
     fb.reset();
     showBanner("Suggestion recorded as " + (profile.full_name || "you") + " — thanks!", "ok");
+    awardXp(15, "event suggestion");
   });
 }
 
@@ -345,6 +462,7 @@ function wireTeamForm(profile, root) {
     showBanner("Team “" + name + "” created!", "ok");
     loadMyTeams(profile);
     loadStats(profile, false);
+    awardXp(20, "team created");
   });
   loadMyTeams(profile);
 }
@@ -373,6 +491,7 @@ async function wireAvatar(profile, root) {
       if (heroFace) heroFace.src = pixelMatrixToSvg(matrix, 128);
       showBanner("Pixel avatar saved!", "ok");
       refreshNav();
+      awardXp(10, "pixel avatar crafted");
     });
   });
 
@@ -432,6 +551,7 @@ function wirePublicProfile(profile, root) {
     if (heroEmail && email) heroEmail.textContent = email;
     refreshNav();
     showBanner("Public profile saved!", "ok");
+    awardXp(10, "profile completed");
   });
 }
 
@@ -465,6 +585,7 @@ async function initDashboard(profile) {
     '<p class="dash-hero-email">' + escapeHtml(profile.email || "") + "</p>" +
     '<div class="dash-hero-tags">' +
     '<span class="role-badge ' + roleCls + '">' + (ROLE_LABEL[role] || role) + "</span>" +
+    '<span class="lv-chip" data-level-chip title="' + (Number(profile.xp) || 0) + ' XP">Lv ' + levelOf(profile.xp) + " · " + rankOf(profile.xp) + "</span>" +
     '<span class="dash-since">Joined ' + escapeHtml(memberSince) + "</span>" +
     "</div></div>" +
     '<div class="dash-hero-actions">' +
@@ -1041,6 +1162,7 @@ async function init() {
   wireRegister();
   wireChatNotify();
   if ($("#dashboard-root")) await initDashboard(profile);
+  maybeWelcomeBack(profile);
   enhanceTeamPage();
 
   supabase.auth.onAuthStateChange(async () => {
