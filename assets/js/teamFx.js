@@ -102,6 +102,12 @@
 
   function open(card) {
     var d = card.dataset, q = function (s) { return ov.querySelector(s); };
+    // Prefer the live Supabase profile modal (auth.js) when this member has an account
+    if (window.CCLTCE_OPEN_PROFILE && window.__CCLTCE_PROFILES_BY_NAME) {
+      var key = String(d.name || "").trim().toLowerCase();
+      var live = window.__CCLTCE_PROFILES_BY_NAME.get(key);
+      if (live) { window.CCLTCE_OPEN_PROFILE(live); return; }
+    }
     if (ov.hidden) last = document.activeElement;
     var imgEl = card.querySelector(".t-head img") || card.querySelector(".tn-avatar img") || card.querySelector("img");
     q(".tf-head img").src = imgEl ? imgEl.src : "";

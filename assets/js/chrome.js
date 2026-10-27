@@ -42,8 +42,8 @@
   const LINKS = [
     ["events.html", "Events"],
     ["team.html", "Team"],
+    ["community.html", "Community"],
     ["notices.html", "Notices"],
-    ["resources.html", "Resources"],
   ];
 
   const NAV =
@@ -52,11 +52,8 @@
     '<ul class="nav-links">' +
     LINKS.map(function (l) { return '<li><a href="' + l[0] + '">' + l[1] + "</a></li>"; }).join("") +
     "</ul>" +
-    '<span class="nav-cta"><a href="challenges.html">CCLTCE Week ' + svg("star", 13) + "</a></span>" +
     '<span class="nav-tools">' +
-    '<button class="sound-toggle" type="button" aria-pressed="false" aria-label="Play ambient sound" title="Play ambience">' +
-    '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6Z"/></svg>' +
-    '<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span></button>' +
+    '<span class="nav-auth" data-auth-slot><a href="login.html">Login</a></span>' +
     '<button class="nav-burger" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">' +
     "<span></span><span></span><span></span></button></span></nav>";
 
@@ -64,7 +61,7 @@
     '<div class="mobile-menu" id="mobile-menu" hidden>' +
     '<a href="index.html">Home</a>' +
     LINKS.map(function (l) { return '<a href="' + l[0] + '">' + l[1] + "</a>"; }).join("") +
-    '<a href="challenges.html">Challenges</a><a href="achievements.html">Achievements</a></div>';
+    "</div>";
 
   const SOCIALS = [
     ["github", "https://github.com/CCLTCE", "GitHub", "ic-gh"],
@@ -78,8 +75,8 @@
     '<span class="foot-brand">' + FOOT_LOGO + "Coding Club &middot; LTCE</span>" +
     '<nav class="foot-links" aria-label="Footer">' +
     '<a href="events.html">Events</a><a href="team.html">Team</a>' +
-    '<a href="notices.html">Notices</a><a href="challenges.html">Challenges</a>' +
-    '<a href="resources.html">Resources</a><a href="achievements.html">Achievements</a>' +
+    '<a href="community.html">Community</a>' +
+    '<a href="notices.html">Notices</a>' +
     "</nav>" +
     '<span class="foot-social">' +
     SOCIALS.map(function (s) {
@@ -99,6 +96,19 @@
     });
   }
 
+  function loadAuth() {
+    // config is a classic script; auth is an ES module that depends on it
+    var cfg = document.createElement("script");
+    cfg.src = "assets/js/supabase-config.js";
+    cfg.onload = function () {
+      var s = document.createElement("script");
+      s.type = "module";
+      s.src = "assets/js/auth.js";
+      document.body.appendChild(s);
+    };
+    document.body.appendChild(cfg);
+  }
+
   function mount() {
     var head = document.querySelector(".nav-wrap");
     if (head) head.innerHTML = NAV + MOBILE;
@@ -107,6 +117,7 @@
     if (foot) foot.innerHTML = FOOTER;
 
     markActive();
+    loadAuth();
 
     var burger = document.querySelector(".nav-burger");
     var menu = document.getElementById("mobile-menu");
