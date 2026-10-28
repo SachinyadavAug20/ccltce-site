@@ -115,14 +115,269 @@ body:has(#narrative-scroll) footer {
 }
 @keyframes hintBob { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
 
-@media (max-width: 700px) {
-  .narrative-overlay { right: 4%; left: 4%; max-width: none; bottom: 8%; }
-  .narrative-overlay.bedrock { right: 4%; left: 4%; transform: translateY(16px); }
-  .narrative-overlay.bedrock.on { transform: translateY(0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  #narrative-scroll { height: auto; }
-  #narrative-webgl { display: none; }
-  .narrative-overlay { position: relative; opacity: 1; transform: none; bottom: auto; right: auto; margin: 1rem auto; max-width: 480px; }
-  .narrative-hint { display: none; }
+/* ── static app view — phones/tablets + reduced-motion:
+   plain scrolling home (hero → quick tiles → content in normal flow).
+   No pinned viewport, no 750vh void, no cards popping over emptiness. ── */
+.home-tiles-wrap, .home-tiles, .mobile-dashboard { display: none; }
+
+@media (max-width: 899px), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  #narrative-scroll { height: auto !important; padding-bottom: 2rem; }
+  #narrative-webgl { display: none !important; }
+  .narrative-viewport { position: static !important; height: auto !important; overflow: visible !important; }
+  .hero-overlay {
+    position: relative; inset: auto;
+    min-height: auto; padding: 4.8rem 1rem 1.25rem;
+    opacity: 1; pointer-events: auto;
+  }
+  .narrative-hint { display: none !important; }
+
+  /* REMOVE card on scroll in mobile view */
+  .narrative-overlay {
+    display: none !important;
+  }
+
+  /* app-style quick links — the mobile navigation */
+  .home-tiles-wrap {
+    display: block;
+    width: min(34rem, calc(100% - 1.5rem));
+    margin: 0.5rem auto 1.5rem;
+  }
+  .mobile-sec-heading {
+    font-family: var(--disp);
+    font-size: 0.52rem;
+    letter-spacing: 0.16em;
+    color: #ffd76a;
+    text-shadow: 1px 1px 0 #000;
+    margin: 1.25rem 0 0.65rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .mobile-sec-heading .msh-gem {
+    color: #17dd62;
+    font-size: 0.65rem;
+  }
+  .home-tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    width: 100%;
+    margin: 0;
+  }
+  .home-tile {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 58px;
+    padding: 0.75rem 0.8rem;
+    background: #18181e;
+    border: 2px solid #282834;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45), inset 1px 1px 0 rgba(255, 255, 255, 0.05);
+    text-decoration: none;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.1s ease, background 0.1s ease, border-color 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .home-tile:active {
+    transform: scale(0.97);
+    background: #202028;
+    border-color: #3b3b4d;
+  }
+  .home-tile:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .tile-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .tile-events .tile-icon { background: rgba(255, 215, 106, 0.14); color: #ffd76a; border: 1px solid rgba(255, 215, 106, 0.3); }
+  .tile-challenges .tile-icon { background: rgba(23, 221, 98, 0.14); color: #17dd62; border: 1px solid rgba(23, 221, 98, 0.3); }
+  .tile-resources .tile-icon { background: rgba(96, 165, 250, 0.14); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.3); }
+  .tile-community .tile-icon { background: rgba(168, 85, 247, 0.14); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+  .tile-team .tile-icon { background: rgba(249, 115, 22, 0.14); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3); }
+  .tile-notices .tile-icon { background: rgba(244, 63, 94, 0.14); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+  .tile-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+  }
+  .tile-title {
+    font-family: var(--disp);
+    font-size: 0.54rem;
+    color: #fff;
+    line-height: 1.25;
+    margin-bottom: 2px;
+    text-shadow: 1px 1px 0 #000;
+  }
+  .tile-desc {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #8f96a3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tile-arrow {
+    color: #636b79;
+    font-size: 1.2rem;
+    line-height: 1;
+    margin-left: auto;
+  }
+
+  /* mobile app dashboard sections */
+  .mobile-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: min(34rem, calc(100% - 1.5rem));
+    margin: 0 auto 2rem;
+  }
+  .mobile-card {
+    background: #15151a;
+    border: 2px solid #252530;
+    border-radius: 8px;
+    padding: 1rem 1.1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 1px 1px 0 rgba(255, 255, 255, 0.04);
+  }
+  .mobile-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #23232c;
+  }
+  .mobile-card-title {
+    font-family: var(--disp);
+    font-size: 0.52rem;
+    color: #ffd76a;
+    letter-spacing: 0.06em;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .mobile-card-link {
+    font-family: var(--disp);
+    font-size: 0.42rem;
+    color: var(--emerald);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+  }
+  .mobile-notice-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid #1f1f26;
+  }
+  .mobile-notice-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .mobile-notice-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .mobile-tag {
+    font-family: var(--disp);
+    font-size: 0.38rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .mobile-tag.new { background: rgba(23, 221, 98, 0.16); color: #17dd62; border: 1px solid rgba(23, 221, 98, 0.35); }
+  .mobile-tag.won { background: rgba(255, 215, 106, 0.16); color: #ffd76a; border: 1px solid rgba(255, 215, 106, 0.35); }
+  .mobile-tag.urgent { background: rgba(244, 63, 94, 0.16); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.35); }
+  .mobile-notice-date {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #71717a;
+  }
+  .mobile-notice-text {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: #d4d4d8;
+    line-height: 1.45;
+    margin: 0;
+  }
+  .mobile-notice-text strong {
+    color: #fff;
+  }
+
+  /* mobile featured event */
+  .mobile-event-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .mobile-event-title {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+  }
+  .mobile-event-desc {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: #a1a1aa;
+    line-height: 1.4;
+    margin: 0;
+  }
+  .mobile-event-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+  }
+  .mobile-event-actions .btn {
+    flex: 1;
+    min-height: 44px;
+    font-size: 0.48rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* mobile stats row */
+  .mobile-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.4rem;
+    text-align: center;
+  }
+  .mobile-stat-box {
+    padding: 0.65rem 0.2rem;
+    background: #111115;
+    border: 1px solid #23232c;
+    border-radius: 6px;
+  }
+  .mobile-stat-num {
+    font-family: var(--disp);
+    font-size: 0.68rem;
+    color: #ffd76a;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .mobile-stat-lbl {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: #82828e;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: block;
+  }
 }

@@ -1,13 +1,14 @@
-// Narrative scroll — pinned scroll story.
+// Narrative scroll — pinned scroll story (motion-OK desktop only).
 // Desktop: full WebGL cinematic (Three.js, dragon, crystals, adaptive perf) — loaded lazily.
-// Phones/tablets/reduced-motion: lightweight path — same story overlays + dimension phases
-// driven by a rAF-throttled scroll listener, zero WebGL, zero Three.js download (656KB saved).
+// Phones/tablets/reduced-motion: skip entirely — narrative.css renders the static app view
+// (hero → quick tiles → content in normal scroll) with zero JS and zero Three.js download.
 (function () {
-  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   var wrapper = document.getElementById("narrative-scroll");
   if (!wrapper) return;
-  var lightPath = reduce || matchMedia("(max-width: 899px), (pointer: coarse)").matches;
-  if (lightPath) { mobileStory(wrapper); return; }
+  if (
+    matchMedia("(prefers-reduced-motion: reduce)").matches ||
+    matchMedia("(max-width: 899px), (pointer: coarse)").matches
+  ) return;
 
   async function start() {
     var THREE = await import("../vendor/three.module.js");
@@ -160,63 +161,4 @@
   start().catch(function (err) {
     console.warn("Narrative WebGL path unavailable —", err);
   });
-
-  // ── lightweight story path: overlays + phases, no WebGL (mobile / reduced-motion) ──
-  function mobileStory(w) {
-    var hint = w.querySelector(".narrative-hint");
-    var overlays = {
-      surface: w.querySelector(".narrative-overlay.surface"),
-      station1: w.querySelector(".narrative-overlay.station-1"),
-      station2: w.querySelector(".narrative-overlay.station-2"),
-      station3: w.querySelector(".narrative-overlay.station-3"),
-      bedrock: w.querySelector(".narrative-overlay.bedrock"),
-    };
-    var heroOverlay = document.querySelector(".hero-overlay");
-    var progress = { raw: 0, t: 0, s: 0, dim: "overworld" };
-    window.CCLTCE_PROGRESS = progress;
-    var lastHud = -1, lastDim = "", queued = false;
-    function clamp01(v) { return Math.min(1, Math.max(0, v)); }
-    function phaseAt(t) {
-      if (t < 0.25) return "surface";
-      if (t < 0.46) return "station1";
-      if (t < 0.575) return "station2";
-      if (t < 0.7) return "station3";
-      return "bedrock";
-    }
-    function dimAt(t) { return t < 0.33 ? "overworld" : t < 0.67 ? "nether" : "end"; }
-    function updateOverlays(t) {
-      var phase = phaseAt(t);
-      for (var key in overlays) { var el = overlays[key]; if (el) el.classList.toggle("on", key === phase); }
-      if (heroOverlay) {
-        var hf = clamp01((t - 0.05) / 0.16);
-        heroOverlay.style.opacity = 1 - hf;
-        heroOverlay.style.transform = "translateY(" + (-50 * hf) + "px)";
-        heroOverlay.style.display = hf >= 1 ? "none" : "";
-      }
-      if (hint) hint.style.opacity = t > 0.04 ? "0" : "1";
-    }
-    function syncHud(t) {
-      if (t === lastHud) return;
-      lastHud = t;
-      updateOverlays(t);
-      var dim = dimAt(t);
-      if (dim !== lastDim) {
-        lastDim = dim; progress.dim = dim;
-        window.CCLTCE_DIM = dim;
-        document.documentElement.setAttribute("data-dim", dim);
-        if (window.CCLTCE_SFX && window.CCLTCE_SFX.setPhase) window.CCLTCE_SFX.setPhase(dim);
-      }
-    }
-    function onScroll() {
-      var rect = w.getBoundingClientRect();
-      progress.raw = clamp01(-rect.top / (w.offsetHeight - innerHeight));
-      progress.t = progress.s = progress.raw;
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(function () { queued = false; syncHud(progress.raw); });
-    }
-    addEventListener("scroll", onScroll, { passive: true });
-    syncHud(0);
-    onScroll();
-  }
 })();
