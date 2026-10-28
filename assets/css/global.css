@@ -121,8 +121,8 @@ body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-even
   contain-intrinsic-size: auto 132px;
 }
 .board-row { contain-intrinsic-size: auto 56px; }
-.chat-row { contain-intrinsic-size: auto 64px; }
-.member-card[hidden] { display: none; }
+[hidden] { display: none !important; }
+.member-card[hidden] { display: none !important; }
 
 /* ── skeleton rows for initial fetches ── */
 .skel-row {

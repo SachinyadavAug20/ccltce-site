@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Team — CCLTCE</title>
   <meta name="description" content="The core team behind the Coding Club at LTCOE." />
   <meta name="theme-color" content="#141414" />
@@ -23,7 +23,13 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Team — CCLTCE" />
   <meta name="twitter:description" content="Meet the core team behind the Coding Club at LTCOE — people over positions." />
-  <meta name="twitter:image" content="https://ccltce.github.io/assets/img/ccltce-logo.png" />
+  <!-- Vercel Web Analytics & Speed Insights -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
   <link rel="stylesheet" href="assets/css/global.css" />
   <link rel="stylesheet" href="assets/css/nav.css" />
   <link rel="stylesheet" href="assets/css/brand.css" />
@@ -52,6 +58,41 @@
       <p>The people who run CCLTCE &mdash; people over positions.</p>
     </section>
 
+
+    <!-- Team View & Interactive Canvas Controls -->
+    <section class="team-ctrl-wrap" aria-label="Team View Controls">
+      <div class="team-ctrl-bar">
+        <!-- View Mode Switcher -->
+        <div class="team-mode-pills" role="tablist" aria-label="Display View">
+          <button type="button" class="team-pill-btn active" id="btn-mode-tree" role="tab" aria-selected="true" title="Interactive Organization Tree">
+            <svg class="pill-svg" viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M7 1h2v2H7zM5 3h6v2H5zM4 5h8v2H4zM2 7h12v2H2zM1 9h14v2H1zM7 11h2v4H7z"/></svg>
+            <span>Org Tree</span>
+          </button>
+          <button type="button" class="team-pill-btn" id="btn-mode-grid" role="tab" aria-selected="false" title="Classic Member Roster Grid">
+            <svg class="pill-svg" viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M1 1h6v6H1zM9 1h6v6H9zM1 9h6v6H1zM9 9h6v6H9z"/></svg>
+            <span>Roster Grid</span>
+          </button>
+        </div>
+
+        <!-- Tree Canvas Controls (Fit Screen, Zoom, Pan Reset) -->
+        <div class="team-canvas-tools" id="team-canvas-tools">
+          <button type="button" class="team-tool-btn" id="btn-tree-fit" title="Fit entire hierarchy into screen (ideal for mobile)" aria-label="Fit tree to screen">
+            <svg class="tool-svg" viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M1 1h4v2H3v2H1zm10 0h4v4h-2V3h-2zm4 10v4h-4v-2h2v-2zm-14 0h2v2h2v2H1z"/></svg>
+            <span>Fit Screen</span>
+          </button>
+          <button type="button" class="team-tool-btn" id="btn-tree-zoom-in" title="Zoom in" aria-label="Zoom in">
+            <span>＋</span>
+          </button>
+          <button type="button" class="team-tool-btn" id="btn-tree-zoom-out" title="Zoom out" aria-label="Zoom out">
+            <span>－</span>
+          </button>
+          <button type="button" class="team-tool-btn" id="btn-tree-reset" title="Reset to original 1:1 view" aria-label="Reset zoom">
+            <span>↺ 1:1</span>
+          </button>
+        </div>
+      </div>
+      <p class="team-ctrl-hint" id="team-ctrl-hint">Tap any member to inspect bio &amp; stats • Drag canvas to pan</p>
+    </section>
 
     <!-- Tree View Container -->
     <section class="team-tree-container" id="team-tree" aria-label="Team Hierarchy Tree"></section>

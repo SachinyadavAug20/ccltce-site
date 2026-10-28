@@ -30,6 +30,7 @@
   function level() { return 1 + Math.floor(xp / 100); }
   function need() { return 100 - (xp % 100); }
   function paint() {
+    if (!fill || !rail) return;
     fill.style.height = (xp % 100) + "%";
     rail.setAttribute("aria-valuenow", String(xp % 100));
   }
@@ -57,6 +58,7 @@
     })(t0);
   }
   function showToast(text) {
+    if (!toast) return;
     toast.textContent = text;
     toast.hidden = false;
     toast.classList.add("on");
@@ -73,9 +75,10 @@
     return "Lv " + level() + " · " + rank() + "\n" + (xp % 100) + "% to next · " + need() + " XP left\n" +
       "Earn XP by clicking, shell (Ctrl+`), events,\nchallenges. Relics fill the hotbar below.";
   }
-  function showTip() { tip.textContent = tipText(); tip.hidden = false; }
-  function hideTip() { tip.hidden = true; }
+  function showTip() { if (!tip) return; tip.textContent = tipText(); tip.hidden = false; }
+  function hideTip() { if (tip) tip.hidden = true; }
   function paintSlots() {
+    if (!slots) return;
     slots.forEach(function (s, i) {
       var r = relics[i], q = QUICK[i] || ["", "", null];
       s.textContent = r ? (RELIC[r] || "★") : q[0];
@@ -89,12 +92,12 @@
     xp += n;
     xpDirty = true;
     scheduleSave();
-    paint();
+    if (fill) paint();
     if (level() > before) {
       if (window.CCLTCE_SFX) CCLTCE_SFX.levelUp();
-      burstGold();
-      showToast("★ Level " + level() + "! " + rank());
-      if (gsap && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      if (rail) burstGold();
+      if (toast) showToast("★ Level " + level() + "! " + rank());
+      if (fill && gsap && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
         gsap.fromTo(fill, { filter: "brightness(2)" }, { filter: "brightness(1)", duration: 0.5 });
       }
     }
@@ -104,9 +107,11 @@
     relics.push(name);
     relicsDirty = true;
     scheduleSave();
-    paintSlots();
+    if (slots) paintSlots();
   }
   function mount() {
+    // Skip desktop game HUD on mobile/touch screens (< 900px or touch) — concentrated mobile app shell
+    if (matchMedia("(max-width: 899px), (pointer: coarse)").matches) return;
     rail = document.createElement("div");
     rail.className = "xp-rail";
     rail.setAttribute("role", "progressbar");
