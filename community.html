@@ -36,65 +36,193 @@
       <p>Every account on the site &mdash; browse, message, and team up before the next event drops.</p>
     </section>
 
-    <section class="auth-card comm-root" id="community-root">
-      <div class="dash-tabs comm-tabs" role="tablist" id="comm-tabs">
-        <button class="dash-tab active" role="tab" data-ctab="directory" aria-selected="true">Directory</button>
-        <button class="dash-tab" role="tab" data-ctab="inbox" aria-selected="false">Chats</button>
-        <button class="dash-tab" role="tab" data-ctab="teams" aria-selected="false">Team-ups</button>
-        <button class="dash-tab" role="tab" data-ctab="board" aria-selected="false">Leaderboard</button>
+    <section class="comm-root" id="community-root">
+      <div class="comm-topbar">
+        <div class="comm-brand-badge">
+          <div class="comm-brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.35 5L2 22l5.2-1.31C8.61 21.46 10.25 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.57 0-3.05-.44-4.32-1.2l-.31-.18-3.19.8 1.05-3.09-.2-.33C4.31 14.73 3.8 13.4 3.8 12c0-4.52 3.68-8.2 8.2-8.2 4.52 0 8.2 3.68 8.2 8.2 0 4.52-3.68 8.2-8.2 8.2z"/></svg>
+          </div>
+          <div>
+            <h2 class="comm-brand-title">CCLTCE Community</h2>
+            <p class="comm-brand-sub">WhatsApp &bull; Campus Hub</p>
+          </div>
+        </div>
       </div>
 
-      <section class="comm-panel active" data-cpanel="directory" role="tabpanel">
-        <p class="dash-note">Click anyone to open their full profile. Team up for future events, or jump into an open channel — chats are public, text &amp; links only.</p>
-        <input id="comm-search" class="comm-search" type="search" placeholder="Search name, role, bio…" maxlength="80" />
-        <div id="comm-grid" class="members-grid" aria-live="polite"><p class="dash-empty">Loading members…</p></div>
-      </section>
+      <nav class="comm-tabs" role="tablist" id="comm-tabs" aria-label="Social Sections">
+        <button class="comm-tab active" role="tab" data-ctab="inbox" aria-selected="true">
+          <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+          <span>Chats</span>
+          <span class="comm-tab-badge">3</span>
+        </button>
+        <button class="comm-tab" role="tab" data-ctab="teams" aria-selected="false">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          <span>Updates</span>
+        </button>
+        <button class="comm-tab" role="tab" data-ctab="directory" aria-selected="false">
+          <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          <span>Directory</span>
+        </button>
+        <button class="comm-tab" role="tab" data-ctab="board" aria-selected="false">
+          <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 0 0 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
+          <span>Leaderboard</span>
+        </button>
+      </nav>
 
-      <section class="comm-panel" data-cpanel="inbox" role="tabpanel">
-        <div id="comm-inbox-guard" class="auth-guard" hidden>
-          <p class="auth-guard-title">Log in to chat</p>
-          <p class="auth-guard-sub">Open channels for everyone — text and links only. No DMs, no calls.</p>
-          <div class="auth-actions"><a class="btn btn-primary" href="login.html">Log in</a></div>
-        </div>
-        <div id="comm-inbox" class="inbox" hidden>
-          <div class="inbox-list-wrap">
-            <div class="inbox-head"><h3>Channels</h3></div>
-            <div id="inbox-list" class="inbox-list" aria-live="polite"><p class="dash-empty">Loading channels…</p></div>
-          </div>
-          <div class="inbox-thread-wrap">
-            <div class="inbox-head"><h3 id="thread-title">#general</h3></div>
-            <div id="thread-body" class="thread-body"><p class="dash-empty">Pick a channel.</p></div>
-            <form id="thread-form" class="thread-form" hidden>
-              <input id="thread-input" type="text" maxlength="2000" placeholder="Message — text and links only…" autocomplete="off" />
-              <button class="btn btn-primary" type="submit">Send</button>
+      <!-- ── CHATS PANEL (WhatsApp Web & Mobile View) ── -->
+      <section class="comm-panel active" data-cpanel="inbox" role="tabpanel">
+        <div id="comm-inbox" class="wa-inbox">
+          <!-- Sidebar: WhatsApp Chat List -->
+          <aside class="wa-sidebar" id="wa-sidebar">
+            <div class="wa-side-header">
+              <div class="wa-user-avatar" id="wa-user-avatar-wrap" title="Your Profile">
+                <img id="wa-my-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%231f2937'/%3E%3C/svg%3E" alt="My avatar" />
+                <span class="wa-online-dot"></span>
+              </div>
+              <div class="wa-side-actions">
+                <button type="button" class="wa-icon-btn" id="wa-btn-refresh-chats" title="Refresh">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="wa-search-bar">
+              <div class="wa-search-box">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="wa-search-icon"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                <input type="text" id="wa-channel-search" placeholder="Search or start new chat" autocomplete="off" />
+              </div>
+              <div class="wa-filter-chips">
+                <button class="wa-chip active" data-filter="all">All</button>
+                <button class="wa-chip" data-filter="channels">Channels</button>
+                <button class="wa-chip" data-filter="unread">Unread</button>
+                <button class="wa-chip" data-filter="squads">Squads</button>
+              </div>
+            </div>
+
+            <div id="inbox-list" class="wa-chat-list" aria-live="polite">
+              <p class="dash-empty">Loading channels…</p>
+            </div>
+          </aside>
+
+          <!-- Chat Room / Active Thread -->
+          <main class="wa-thread-pane" id="wa-thread-pane">
+            <div class="wa-thread-header">
+              <button type="button" class="wa-back-btn" id="wa-back-btn" aria-label="Back to chats">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+              </button>
+              <div class="wa-thread-info">
+                <div class="wa-thread-avatar" id="thread-avatar">#</div>
+                <div class="wa-title-wrap">
+                  <h3 id="thread-title">#general</h3>
+                  <span id="thread-status" class="wa-thread-status">🟢 5 online • Everyday club chatter</span>
+                </div>
+              </div>
+              <div class="wa-header-actions">
+                <button type="button" class="wa-icon-btn" id="btn-search-msgs" title="Search in chat">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </button>
+                <button type="button" class="wa-icon-btn" id="btn-channel-info" title="Channel Info & Members">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div id="thread-body" class="wa-thread-body">
+              <div class="wa-date-separator"><span class="wa-date-pill">TODAY</span></div>
+              <p class="dash-empty">Connecting to chat...</p>
+            </div>
+
+            <!-- Emoji Reaction Tray -->
+            <div id="wa-emoji-tray" class="wa-emoji-tray" hidden>
+              <button type="button" class="wa-emoji-btn" data-emo="👍">👍</button>
+              <button type="button" class="wa-emoji-btn" data-emo="❤️">❤️</button>
+              <button type="button" class="wa-emoji-btn" data-emo="🔥">🔥</button>
+              <button type="button" class="wa-emoji-btn" data-emo="🚀">🚀</button>
+              <button type="button" class="wa-emoji-btn" data-emo="😂">😂</button>
+              <button type="button" class="wa-emoji-btn" data-emo="🎉">🎉</button>
+              <button type="button" class="wa-emoji-btn" data-emo="💻">💻</button>
+              <button type="button" class="wa-emoji-btn" data-emo="⚡">⚡</button>
+              <button type="button" class="wa-emoji-btn" data-emo="👾">👾</button>
+              <button type="button" class="wa-emoji-btn" data-emo="💯">💯</button>
+            </div>
+
+            <form id="thread-form" class="wa-input-bar">
+              <button type="button" class="wa-tool-btn" id="wa-toggle-emoji" title="Pick emoji" aria-label="Toggle emoji picker">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+              </button>
+              <input id="thread-input" class="wa-input-field" type="text" maxlength="2000" placeholder="Type a message..." autocomplete="off" />
+              <button class="wa-send-btn" type="submit" id="thread-submit" aria-label="Send message">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
             </form>
+          </main>
+        </div>
+      </section>
+
+      <!-- ── UPDATES & STORIES PANEL (WhatsApp Style) ── -->
+      <section class="comm-panel" data-cpanel="teams" role="tabpanel">
+        <div class="wa-updates-panel">
+          <h3 class="wa-section-heading"><span class="gem">◈</span> STATUS &amp; STORIES</h3>
+          <div class="wa-stories-row" id="wa-stories-row">
+            <!-- Rendered by community.js -->
+          </div>
+
+          <h3 class="wa-section-heading"><span class="gem">◈</span> PRE-EVENT SQUADS</h3>
+          <div id="comm-teams-guard" class="auth-guard" hidden>
+            <p class="auth-guard-title">Log in to team up</p>
+            <p class="auth-guard-sub">Send and accept team-up invites so you&rsquo;re ready when events open.</p>
+            <div class="auth-actions"><a class="btn btn-primary" href="login.html">Log in</a></div>
+          </div>
+          <div id="comm-teams">
+            <div class="comm-subhead"><h4>Invites received</h4></div>
+            <div id="invites-in" class="dash-list" aria-live="polite"><p class="dash-empty">None yet.</p></div>
+            <div class="comm-subhead"><h4>Invites sent</h4></div>
+            <div id="invites-out" class="dash-list" aria-live="polite"><p class="dash-empty">None yet.</p></div>
+            <div class="comm-subhead"><h4>Accepted squads</h4></div>
+            <div id="squads-list" class="dash-list" aria-live="polite"><p class="dash-empty">No accepted team-ups yet.</p></div>
           </div>
         </div>
       </section>
 
-      <section class="comm-panel" data-cpanel="board" role="tabpanel">
-        <p class="dash-note">Earn XP everywhere — chat, team-ups, profiles, feedback. Top of the server wins bragging rights.</p>
-        <div id="board-self" class="board-self" hidden></div>
-        <div id="board-podium" class="board-podium" aria-label="Top three" hidden></div>
-        <div id="board-list" class="board-list" aria-live="polite"><p class="dash-empty">Loading leaderboard…</p></div>
+      <!-- ── DIRECTORY / CONTACTS PANEL ── -->
+      <section class="comm-panel" data-cpanel="directory" role="tabpanel">
+        <div class="wa-dir-panel">
+          <input id="comm-search" class="comm-search" type="search" placeholder="Search members, roles, tech stack…" maxlength="80" />
+          <div id="comm-grid" class="wa-contacts-grid" aria-live="polite"><p class="dash-empty">Loading members…</p></div>
+        </div>
       </section>
 
-      <section class="comm-panel" data-cpanel="teams" role="tabpanel">
-        <div id="comm-teams-guard" class="auth-guard" hidden>
-          <p class="auth-guard-title">Log in to team up</p>
-          <p class="auth-guard-sub">Send and accept team-up invites so you&rsquo;re ready when events open.</p>
-          <div class="auth-actions"><a class="btn btn-primary" href="login.html">Log in</a></div>
-        </div>
-        <div id="comm-teams" hidden>
-          <div class="comm-subhead"><h4>Invites received</h4></div>
-          <div id="invites-in" class="dash-list" aria-live="polite"><p class="dash-empty">None yet.</p></div>
-          <div class="comm-subhead"><h4>Invites sent</h4></div>
-          <div id="invites-out" class="dash-list" aria-live="polite"><p class="dash-empty">None yet.</p></div>
-          <div class="comm-subhead"><h4>Accepted squads</h4></div>
-          <div id="squads-list" class="dash-list" aria-live="polite"><p class="dash-empty">No accepted team-ups yet.</p></div>
+      <!-- ── LEADERBOARD PANEL ── -->
+      <section class="comm-panel" data-cpanel="board" role="tabpanel">
+        <div class="wa-dir-panel">
+          <p class="dash-note">Earn XP everywhere — chats, team-ups, profiles, feedback. Top of the server wins bragging rights.</p>
+          <div id="board-self" class="board-self" hidden></div>
+          <div id="board-podium" class="board-podium" aria-label="Top three" hidden></div>
+          <div id="board-list" class="board-list" aria-live="polite"><p class="dash-empty">Loading leaderboard…</p></div>
         </div>
       </section>
     </section>
+
+    <!-- Story Viewer Modal -->
+    <div id="wa-story-modal" class="wa-story-modal" hidden>
+      <div class="wa-story-box">
+        <div class="wa-story-progress"><div class="wa-story-progress-bar" id="wa-story-bar"></div></div>
+        <div class="wa-story-modal-head">
+          <div class="wa-story-author">
+            <img id="wa-story-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%231f2937'/%3E%3C/svg%3E" alt="" />
+            <div>
+              <span id="wa-story-author-name" class="wa-story-author-name">CCLTCE Admin</span>
+              <span id="wa-story-modal-time" class="wa-story-time">Just now</span>
+            </div>
+          </div>
+          <button type="button" class="wa-story-close-btn" id="wa-story-close">&times;</button>
+        </div>
+        <div class="wa-story-modal-body">
+          <h4 id="wa-story-modal-title" class="wa-story-content-title">DSA Bootcamp Kickoff</h4>
+          <p id="wa-story-modal-desc" class="wa-story-content-desc">Arrays, graphs, DP & weekly rated Codeforces rounds.</p>
+        </div>
+      </div>
+    </div>
   </main>
 
   <footer></footer>
