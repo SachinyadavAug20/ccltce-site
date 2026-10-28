@@ -228,11 +228,178 @@ function wireTabs() {
   });
 }
 
-// ── directory ──
-let memberHay = null; // id -> lowercase search haystack, built once
+// ── directory state ──
+let memberHay = null; // id -> lowercase search haystack
+let currentRoleFilter = "all";
+let currentSearchQuery = "";
 
 function memberById(id) {
   return members.find((x) => x.id === id);
+}
+
+function buildMemberHay(list) {
+  memberHay = new Map();
+  list.forEach((u) => {
+    let linkText = "";
+    if (Array.isArray(u.links)) {
+      linkText = u.links.map((l) => (l.label || "") + " " + (l.url || "")).join(" ");
+    } else if (typeof u.links === "string") {
+      linkText = u.links;
+    }
+    const roleName = ROLE_LABEL[u.role] || u.role || "";
+    const hay = [u.full_name, u.email, u.role, roleName, u.bio, linkText]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    memberHay.set(u.id, hay);
+  });
+}
+
+function updateFilterChipCounts(list) {
+  const setTxt = (id, txt) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+  };
+  const total = list.length;
+  const club = list.filter((x) => x.role === "coding_club_member" || x.role === "president").length;
+  const admin = list.filter((x) => x.role === "admin").length;
+  const student = list.filter((x) => x.role === "student").length;
+
+  setTxt("chip-cnt-all", total);
+  setTxt("chip-cnt-club", club);
+  setTxt("chip-cnt-admin", admin);
+  setTxt("chip-cnt-student", student);
+}
+
+function applyDirectoryFilters() {
+  const grid = $("#comm-grid");
+  const countBadge = $("#comm-search-count");
+  const clearBtn = $("#comm-search-clear");
+  const searchInput = $("#comm-search");
+
+  const q = searchInput ? searchInput.value.trim().toLowerCase() : "";
+  currentSearchQuery = q;
+
+  if (clearBtn) clearBtn.hidden = !q;
+  if (!grid || !memberHay) return;
+
+  let shown = 0;
+  grid.querySelectorAll(".wa-contact-card").forEach((card) => {
+    const u = memberById(card.dataset.id);
+    if (!u) {
+      card.hidden = true;
+      return;
+    }
+    const matchSearch = !q || (memberHay.get(card.dataset.id) || "").includes(q);
+    const matchRole =
+      currentRoleFilter === "all" ||
+      u.role === currentRoleFilter ||
+      (currentRoleFilter === "admin" && u.role === "admin") ||
+      (currentRoleFilter === "coding_club_member" && (u.role === "coding_club_member" || u.role === "president"));
+
+    const isVisible = matchSearch && matchRole;
+    card.hidden = !isVisible;
+    if (isVisible) shown++;
+  });
+
+  if (countBadge) {
+    if (q) {
+      countBadge.textContent = `${shown} ${shown === 1 ? "match" : "matches"}`;
+    } else if (currentRoleFilter !== "all") {
+      countBadge.textContent = `${shown} filtered`;
+    } else {
+      countBadge.textContent = `${shown} members`;
+    }
+  }
+
+  let noneEl = grid.querySelector(".comm-no-match");
+  if (shown === 0) {
+    if (!noneEl) {
+      noneEl = document.createElement("div");
+      noneEl.className = "comm-no-match";
+      grid.appendChild(noneEl);
+    }
+    noneEl.innerHTML = `
+      <div class="comm-no-match-icon">🔍</div>
+      <p class="comm-no-match-title">NO MATCHES FOUND</p>
+      <p class="comm-no-match-sub">No members match your search criteria.</p>
+      <button class="comm-btn-reset-filter" type="button">Reset Search &amp; Filters</button>
+    `;
+    const resetBtn = noneEl.querySelector(".comm-btn-reset-filter");
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => resetFilters());
+    }
+    noneEl.hidden = false;
+  } else if (noneEl) {
+    noneEl.hidden = true;
+  }
+}
+
+function resetFilters() {
+  const searchInput = $("#comm-search");
+  if (searchInput) searchInput.value = "";
+  currentRoleFilter = "all";
+  currentSearchQuery = "";
+
+  $$(".comm-filter-chips .comm-chip").forEach((btn) => {
+    const isAll = btn.dataset.role === "all";
+    btn.classList.toggle("active", isAll);
+    btn.setAttribute("aria-checked", isAll ? "true" : "false");
+  });
+
+  applyDirectoryFilters();
+  if (searchInput) searchInput.focus();
+}
+
+function wireFilterChips() {
+  const chips = $$(".comm-filter-chips .comm-chip");
+  chips.forEach((btn) => {
+    if (btn.dataset.wired) return;
+    btn.dataset.wired = "1";
+    btn.addEventListener("click", () => {
+      chips.forEach((b) => {
+        b.classList.toggle("active", b === btn);
+        b.setAttribute("aria-checked", b === btn ? "true" : "false");
+      });
+      currentRoleFilter = btn.dataset.role || "all";
+      applyDirectoryFilters();
+      if (window.CCLTCE_SFX) window.CCLTCE_SFX.click();
+    });
+  });
+}
+
+function wireSearch() {
+  const search = $("#comm-search");
+  const clearBtn = $("#comm-search-clear");
+
+  if (search && !search.dataset.wired) {
+    search.dataset.wired = "1";
+    let t = 0;
+    search.addEventListener("input", () => {
+      clearTimeout(t);
+      t = setTimeout(() => applyDirectoryFilters(), 100);
+    });
+    search.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        search.value = "";
+        applyDirectoryFilters();
+      }
+    });
+  }
+
+  if (clearBtn && !clearBtn.dataset.wired) {
+    clearBtn.dataset.wired = "1";
+    clearBtn.addEventListener("click", () => {
+      if (search) {
+        search.value = "";
+        search.focus();
+      }
+      applyDirectoryFilters();
+      if (window.CCLTCE_SFX) window.CCLTCE_SFX.click();
+    });
+  }
+
+  wireFilterChips();
 }
 
 async function loadDirectory() {
@@ -240,10 +407,8 @@ async function loadDirectory() {
   if (!grid) return;
   if (!members.length) {
     members = SEED_MEMBERS;
-    memberHay = new Map();
-    members.forEach((u) =>
-      memberHay.set(u.id, [u.full_name, u.email, u.role, u.bio].filter(Boolean).join(" ").toLowerCase())
-    );
+    buildMemberHay(members);
+    updateFilterChipCounts(members);
     renderDirectory(members);
     wireDirectory();
     wireSearch();
@@ -257,11 +422,11 @@ async function loadDirectory() {
         .order("created_at", { ascending: true });
       if (!res.error && res.data && res.data.length) {
         members = res.data;
-        memberHay = new Map();
-        members.forEach((u) =>
-          memberHay.set(u.id, [u.full_name, u.email, u.role, u.bio].filter(Boolean).join(" ").toLowerCase())
-        );
+        buildMemberHay(members);
+        updateFilterChipCounts(members);
         renderDirectory(members);
+        wireDirectory();
+        wireSearch();
       }
     } catch (e) {}
   }
@@ -288,39 +453,6 @@ function wireDirectory() {
     }
     openProfileModal(u, me);
   });
-}
-
-// filter by toggling hidden — no innerHTML rebuild
-function wireSearch() {
-  const search = $("#comm-search");
-  if (!search || search.dataset.wired) return;
-  search.dataset.wired = "1";
-  let t = 0;
-  search.addEventListener("input", () => {
-    clearTimeout(t);
-    t = setTimeout(() => filterDirectory(search.value.trim().toLowerCase()), 120);
-  });
-}
-
-function filterDirectory(q) {
-  const grid = $("#comm-grid");
-  if (!grid || !memberHay) return;
-  let shown = 0;
-  grid.querySelectorAll(".wa-contact-card").forEach((card) => {
-    const ok = !q || (memberHay.get(card.dataset.id) || "").includes(q);
-    card.hidden = !ok;
-    if (ok) shown++;
-  });
-  let none = grid.querySelector(".comm-no-match");
-  if (!shown) {
-    if (!none) {
-      none = document.createElement("p");
-      none.className = "dash-empty comm-no-match";
-      none.textContent = "No matches.";
-      grid.appendChild(none);
-    }
-    none.hidden = false;
-  } else if (none) none.hidden = true;
 }
 
 function renderDirectory(list) {

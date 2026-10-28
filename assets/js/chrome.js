@@ -125,6 +125,19 @@
     document.body.appendChild(m);
   }
 
+  function loadAnalytics() {
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+    var s1 = document.createElement("script");
+    s1.defer = true;
+    s1.src = "/_vercel/insights/script.js";
+    document.head.appendChild(s1);
+    var s2 = document.createElement("script");
+    s2.defer = true;
+    s2.src = "/_vercel/speed-insights/script.js";
+    document.head.appendChild(s2);
+  }
+
   function mount() {
     var head = document.querySelector(".nav-wrap");
     if (head) head.innerHTML = NAV + MOBILE;
@@ -134,6 +147,7 @@
 
     markActive();
     loadAuth();
+    loadAnalytics();
 
     var burger = document.querySelector(".nav-burger");
     var menu = document.getElementById("mobile-menu");
