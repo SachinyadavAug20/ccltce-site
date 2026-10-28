@@ -41,20 +41,63 @@ const $ = (s, r) => (r || document).querySelector(s);
 const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
 let _sessionUser = null;
 
-function showBanner(msg, kind) {
-  let el = $(".auth-banner");
-  if (!el) {
-    el = document.createElement("div");
-    el.className = "auth-banner";
-    el.setAttribute("role", "status");
-    const main = $("main") || document.body;
-    main.prepend(el);
+export function showToast(msg, kind = "info", duration = 4500) {
+  let box = $("#retro-toast-box");
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "retro-toast-box";
+    box.className = "retro-toast-box";
+    box.setAttribute("role", "status");
+    box.setAttribute("aria-live", "polite");
+    document.body.appendChild(box);
   }
-  el.textContent = msg;
-  el.dataset.kind = kind || "info";
-  el.hidden = false;
-  clearTimeout(showBanner._t);
-  showBanner._t = setTimeout(() => { el.hidden = true; }, 6000);
+
+  const item = document.createElement("div");
+  item.className = "retro-toast-item";
+  item.dataset.kind = kind;
+
+  let icon = "ℹ️";
+  if (kind === "ok") icon = "★";
+  else if (kind === "warn") icon = "⚠️";
+  else if (kind === "err") icon = "❌";
+  else if (kind === "chat") icon = "💬";
+
+  const safeMsg = String(msg).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  item.innerHTML = `
+    <span class="toast-icon">${icon}</span>
+    <span class="toast-msg">${safeMsg}</span>
+    <button type="button" class="toast-x" aria-label="Close notification">&times;</button>
+  `;
+
+  const dismiss = () => {
+    if (item.classList.contains("toast-out")) return;
+    item.classList.add("toast-out");
+    setTimeout(() => { item.remove(); }, 220);
+  };
+
+  item.querySelector(".toast-x").addEventListener("click", (e) => {
+    e.stopPropagation();
+    dismiss();
+  });
+
+  if (kind === "chat") {
+    item.style.cursor = "pointer";
+    item.addEventListener("click", () => {
+      location.href = "community.html";
+    });
+  }
+
+  box.appendChild(item);
+
+  if (kind === "ok" && window.CCLTCE_SFX && window.CCLTCE_SFX.pop) {
+    try { window.CCLTCE_SFX.pop(); } catch (e) {}
+  }
+
+  setTimeout(dismiss, duration);
+}
+
+export function showBanner(msg, kind) {
+  showToast(msg, kind);
 }
 
 function errText(e) {

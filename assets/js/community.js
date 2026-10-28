@@ -1,6 +1,6 @@
 // Community — directory, open chat channels (text + links only) and pre-event team-ups.
 // ES module; depends on auth.js (loaded by chrome.js) exports.
-import { supabase, getProfile, openProfileModal, avatarSrc, awardXp, levelOf, rankOf } from "./auth.js";
+import { supabase, getProfile, openProfileModal, avatarSrc, awardXp, levelOf, rankOf, showToast } from "./auth.js";
 
 const $ = (s, r) => (r || document).querySelector(s);
 const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
@@ -22,19 +22,9 @@ function linkify(body) {
 }
 
 function flash(msg, kind) {
-  let el = $(".comm-flash");
-  if (!el) {
-    el = document.createElement("div");
-    el.className = "auth-banner comm-flash";
-    el.setAttribute("role", "status");
-    const main = $("main") || document.body;
-    main.prepend(el);
+  if (typeof showToast === "function") {
+    showToast(msg, kind);
   }
-  el.textContent = msg;
-  el.dataset.kind = kind || "info";
-  el.hidden = false;
-  clearTimeout(flash._t);
-  flash._t = setTimeout(() => { el.hidden = true; }, 5000);
 }
 
 function skelRows(n) {
@@ -189,7 +179,7 @@ function formatTime(isoString) {
   return `${h}:${m} ${ampm}`;
 }
 
-function playWhatsAppChime() {
+function playRetroChatSound() {
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return;
@@ -197,15 +187,14 @@ function playWhatsAppChime() {
     const now = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(880, now);
-    osc.frequency.exponentialRampToValueAtTime(1760, now + 0.07);
-    gain.gain.setValueAtTime(0.001, now);
-    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(659.25, now);
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.06);
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
     osc.connect(gain).connect(ctx.destination);
     osc.start(now);
-    osc.stop(now + 0.18);
+    osc.stop(now + 0.15);
   } catch (e) {}
 }
 
@@ -517,6 +506,15 @@ function setupMobileChatNav() {
     backBtn.dataset.wired = "1";
     backBtn.addEventListener("click", () => {
       inbox.classList.remove("thread-active");
+      if (window.CCLTCE_SFX) window.CCLTCE_SFX.click();
+    });
+  }
+  if (!window._commKeyNavWired) {
+    window._commKeyNavWired = true;
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && inbox && inbox.classList.contains("thread-active") && window.innerWidth < 900) {
+        inbox.classList.remove("thread-active");
+      }
     });
   }
 }
@@ -754,43 +752,27 @@ function chatRowHtml(m) {
   if (keys.length) {
     rxHtml = keys.map((emo) => {
       const cnt = rx[emo];
-      return `<button type="button" class="wa-reaction-chip" data-mid="${esc(m.id)}" data-emo="${esc(emo)}">${esc(emo)} ${cnt}</button>`;
+      return `<button type="button" class="mc-reaction-chip wa-reaction-chip" data-mid="${esc(m.id)}" data-emo="${esc(emo)}">${esc(emo)} ${cnt}</button>`;
     }).join("");
   }
-  rxHtml += `<button type="button" class="wa-add-reaction-btn" data-mid="${esc(m.id)}" title="React with emoji">+</button>`;
-
-  if (isMine) {
-    return (
-      `<div class="wa-msg-row wa-out" data-mid="${esc(m.id)}">` +
-      `<div class="wa-msg-wrapper">` +
-      `<div class="wa-msg-bubble">` +
-      `<div class="wa-msg-text">${linkify(m.body)}</div>` +
-      `<div class="wa-msg-meta">` +
-      `<span>${esc(timeStr)}</span>` +
-      `<span class="wa-ticks" title="Sent to channel">✓✓</span>` +
-      `</div>` +
-      `</div>` +
-      (rxHtml ? `<div class="wa-reactions-bar">${rxHtml}</div>` : "") +
-      `</div></div>`
-    );
-  }
+  rxHtml += `<button type="button" class="mc-add-reaction-btn wa-add-reaction-btn" data-mid="${esc(m.id)}" title="React with emoji">+</button>`;
 
   return (
-    `<div class="wa-msg-row wa-in" data-mid="${esc(m.id)}">` +
-    `<img class="wa-msg-avatar" src="${esc(avatar)}" alt="" width="28" height="28" loading="lazy" decoding="async" />` +
-    `<div class="wa-msg-wrapper">` +
-    `<div class="wa-msg-bubble">` +
-    `<div class="wa-sender-header">` +
-    `<span class="wa-sender-name ${roleCls}">${name}</span>` +
-    `<span class="wa-role-tag">${roleName}</span>` +
+    `<div class="mc-msg-row wa-msg-row ${isMine ? "mc-msg-mine" : ""}" data-mid="${esc(m.id)}">` +
+    `<div class="mc-msg-avatar-col">` +
+    `<img class="mc-msg-avatar wa-msg-avatar" src="${esc(avatar)}" alt="${name}" width="34" height="34" loading="lazy" decoding="async" />` +
     `</div>` +
-    `<div class="wa-msg-text">${linkify(m.body)}</div>` +
-    `<div class="wa-msg-meta">` +
-    `<span>${esc(timeStr)}</span>` +
+    `<div class="mc-msg-content wa-msg-wrapper">` +
+    `<div class="mc-msg-header">` +
+    `<span class="mc-msg-author wa-sender-name ${roleCls}">${name}</span>` +
+    `<span class="mc-role-badge wa-role-tag ${roleCls}">${roleName}</span>` +
+    (isMine ? `<span class="mc-you-badge">YOU</span>` : "") +
+    `<time class="mc-msg-time wa-msg-meta">${esc(timeStr)}</time>` +
     `</div>` +
+    `<div class="mc-msg-text wa-msg-text">${linkify(m.body)}</div>` +
+    (rxHtml ? `<div class="mc-reactions-bar wa-reactions-bar">${rxHtml}</div>` : "") +
     `</div>` +
-    `<div class="wa-reactions-bar">${rxHtml}</div>` +
-    `</div></div>`
+    `</div>`
   );
 }
 
@@ -1000,7 +982,7 @@ function wireThreadForm() {
     if (body.length > 2000) body = body.slice(0, 2000);
 
     input.value = "";
-    playWhatsAppChime();
+    playRetroChatSound();
 
     const submitBtn = $("#thread-submit");
     if (submitBtn) submitBtn.disabled = true;
