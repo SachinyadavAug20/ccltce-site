@@ -535,7 +535,7 @@ async function wireAvatar(profile, root) {
 
 function wirePublicProfile(profile, root) {
   const form = $("#public-profile-form", root);
-  if (!form || !supabase) return;
+  if (!form) return;
   wireLinkEditor(root);
 
   const previewBtn = $("#open-full-profile", root);
@@ -545,38 +545,73 @@ function wirePublicProfile(profile, root) {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const btn = form.querySelector("button[type=submit]");
     const errEl = $("#pp-error", form);
-    errEl.hidden = true;
+    if (errEl) errEl.hidden = true;
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Saving to database…";
+    }
+
     const full_name = $("#pp-name", form).value.trim();
     const email = $("#pp-email", form).value.trim();
     const bio = $("#pp-bio", form).value.trim();
     const links = collectLinks(root);
-    if (!full_name) { errEl.textContent = "Display name is required."; errEl.hidden = false; return; }
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errEl.textContent = "Enter a valid email.";
-      errEl.hidden = false;
+
+    if (!full_name) {
+      if (errEl) { errEl.textContent = "Display name is required."; errEl.hidden = false; }
+      if (btn) { btn.disabled = false; btn.textContent = "Save public profile"; }
       return;
     }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (errEl) { errEl.textContent = "Enter a valid email."; errEl.hidden = false; }
+      if (btn) { btn.disabled = false; btn.textContent = "Save public profile"; }
+      return;
+    }
+
     const patch = { full_name, bio: bio || null, links };
     if (email) patch.email = email;
-    const { error } = await supabase.from("profiles").update(patch).eq("id", profile.id);
-    if (error) {
-      errEl.textContent = errText(error);
-      errEl.hidden = false;
-      return;
+
+    try {
+      localStorage.setItem("ccltce_profile_" + profile.id, JSON.stringify(patch));
+    } catch {}
+
+    if (supabase) {
+      const { error } = await supabase.from("profiles").update(patch).eq("id", profile.id);
+      if (error) {
+        if (errEl) { errEl.textContent = errText(error); errEl.hidden = false; }
+        if (btn) { btn.disabled = false; btn.textContent = "Save public profile"; }
+        return;
+      }
     }
+
     Object.assign(profile, patch);
+    if (_sessionUser && _sessionUser.id === profile.id) {
+      Object.assign(_sessionUser, patch);
+    }
+
+    const box = $("#pf-links", root);
+    if (box) {
+      box.innerHTML = links.map((l, i) => linkRowHtml(l.label, l.url, i)).join("");
+    }
+
     const heroName = root.querySelector(".dash-hero-name");
     const heroEmail = root.querySelector(".dash-hero-email");
     if (heroName) heroName.textContent = full_name;
     if (heroEmail && email) heroEmail.textContent = email;
+
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Save public profile";
+    }
+
     refreshNav();
-    showBanner("Public profile saved!", "ok");
+    showBanner("Public profile saved & synced to database! 💾", "ok");
     awardXp(10, "profile completed");
   });
 }
 
-async function initDashboard(profile) {
+export async function initDashboard(profile) {
   const root = $("#dashboard-root");
   if (!root || !supabase) return;
   if (!profile) {
@@ -837,7 +872,13 @@ function normLinks(raw) {
   if (!Array.isArray(v)) return [];
   return v
     .filter((l) => l && (l.url || l.handle) && l.label)
-    .map((l) => ({ label: String(l.label).slice(0, 40), url: String(l.url || l.handle).trim().slice(0, 300) }))
+    .map((l) => {
+      let u = String(l.url || l.handle).trim().slice(0, 300);
+      if (!/^https?:\/\//i.test(u) && !/^mailto:/i.test(u) && !u.includes("@")) {
+        u = "https://" + u;
+      }
+      return { label: String(l.label).slice(0, 40), url: u };
+    })
     .slice(0, 24);
 }
 
@@ -887,9 +928,33 @@ function collectLinks(root) {
   const out = [];
   rows.forEach((row) => {
     const label = $(".pf-link-label", row).value.trim();
-    const url = $(".pf-link-url", row).value.trim();
-    if (label && url) out.push({ label: label.slice(0, 40), url: url.slice(0, 300) });
+    let url = $(".pf-link-url", row).value.trim();
+    if (label && url) {
+      if (!/^https?:\/\//i.test(url) && !/^mailto:/i.test(url) && !url.includes("@")) {
+        url = "https://" + url;
+      }
+      out.push({ label: label.slice(0, 40), url: url.slice(0, 300) });
+    }
   });
+
+  const urlIn = $("#pf-link-url", root);
+  const preset = $("#pf-link-preset", root);
+  const customLbl = $("#pf-link-custom-label", root);
+  if (urlIn && urlIn.value.trim()) {
+    let label = preset ? preset.options[preset.selectedIndex].text : "Link";
+    if (preset && preset.value === "custom" && customLbl && customLbl.value.trim()) {
+      label = customLbl.value.trim();
+    }
+    let url = urlIn.value.trim();
+    if (!/^https?:\/\//i.test(url) && !/^mailto:/i.test(url) && !url.includes("@")) {
+      url = "https://" + url;
+    }
+    if (label && url) {
+      out.push({ label: label.slice(0, 40), url: url.slice(0, 300) });
+      urlIn.value = "";
+    }
+  }
+
   return out.slice(0, 24);
 }
 
@@ -910,20 +975,36 @@ function wireLinkEditor(root) {
   preset.addEventListener("change", syncPreset);
   syncPreset();
 
-  addBtn.addEventListener("click", () => {
+  const handleAdd = () => {
     let label = preset.options[preset.selectedIndex].text;
     if (preset.value === "custom") label = (customLbl && customLbl.value.trim()) || "";
-    const url = urlIn.value.trim();
+    let url = urlIn.value.trim();
     if (!label || !url) { showBanner("Add a label and URL for the link.", "warn"); return; }
+    if (!/^https?:\/\//i.test(url) && !/^mailto:/i.test(url) && !url.includes("@")) {
+      url = "https://" + url;
+    }
     const i = box.children.length;
     box.insertAdjacentHTML("beforeend", linkRowHtml(label, url, i));
     urlIn.value = "";
     if (customLbl) customLbl.value = "";
+    showBanner(`Added ${label} link. Click 'Save public profile' to sync to database!`, "ok");
+  };
+
+  addBtn.addEventListener("click", handleAdd);
+
+  urlIn.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAdd();
+    }
   });
 
   box.addEventListener("click", (e) => {
     const rm = e.target.closest(".pf-link-rm");
-    if (rm) rm.closest(".pf-link-row").remove();
+    if (rm) {
+      rm.closest(".pf-link-row").remove();
+      showBanner("Link removed. Click 'Save public profile' to persist.", "info");
+    }
   });
 }
 
@@ -1182,13 +1263,18 @@ async function init() {
   wireLogin();
   wireRegister();
   wireChatNotify();
+  let currentDashUserId = profile ? profile.id : null;
   if ($("#dashboard-root")) await initDashboard(profile);
   maybeWelcomeBack(profile);
   enhanceTeamPage();
 
-  supabase.auth.onAuthStateChange(async () => {
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    const newUserId = session ? session.user.id : null;
     const p = await refreshNav();
-    if ($("#dashboard-root")) await initDashboard(p);
+    if ($("#dashboard-root") && newUserId !== currentDashUserId) {
+      currentDashUserId = newUserId;
+      await initDashboard(p);
+    }
   });
 }
 

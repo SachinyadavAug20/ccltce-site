@@ -52,12 +52,7 @@
       <nav class="comm-tabs" role="tablist" id="comm-tabs" aria-label="Social Sections">
         <button class="comm-tab active" role="tab" data-ctab="inbox" aria-selected="true">
           <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
-          <span>Chats</span>
-          <span class="comm-tab-badge">3</span>
-        </button>
-        <button class="comm-tab" role="tab" data-ctab="teams" aria-selected="false">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-          <span>Updates</span>
+          <span>Channels</span>
         </button>
         <button class="comm-tab" role="tab" data-ctab="directory" aria-selected="false">
           <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
@@ -69,10 +64,10 @@
         </button>
       </nav>
 
-      <!-- ── CHATS PANEL (WhatsApp Web & Mobile View) ── -->
+      <!-- ── CHATS PANEL (Discord-style Text Channels) ── -->
       <section class="comm-panel active" data-cpanel="inbox" role="tabpanel">
         <div id="comm-inbox" class="wa-inbox">
-          <!-- Sidebar: WhatsApp Chat List -->
+          <!-- Sidebar: Channels List -->
           <aside class="wa-sidebar" id="wa-sidebar">
             <div class="wa-side-header">
               <div class="wa-user-avatar" id="wa-user-avatar-wrap" title="Your Profile">
@@ -89,13 +84,12 @@
             <div class="wa-search-bar">
               <div class="wa-search-box">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="wa-search-icon"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                <input type="text" id="wa-channel-search" placeholder="Search or start new chat" autocomplete="off" />
+                <input type="text" id="wa-channel-search" placeholder="Search channels..." autocomplete="off" />
               </div>
               <div class="wa-filter-chips">
                 <button class="wa-chip active" data-filter="all">All</button>
                 <button class="wa-chip" data-filter="channels">Channels</button>
                 <button class="wa-chip" data-filter="unread">Unread</button>
-                <button class="wa-chip" data-filter="squads">Squads</button>
               </div>
             </div>
 
@@ -107,11 +101,9 @@
                 <div class="wa-item-body">
                   <div class="wa-item-row-top">
                     <span class="wa-item-name">#general</span>
-                    <span class="wa-item-time">10:41 AM</span>
                   </div>
                   <div class="wa-item-row-bot">
-                    <span class="wa-item-preview">Nitesh: All project submissions due at 11:59 PM!</span>
-                    <span class="wa-item-unread-badge">3</span>
+                    <span class="wa-item-preview">Everyday club chatter — say hi!</span>
                   </div>
                 </div>
               </button>
@@ -122,11 +114,9 @@
                 <div class="wa-item-body">
                   <div class="wa-item-row-top">
                     <span class="wa-item-name">#events</span>
-                    <span class="wa-item-time">09:15 AM</span>
                   </div>
                   <div class="wa-item-row-bot">
-                    <span class="wa-item-preview">Rashi: Looking for 1 backend dev for Squad Bravo!</span>
-                    <span class="wa-item-unread-badge">1</span>
+                    <span class="wa-item-preview">Aakash: hopefully</span>
                   </div>
                 </div>
               </button>
@@ -137,10 +127,9 @@
                 <div class="wa-item-body">
                   <div class="wa-item-row-top">
                     <span class="wa-item-name">#help</span>
-                    <span class="wa-item-time">Yesterday</span>
                   </div>
                   <div class="wa-item-row-bot">
-                    <span class="wa-item-preview">Nitesh: Ensure authenticated role has INSERT permissions.</span>
+                    <span class="wa-item-preview">Stuck on code, homework or setup?</span>
                   </div>
                 </div>
               </button>
@@ -151,10 +140,9 @@
                 <div class="wa-item-body">
                   <div class="wa-item-row-top">
                     <span class="wa-item-name">#showcase</span>
-                    <span class="wa-item-time">2 days ago</span>
                   </div>
                   <div class="wa-item-row-bot">
-                    <span class="wa-item-preview">Aakash: Shipped our 3D voxel terrain engine!</span>
+                    <span class="wa-item-preview">Aakash: See my github...</span>
                   </div>
                 </div>
               </button>
@@ -165,24 +153,9 @@
                 <div class="wa-item-body">
                   <div class="wa-item-row-top">
                     <span class="wa-item-name">#random</span>
-                    <span class="wa-item-time">Yesterday</span>
                   </div>
                   <div class="wa-item-row-bot">
-                    <span class="wa-item-preview">Sachin: Vim vs VS Code debate starts in 10 minutes...</span>
-                  </div>
-                </div>
-              </button>
-              <button class="wa-chat-item" type="button" data-ch="squad-alpha">
-                <div class="wa-item-avatar">
-                  <span class="wa-chan-icon gen">⚡</span>
-                </div>
-                <div class="wa-item-body">
-                  <div class="wa-item-row-top">
-                    <span class="wa-item-name">#Hackathon Alpha (Squad)</span>
-                    <span class="wa-item-time">08:30 AM</span>
-                  </div>
-                  <div class="wa-item-row-bot">
-                    <span class="wa-item-preview">Sachin: Team Alpha repo is setup at github.com/ccltce.</span>
+                    <span class="wa-item-preview">Off-topic, memes, music, life</span>
                   </div>
                 </div>
               </button>
@@ -192,7 +165,7 @@
           <!-- Chat Room / Active Thread -->
           <main class="wa-thread-pane" id="wa-thread-pane">
             <div class="wa-thread-header">
-              <button type="button" class="wa-back-btn" id="wa-back-btn" aria-label="Back to chats">
+              <button type="button" class="wa-back-btn" id="wa-back-btn" aria-label="Back to channels">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
               </button>
               <div class="wa-thread-info">
@@ -203,90 +176,20 @@
                 </div>
               </div>
               <div class="wa-header-actions">
-                <button type="button" class="wa-icon-btn" id="btn-search-msgs" title="Search in chat">
+                <button type="button" class="wa-icon-btn" id="btn-search-msgs" title="Search in channel">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                 </button>
-                <button type="button" class="wa-icon-btn" id="btn-channel-info" title="Channel Info & Members">
+                <button type="button" class="wa-icon-btn" id="btn-channel-info" title="Channel Info">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                 </button>
               </div>
             </div>
 
             <div id="thread-body" class="wa-thread-body">
-              <div class="wa-date-separator"><span class="wa-date-pill">TODAY</span></div>
-
-              <div class="wa-msg-row wa-in" data-mid="msg-g1">
-                <img class="wa-msg-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23111827'/%3E%3Crect x='3' y='3' width='10' height='10' fill='%23f9c8a0'/%3E%3Crect x='3' y='2' width='10' height='3' fill='%233d2314'/%3E%3Crect x='4' y='6' width='2' height='2' fill='%23f59e0b'/%3E%3Crect x='10' y='6' width='2' height='2' fill='%23f59e0b'/%3E%3Crect x='6' y='10' width='4' height='1' fill='%237a5240'/%3E%3C/svg%3E" alt="" width="30" height="30" />
-                <div class="wa-msg-wrapper">
-                  <div class="wa-msg-bubble">
-                    <div class="wa-sender-header">
-                      <span class="wa-sender-name role-president">Sachin Yadav</span>
-                      <span class="wa-role-tag">President</span>
-                    </div>
-                    <div class="wa-msg-text">Hey everyone! Welcome to CCLTCE Cyber Hub 🚀 Check out the new directory to team up for the next hackathon.</div>
-                    <div class="wa-msg-meta"><span>07:41 AM</span></div>
-                  </div>
-                  <div class="wa-reactions-bar">
-                    <button type="button" class="wa-reaction-chip" data-mid="msg-g1" data-emo="🔥">🔥 6</button>
-                    <button type="button" class="wa-reaction-chip" data-mid="msg-g1" data-emo="🚀">🚀 4</button>
-                    <button type="button" class="wa-add-reaction-btn" data-mid="msg-g1" title="React with emoji">+</button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="wa-msg-row wa-in" data-mid="msg-g2">
-                <img class="wa-msg-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23111827'/%3E%3Crect x='3' y='3' width='10' height='10' fill='%23e8b48a'/%3E%3Crect x='3' y='2' width='10' height='3' fill='%231a1a1a'/%3E%3Crect x='4' y='6' width='2' height='2' fill='%233b82f6'/%3E%3Crect x='10' y='6' width='2' height='2' fill='%233b82f6'/%3E%3Crect x='6' y='10' width='4' height='1' fill='%237a5240'/%3E%3C/svg%3E" alt="" width="30" height="30" />
-                <div class="wa-msg-wrapper">
-                  <div class="wa-msg-bubble">
-                    <div class="wa-sender-header">
-                      <span class="wa-sender-name role-member">Aakash Sharma</span>
-                      <span class="wa-role-tag">Club Member</span>
-                    </div>
-                    <div class="wa-msg-text">Loving the clean new layout! Anyone free for a quick code review on our WebSocket client later today?</div>
-                    <div class="wa-msg-meta"><span>08:41 AM</span></div>
-                  </div>
-                  <div class="wa-reactions-bar">
-                    <button type="button" class="wa-reaction-chip" data-mid="msg-g2" data-emo="👍">👍 5</button>
-                    <button type="button" class="wa-add-reaction-btn" data-mid="msg-g2" title="React with emoji">+</button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="wa-msg-row wa-in" data-mid="msg-g3">
-                <img class="wa-msg-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23111827'/%3E%3Crect x='3' y='3' width='10' height='10' fill='%23f9c8a0'/%3E%3Crect x='3' y='2' width='10' height='4' fill='%238b4513'/%3E%3Crect x='4' y='6' width='2' height='2' fill='%23ec4899'/%3E%3Crect x='10' y='6' width='2' height='2' fill='%23ec4899'/%3E%3Crect x='6' y='10' width='4' height='1' fill='%237a5240'/%3E%3C/svg%3E" alt="" width="30" height="30" />
-                <div class="wa-msg-wrapper">
-                  <div class="wa-msg-bubble">
-                    <div class="wa-sender-header">
-                      <span class="wa-sender-name role-member">Rashi Gupta</span>
-                      <span class="wa-role-tag">Club Member</span>
-                    </div>
-                    <div class="wa-msg-text">Count me in @Aakash! Also friendly reminder to RSVP in the Events tab before registrations fill up 🎯</div>
-                    <div class="wa-msg-meta"><span>09:41 AM</span></div>
-                  </div>
-                  <div class="wa-reactions-bar">
-                    <button type="button" class="wa-reaction-chip" data-mid="msg-g3" data-emo="❤️">❤️ 3</button>
-                    <button type="button" class="wa-add-reaction-btn" data-mid="msg-g3" title="React with emoji">+</button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="wa-msg-row wa-in" data-mid="msg-g4">
-                <img class="wa-msg-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23111827'/%3E%3Crect x='3' y='3' width='10' height='10' fill='%23d49a6c'/%3E%3Crect x='3' y='2' width='10' height='3' fill='%234a3728'/%3E%3Crect x='4' y='6' width='2' height='2' fill='%238b5cf6'/%3E%3Crect x='10' y='6' width='2' height='2' fill='%238b5cf6'/%3E%3Crect x='6' y='10' width='4' height='1' fill='%237a5240'/%3E%3C/svg%3E" alt="" width="30" height="30" />
-                <div class="wa-msg-wrapper">
-                  <div class="wa-msg-bubble">
-                    <div class="wa-sender-header">
-                      <span class="wa-sender-name role-admin">Nitesh Kumar</span>
-                      <span class="wa-role-tag">Admin</span>
-                    </div>
-                    <div class="wa-msg-text">All project submissions for the sprint are due at 11:59 PM. Ping in #help if you hit any git snags!</div>
-                    <div class="wa-msg-meta"><span>10:41 AM</span></div>
-                  </div>
-                  <div class="wa-reactions-bar">
-                    <button type="button" class="wa-reaction-chip" data-mid="msg-g4" data-emo="💻">💻 4</button>
-                    <button type="button" class="wa-reaction-chip" data-mid="msg-g4" data-emo="⚡">⚡ 2</button>
-                    <button type="button" class="wa-add-reaction-btn" data-mid="msg-g4" title="React with emoji">+</button>
-                  </div>
-                </div>
+              <div class="channel-start-banner" id="channel-start-banner">
+                <div class="channel-start-hash">#</div>
+                <h2 class="channel-start-title" id="channel-banner-title">Welcome to #general!</h2>
+                <p class="channel-start-desc" id="channel-banner-desc">This is the start of the #general channel. Everyday club chatter &mdash; say hi, share wins, ask anything.</p>
               </div>
             </div>
 
@@ -308,37 +211,12 @@
               <button type="button" class="wa-tool-btn" id="wa-toggle-emoji" title="Pick emoji" aria-label="Toggle emoji picker">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
               </button>
-              <input id="thread-input" class="wa-input-field" type="text" maxlength="2000" placeholder="Type a message..." autocomplete="off" />
+              <input id="thread-input" class="wa-input-field" type="text" maxlength="2000" placeholder="Message #general..." autocomplete="off" />
               <button class="wa-send-btn" type="submit" id="thread-submit" aria-label="Send message">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
               </button>
             </form>
           </main>
-        </div>
-      </section>
-
-      <!-- ── UPDATES & STORIES PANEL (WhatsApp Style) ── -->
-      <section class="comm-panel" data-cpanel="teams" role="tabpanel">
-        <div class="wa-updates-panel">
-          <h3 class="wa-section-heading"><span class="gem">◈</span> STATUS &amp; STORIES</h3>
-          <div class="wa-stories-row" id="wa-stories-row">
-            <!-- Rendered by community.js -->
-          </div>
-
-          <h3 class="wa-section-heading"><span class="gem">◈</span> PRE-EVENT SQUADS</h3>
-          <div id="comm-teams-guard" class="auth-guard" hidden>
-            <p class="auth-guard-title">Log in to team up</p>
-            <p class="auth-guard-sub">Send and accept team-up invites so you&rsquo;re ready when events open.</p>
-            <div class="auth-actions"><a class="btn btn-primary" href="login.html">Log in</a></div>
-          </div>
-          <div id="comm-teams">
-            <div class="comm-subhead"><h4>Invites received</h4></div>
-            <div id="invites-in" class="dash-list" aria-live="polite"><p class="dash-empty">None yet.</p></div>
-            <div class="comm-subhead"><h4>Invites sent</h4></div>
-            <div id="invites-out" class="dash-list" aria-live="polite"><p class="dash-empty">None yet.</p></div>
-            <div class="comm-subhead"><h4>Accepted squads</h4></div>
-            <div id="squads-list" class="dash-list" aria-live="polite"><p class="dash-empty">No accepted team-ups yet.</p></div>
-          </div>
         </div>
       </section>
 
@@ -360,27 +238,6 @@
         </div>
       </section>
     </section>
-
-    <!-- Story Viewer Modal -->
-    <div id="wa-story-modal" class="wa-story-modal" hidden>
-      <div class="wa-story-box">
-        <div class="wa-story-progress"><div class="wa-story-progress-bar" id="wa-story-bar"></div></div>
-        <div class="wa-story-modal-head">
-          <div class="wa-story-author">
-            <img id="wa-story-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%231f2937'/%3E%3C/svg%3E" alt="" />
-            <div>
-              <span id="wa-story-author-name" class="wa-story-author-name">CCLTCE Admin</span>
-              <span id="wa-story-modal-time" class="wa-story-time">Just now</span>
-            </div>
-          </div>
-          <button type="button" class="wa-story-close-btn" id="wa-story-close">&times;</button>
-        </div>
-        <div class="wa-story-modal-body">
-          <h4 id="wa-story-modal-title" class="wa-story-content-title">DSA Bootcamp Kickoff</h4>
-          <p id="wa-story-modal-desc" class="wa-story-content-desc">Arrays, graphs, DP & weekly rated Codeforces rounds.</p>
-        </div>
-      </div>
-    </div>
   </main>
 
   <footer></footer>

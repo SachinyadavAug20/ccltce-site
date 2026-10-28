@@ -101,248 +101,64 @@ const SEED_MEMBERS = [
   }
 ];
 
-const SEED_CHANNELS = [
+const DEFAULT_CHANNELS = [
   {
-    id: "general",
+    id: "3063e856-7821-4731-91f0-3a120620559e",
     slug: "general",
     name: "general",
     purpose: "Everyday club chatter, announcements & banter",
     icon: "gen",
-    unread: 3,
+    unread: 0,
     online: 8,
-    isSquad: false,
     lastTime: "10:41 AM",
-    lastMsg: "Nitesh: All project submissions due at 11:59 PM!"
+    lastMsg: "Everyday club chatter — say hi!"
   },
   {
-    id: "events",
+    id: "ef1a065c-d552-4bff-a7bb-72ad0f31a745",
     slug: "events",
     name: "events",
     purpose: "Hackathons, workshops, dates & deadlines",
     icon: "ev",
-    unread: 1,
-    online: 6,
-    isSquad: false,
+    unread: 0,
+    online: 5,
     lastTime: "09:15 AM",
-    lastMsg: "Rashi: Looking for 1 backend dev for Squad Bravo!"
+    lastMsg: "Aakash: hopefully"
   },
   {
-    id: "help",
+    id: "9f02cb47-928c-4305-8537-ad27da8359d1",
     slug: "help",
     name: "help",
     purpose: "Debug code, DSA roadblocks & project blockers",
     icon: "help",
     unread: 0,
     online: 4,
-    isSquad: false,
     lastTime: "Yesterday",
-    lastMsg: "Nitesh: Ensure authenticated role has INSERT permissions."
+    lastMsg: "Stuck on code, homework or setup?"
   },
   {
-    id: "showcase",
+    id: "f550da64-61e5-4186-be25-5d299ac57f91",
     slug: "showcase",
     name: "showcase",
     purpose: "Show off what you built this weekend",
     icon: "show",
     unread: 0,
     online: 5,
-    isSquad: false,
     lastTime: "2 days ago",
-    lastMsg: "Aakash: Shipped our 3D voxel terrain engine!"
+    lastMsg: "Aakash: See my github..."
   },
   {
-    id: "random",
+    id: "f347a1da-6d6a-48f2-9c39-3dae22eee6c3",
     slug: "random",
     name: "random",
     purpose: "Memes, battle stations & tech hot takes",
     icon: "rand",
     unread: 0,
     online: 7,
-    isSquad: false,
     lastTime: "Yesterday",
-    lastMsg: "Sachin: Vim vs VS Code debate starts in 10 minutes..."
-  },
-  {
-    id: "squad-alpha",
-    slug: "squad-alpha",
-    name: "Hackathon Alpha (Squad)",
-    purpose: "Private squad channel for National Web3 Jam",
-    icon: "gen",
-    unread: 0,
-    online: 4,
-    isSquad: true,
-    lastTime: "08:30 AM",
-    lastMsg: "Sachin: Team Alpha repo is setup at github.com/ccltce."
+    lastMsg: "Off-topic, memes, music, life"
   }
 ];
 
-const SEED_MESSAGES = {
-  general: [
-    {
-      id: "msg-g1",
-      user_id: "seed-sachin",
-      author_name: "Sachin Yadav",
-      author_role: "president",
-      body: "Hey everyone! Welcome to CCLTCE WhatsApp Hub 🚀 Check out the new directory to team up for the next hackathon.",
-      created_at: new Date(Date.now() - 3600000 * 3).toISOString(),
-      reactions: { "🔥": 6, "🚀": 4 },
-      isMine: false
-    },
-    {
-      id: "msg-g2",
-      user_id: "seed-aakash",
-      author_name: "Aakash Sharma",
-      author_role: "coding_club_member",
-      body: "Loving the clean new layout! Anyone free for a quick code review on our WebSocket client later today?",
-      created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
-      reactions: { "👍": 5 },
-      isMine: false
-    },
-    {
-      id: "msg-g3",
-      user_id: "seed-rashi",
-      author_name: "Rashi Gupta",
-      author_role: "coding_club_member",
-      body: "Count me in @Aakash! Also friendly reminder to RSVP in the Events tab before registrations fill up 🎯",
-      created_at: new Date(Date.now() - 3600000 * 1).toISOString(),
-      reactions: { "❤️": 3 },
-      isMine: false
-    },
-    {
-      id: "msg-g4",
-      user_id: "seed-nitesh",
-      author_name: "Nitesh Kumar",
-      author_role: "admin",
-      body: "All project submissions for the sprint are due at 11:59 PM. Ping in #help if you hit any git snags!",
-      created_at: new Date(Date.now() - 60000 * 18).toISOString(),
-      reactions: { "💻": 4, "⚡": 2 },
-      isMine: false
-    }
-  ],
-  events: [
-    {
-      id: "msg-e1",
-      user_id: "seed-sachin",
-      author_name: "Sachin Yadav",
-      author_role: "president",
-      body: "Registration is now live for the State Hackathon! Form link is available on the events page 🏆",
-      created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
-      reactions: { "🔥": 7 },
-      isMine: false
-    },
-    {
-      id: "msg-e2",
-      user_id: "seed-rashi",
-      author_name: "Rashi Gupta",
-      author_role: "coding_club_member",
-      body: "We have 4 teams already formed in the pre-event squads. Looking for 1 backend dev for Squad Bravo!",
-      created_at: new Date(Date.now() - 3600000 * 1.5).toISOString(),
-      reactions: { "⚡": 3 },
-      isMine: false
-    }
-  ],
-  help: [
-    {
-      id: "msg-h1",
-      user_id: "seed-rohan",
-      author_name: "Rohan Patel",
-      author_role: "student",
-      body: "Can someone help with Supabase RLS policies? Getting a 403 when inserting into messages table.",
-      created_at: new Date(Date.now() - 3600000 * 12).toISOString(),
-      reactions: {},
-      isMine: false
-    },
-    {
-      id: "msg-h2",
-      user_id: "seed-nitesh",
-      author_name: "Nitesh Kumar",
-      author_role: "admin",
-      body: "Check `supabase/migration-community.sql` — ensure your authenticated role has INSERT permissions enabled on `public.messages`!",
-      created_at: new Date(Date.now() - 3600000 * 10).toISOString(),
-      reactions: { "💯": 4 },
-      isMine: false
-    }
-  ],
-  showcase: [
-    {
-      id: "msg-s1",
-      user_id: "seed-aakash",
-      author_name: "Aakash Sharma",
-      author_role: "coding_club_member",
-      body: "Just shipped our 3D voxel terrain engine with canvas2d! Runs at 60fps even on mobile browsers 🎉 Check out the interactive demo.",
-      created_at: new Date(Date.now() - 3600000 * 48).toISOString(),
-      reactions: { "🔥": 8, "🚀": 6 },
-      isMine: false
-    }
-  ],
-  random: [
-    {
-      id: "msg-r1",
-      user_id: "seed-sachin",
-      author_name: "Sachin Yadav",
-      author_role: "president",
-      body: "Vim vs VS Code debate starts in 10 minutes... grab your coffee ☕",
-      created_at: new Date(Date.now() - 3600000 * 20).toISOString(),
-      reactions: { "😂": 6, "👾": 4 },
-      isMine: false
-    }
-  ],
-  "squad-alpha": [
-    {
-      id: "msg-sq1",
-      user_id: "seed-sachin",
-      author_name: "Sachin Yadav",
-      author_role: "president",
-      body: "Team Alpha repo is setup at github.com/ccltce. Let's do a sync call at 6 PM!",
-      created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
-      reactions: { "👍": 2 },
-      isMine: false
-    }
-  ]
-};
-
-const STORIES = [
-  {
-    id: "s1",
-    title: "DSA Bootcamp",
-    sub: "Kickoff tomorrow",
-    author: "Aakash Sharma",
-    role: "DSA Lead",
-    time: "2h ago",
-    avatar: avatarSrc({ id: "seed-aakash", role: "coding_club_member" }, 80),
-    content: "Arrays, sliding windows, DP, and weekly rated Codeforces contest preparation starts this Saturday at 10 AM. Join us in Room 402!"
-  },
-  {
-    id: "s2",
-    title: "AI Build Jam",
-    sub: "Agent pipelines",
-    author: "Nitesh Kumar",
-    role: "AI Mentor",
-    time: "4h ago",
-    avatar: avatarSrc({ id: "seed-nitesh", role: "admin" }, 80),
-    content: "Building autonomous agents and RAG pipelines using open models. Bring your laptop and your wildest project ideas to the hack lab."
-  },
-  {
-    id: "s3",
-    title: "Git Masterclass",
-    sub: "Interactive slides",
-    author: "Sachin Yadav",
-    role: "President",
-    time: "7h ago",
-    avatar: avatarSrc({ id: "seed-sachin", role: "president" }, 80),
-    content: "Interactive Git and GitHub masterclass slides have been uploaded. Rebase, merge conflicts, and branching strategies simplified for everyone."
-  },
-  {
-    id: "s4",
-    title: "Regional Squads",
-    sub: "Team up live",
-    author: "Rashi Gupta",
-    role: "Events Lead",
-    time: "11h ago",
-    avatar: avatarSrc({ id: "seed-rashi", role: "coding_club_member" }, 80),
-    content: "Over 40 students have teamed up! Check the pre-event squads section or the Directory tab to find your hackathon co-founders."
-  }
-];
 
 let me = null;
 let members = [];
@@ -353,7 +169,6 @@ let chanSub = null;
 let chanSeen = {}; // slug -> ISO ts of last read
 let lastMsgAt = null; // newest rendered message ts (incremental polling)
 const msgIds = new Set(); // rendered message ids — dedupe realtime vs own send
-let storyTimer = null;
 
 function loadSeen() {
   try { chanSeen = JSON.parse(localStorage.getItem("ccltce_chat_seen") || "{}"); } catch { chanSeen = {}; }
@@ -407,7 +222,6 @@ function wireTabs() {
       $$(".comm-panel").forEach((p) => p.classList.toggle("active", p.dataset.cpanel === id));
       history.replaceState(null, "", "#" + id);
       if (id === "inbox") loadChannelsPanel();
-      if (id === "teams") { loadStories(); if (me) loadTeamUps(); }
       if (id === "directory") loadDirectory();
       if (id === "board") loadBoard();
     });
@@ -466,17 +280,6 @@ function wireDirectory() {
     const act = e.target.closest("[data-act]");
     if (act) {
       e.stopPropagation();
-      if (act.dataset.act === "chat") {
-        switchTab("inbox");
-        const input = $("#thread-input");
-        if (input) {
-          input.value = `@${act.dataset.name || u.full_name || "member"} `;
-          input.focus();
-        }
-        const inbox = $("#comm-inbox");
-        if (inbox) inbox.classList.add("thread-active");
-        return;
-      }
       if (act.dataset.act === "view") return openProfileModal(u, me);
       if (act.dataset.act === "teamup") {
         if (!me) { flash("Log in to send team-up invites.", "warn"); return void (location.href = "login.html"); }
@@ -545,9 +348,8 @@ function renderDirectory(list) {
         '</div>' +
         (u.bio ? '<p class="wa-contact-bio">' + esc(u.bio) + '</p>' : '<p class="wa-contact-bio" style="color:var(--wa-text-sub);font-style:italic">Active campus developer</p>') +
         '<div class="wa-contact-actions">' +
-        '<button class="wa-contact-btn primary" type="button" data-act="chat" data-name="' + name + '">💬 Message</button>' +
+        '<button class="wa-contact-btn primary" type="button" data-act="view">👤 Profile</button>' +
         (isSelf ? "" : '<button class="wa-contact-btn" type="button" data-act="teamup">⚔️ Team Up</button>') +
-        '<button class="wa-contact-btn" type="button" data-act="view">👤 Profile</button>' +
         '</div>' +
         '</div>'
       );
@@ -646,7 +448,7 @@ function updateSidebarPreview(chSlug, text) {
 async function loadChannelsPanel() {
   setupUserAvatar();
   if (!channels.length) {
-    channels = SEED_CHANNELS;
+    channels = DEFAULT_CHANNELS;
     renderChannelList([]);
     if (!activeChannel && channels.length) {
       await openChannel(channels[0]);
@@ -661,7 +463,7 @@ async function loadChannelsPanel() {
     try {
       const [chansRes, recentRes] = await Promise.all([
         supabase.from("channels").select("*").order("created_at"),
-        supabase.from("messages").select("channel_id,created_at").order("created_at", { ascending: false }).limit(300),
+        supabase.from("messages").select("channel_id,created_at,body").order("created_at", { ascending: false }).limit(300),
       ]);
       if (!chansRes.error && chansRes.data && chansRes.data.length) {
         channels = chansRes.data;
@@ -675,11 +477,16 @@ function renderChannelList(recent) {
   const list = $("#inbox-list");
   if (!list) return;
   const unread = {};
+  const lastMessages = {};
   (recent || []).forEach((m) => {
     const c = channels.find((x) => x.id === m.channel_id);
     if (!c) return;
-    const seenAt = chanSeen[c.slug || c.id];
-    if (!seenAt || m.created_at > seenAt) unread[c.slug || c.id] = (unread[c.slug || c.id] || 0) + 1;
+    const chKey = c.slug || c.id;
+    if (!lastMessages[chKey]) {
+      lastMessages[chKey] = m.body;
+    }
+    const seenAt = chanSeen[chKey];
+    if (!seenAt || m.created_at > seenAt) unread[chKey] = (unread[chKey] || 0) + 1;
   });
 
   list.innerHTML = channels
@@ -688,9 +495,9 @@ function renderChannelList(recent) {
       const chKey = c.slug || c.id;
       const n = unread[chKey] != null ? unread[chKey] : (c.unread || 0);
       const iconCls = c.icon || "gen";
-      const iconChar = c.isSquad ? "⚡" : "#";
-      const timeStr = c.lastTime || "10:40 AM";
-      const previewText = c.lastMsg || c.purpose || "Tap to open chat";
+      const iconChar = "#";
+      const timeStr = c.lastTime || "";
+      const previewText = lastMessages[chKey] || c.lastMsg || c.purpose || "Tap to open chat";
       return (
         `<button class="wa-chat-item${isActive ? " active" : ""}" type="button" data-ch="${esc(chKey)}">` +
         `<div class="wa-item-avatar">` +
@@ -699,7 +506,7 @@ function renderChannelList(recent) {
         `<div class="wa-item-body">` +
         `<div class="wa-item-row-top">` +
         `<span class="wa-item-name">#${esc(c.name)}</span>` +
-        `<span class="wa-item-time">${esc(timeStr)}</span>` +
+        (timeStr ? `<span class="wa-item-time">${esc(timeStr)}</span>` : "") +
         `</div>` +
         `<div class="wa-item-row-bot">` +
         `<span class="wa-item-preview">${esc(previewText)}</span>` +
@@ -730,16 +537,18 @@ async function openChannel(c, isUserClick = false) {
   const status = $("#thread-status");
   const form = $("#thread-form");
   const inbox = $("#comm-inbox");
+  const input = $("#thread-input");
 
   if (title) title.textContent = "#" + c.name;
   if (avatar) {
-    avatar.textContent = c.isSquad ? "⚡" : "#";
+    avatar.textContent = "#";
     avatar.className = `wa-thread-avatar wa-chan-icon ${c.icon || "gen"}`;
   }
   const onlineCount = c.online || 5;
   if (status) {
     status.textContent = `🟢 ${onlineCount} online • ${c.purpose || "Everyday club chatter"}`;
   }
+  if (input) input.placeholder = `Message #${c.name}...`;
   if (form) form.hidden = false;
 
   // On mobile (< 900px): slide to thread if explicitly tapped by user; on desktop keep side-by-side
@@ -753,11 +562,8 @@ async function openChannel(c, isUserClick = false) {
   }
 
   const body = $("#thread-body");
-  const seedMsgs = SEED_MESSAGES[chKey];
-  if (seedMsgs && seedMsgs.length) {
-    renderThread(seedMsgs);
-  } else if (body) {
-    body.innerHTML = skelRows(4);
+  if (body) {
+    body.innerHTML = skelRows(3);
   }
 
   // Update active chat styling in sidebar
@@ -776,35 +582,38 @@ async function openChannel(c, isUserClick = false) {
 
 async function loadMessages() {
   if (!activeChannel) return;
-  let msgs = null;
+  const body = $("#thread-body");
+  if (!body) return;
+
+  let msgs = [];
   if (supabase) {
     try {
       const { data, error } = await supabase
         .from("messages")
-        .select("*")
+        .select("id, channel_id, user_id, body, created_at, profiles(id, full_name, email, role, avatar_url, pixel_art)")
         .eq("channel_id", activeChannel.id)
         .order("created_at", { ascending: true })
         .limit(200);
-      if (!error && data && data.length) {
+      if (!error && data) {
         msgs = data;
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error("loadMessages error:", e);
+    }
   }
-  if (!msgs || !msgs.length) {
-    msgs = SEED_MESSAGES[activeChannel.slug || activeChannel.id] || [];
-  }
+
   renderThread(msgs);
 }
 
 function chatRowHtml(m) {
   const isMine = me ? m.user_id === me.id : Boolean(m.isMine);
-  const u = members.find((x) => x.id === m.user_id);
-  const name = esc(m.author_name || (u ? (u.full_name || u.email) : "Member"));
-  const role = m.author_role || (u ? u.role : "student");
+  const p = m.profiles || members.find((x) => x.id === m.user_id) || {};
+  const name = esc(p.full_name || (isMine && me ? (me.full_name || me.email) : (m.author_name || "Member")));
+  const role = p.role || (isMine && me ? (me.role || "student") : (m.author_role || "student"));
   const roleCls = role === "president" ? "role-president" : role === "admin" ? "role-admin" : role === "coding_club_member" ? "role-member" : "role-student";
   const roleName = role === "president" ? "President" : role === "admin" ? "Admin" : role === "coding_club_member" ? "Club Member" : "Student";
   const timeStr = formatTime(m.created_at);
-  const avatar = avatarSrc(u || { id: m.user_id, role }, 32);
+  const avatar = avatarSrc(p.id ? p : { id: m.user_id, role, pixel_art: p.pixel_art, avatar_url: p.avatar_url }, 32);
 
   // reactions
   const rx = m.reactions || {};
@@ -826,10 +635,10 @@ function chatRowHtml(m) {
       `<div class="wa-msg-text">${linkify(m.body)}</div>` +
       `<div class="wa-msg-meta">` +
       `<span>${esc(timeStr)}</span>` +
-      `<span class="wa-ticks" title="Delivered and read">✓✓</span>` +
+      `<span class="wa-ticks" title="Sent to channel">✓✓</span>` +
       `</div>` +
       `</div>` +
-      `<div class="wa-reactions-bar">${rxHtml}</div>` +
+      (rxHtml ? `<div class="wa-reactions-bar">${rxHtml}</div>` : "") +
       `</div></div>`
     );
   }
@@ -859,14 +668,22 @@ function renderThread(msgs) {
   msgIds.clear();
   lastMsgAt = null;
 
-  let html = '<div class="wa-date-separator"><span class="wa-date-pill">TODAY</span></div>';
-  if (!msgs.length) {
-    html += '<p class="dash-empty">No messages yet — break the ice with the club!</p>';
-    body.innerHTML = html;
+  const chName = activeChannel ? activeChannel.name : "general";
+  const chPurpose = activeChannel && activeChannel.purpose ? activeChannel.purpose : "Everyday club chatter, announcements & banter";
+  const headerHtml = `
+    <div class="channel-start-banner" id="channel-start-banner">
+      <div class="channel-start-hash">#</div>
+      <h2 class="channel-start-title">Welcome to #${esc(chName)}!</h2>
+      <p class="channel-start-desc">This is the start of the #${esc(chName)} channel. ${esc(chPurpose)}.</p>
+    </div>
+  `;
+
+  if (!msgs || !msgs.length) {
+    body.innerHTML = headerHtml + '<p class="dash-empty" style="text-align:center;padding:1.5rem 0;color:var(--wa-text-sub)">No messages in this channel yet. Send the first message to kick off the conversation!</p>';
     return;
   }
-  html += msgs.map(chatRowHtml).join("");
-  body.innerHTML = html;
+
+  body.innerHTML = headerHtml + msgs.map(chatRowHtml).join("");
   msgs.forEach((m) => msgIds.add(m.id));
   lastMsgAt = msgs[msgs.length - 1].created_at || null;
   body.scrollTop = body.scrollHeight;
@@ -893,10 +710,27 @@ function subscribeChannel() {
     .on(
       "postgres_changes",
       { event: "INSERT", schema: "public", table: "messages", filter: "channel_id=eq." + chId },
-      (payload) => {
+      async (payload) => {
         if (!activeChannel || activeChannel.id !== chId) return;
         markSeen(activeChannel.slug || activeChannel.id);
-        appendMsg(payload.new);
+        const m = payload.new;
+        if (!m.profiles) {
+          const found = members.find((x) => x.id === m.user_id);
+          if (found) {
+            m.profiles = found;
+          } else {
+            try {
+              const { data: p } = await supabase
+                .from("profiles")
+                .select("id, full_name, email, role, avatar_url, pixel_art")
+                .eq("id", m.user_id)
+                .single();
+              if (p) m.profiles = p;
+            } catch (e) {}
+          }
+        }
+        appendMsg(m);
+        updateSidebarPreview(activeChannel.slug || activeChannel.id, m.body);
       }
     )
     .subscribe();
@@ -1024,120 +858,52 @@ function wireThreadForm() {
     let body = input.value.trim();
     if (!body) return;
 
+    if (!me) {
+      flash(`Log in to send messages in #${activeChannel.name}`, "warn");
+      setTimeout(() => { location.href = "login.html"; }, 800);
+      return;
+    }
+
     body = body.replace(/[\u0000-\u0008\u000B-\u001F]/g, "");
     if (body.length > 2000) body = body.slice(0, 2000);
 
     input.value = "";
     playWhatsAppChime();
 
-    const newMsg = {
-      id: "msg-" + Date.now(),
-      channel_id: activeChannel.id,
-      user_id: me ? me.id : "guest-user",
-      author_name: me ? (me.full_name || me.email) : "You",
-      author_role: me ? (me.role || "student") : "student",
-      body,
-      created_at: new Date().toISOString(),
-      reactions: {},
-      isMine: true
-    };
+    const submitBtn = $("#thread-submit");
+    if (submitBtn) submitBtn.disabled = true;
 
-    appendMsg(newMsg);
-    updateSidebarPreview(activeChannel.slug || activeChannel.id, body);
+    if (supabase) {
+      try {
+        const { data: row, error } = await supabase
+          .from("messages")
+          .insert({
+            channel_id: activeChannel.id,
+            user_id: me.id,
+            body,
+          })
+          .select("id, channel_id, user_id, body, created_at, profiles(id, full_name, email, role, avatar_url, pixel_art)")
+          .single();
 
-    if (me && supabase) {
-      const { data: row, error } = await supabase
-        .from("messages")
-        .insert({
-          channel_id: activeChannel.id,
-          user_id: me.id,
-          body,
-        })
-        .select()
-        .single();
-      if (!error && row) {
-        msgIds.add(row.id);
-        awardXp(5, "chat message");
+        if (error) {
+          flash("Message failed to send: " + (error.message || "database error"), "warn");
+          input.value = body;
+          return;
+        }
+
+        if (row) {
+          appendMsg(row);
+          updateSidebarPreview(activeChannel.slug || activeChannel.id, body);
+          awardXp(5, "chat message");
+        }
+      } catch (err) {
+        flash("Failed to send message: " + (err.message || "Network error"), "warn");
+        input.value = body;
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
       }
     }
   });
-}
-
-// ── WhatsApp Status Stories (Updates Tab) ──
-function loadStories() {
-  const row = $("#wa-stories-row");
-  if (!row) return;
-  row.innerHTML = STORIES.map((s) => {
-    return (
-      `<button type="button" class="wa-story-item" data-story-id="${esc(s.id)}" aria-label="${esc(s.title)} story">` +
-      `<div class="wa-story-ring">` +
-      `<img src="${esc(s.avatar)}" alt="${esc(s.title)}" width="58" height="58" loading="lazy" decoding="async" />` +
-      `</div>` +
-      `<span class="wa-story-title">${esc(s.title)}</span>` +
-      `<span class="wa-story-time">${esc(s.time)}</span>` +
-      `</button>`
-    );
-  }).join("");
-
-  row.querySelectorAll(".wa-story-item").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const s = STORIES.find((x) => x.id === btn.dataset.storyId);
-      if (s) openStoryModal(s);
-    });
-  });
-
-  const closeBtn = $("#wa-story-close");
-  const modal = $("#wa-story-modal");
-  if (closeBtn && !closeBtn.dataset.wired) {
-    closeBtn.dataset.wired = "1";
-    closeBtn.addEventListener("click", closeStoryModal);
-  }
-  if (modal && !modal.dataset.wired) {
-    modal.dataset.wired = "1";
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) closeStoryModal();
-    });
-  }
-}
-
-function openStoryModal(s) {
-  const modal = $("#wa-story-modal");
-  if (!modal) return;
-  const avatar = $("#wa-story-avatar");
-  const author = $("#wa-story-author-name");
-  const time = $("#wa-story-modal-time");
-  const title = $("#wa-story-modal-title");
-  const desc = $("#wa-story-modal-desc");
-  const bar = $("#wa-story-bar");
-
-  if (avatar) avatar.src = s.avatar;
-  if (author) author.textContent = `${s.author} (${s.role})`;
-  if (time) time.textContent = s.time;
-  if (title) title.textContent = s.title;
-  if (desc) desc.textContent = s.content;
-  if (bar) bar.style.width = "0%";
-
-  modal.hidden = false;
-
-  const ring = $(`[data-story-id="${s.id}"] .wa-story-ring`);
-  if (ring) ring.classList.add("seen");
-
-  clearInterval(storyTimer);
-  let pct = 0;
-  storyTimer = setInterval(() => {
-    pct += 2;
-    if (bar) bar.style.width = pct + "%";
-    if (pct >= 100) {
-      clearInterval(storyTimer);
-      closeStoryModal();
-    }
-  }, 100);
-}
-
-function closeStoryModal() {
-  const modal = $("#wa-story-modal");
-  if (modal) modal.hidden = true;
-  clearInterval(storyTimer);
 }
 
 // ── leaderboard ──
@@ -1430,34 +1196,33 @@ async function openInviteModal(toUser) {
       return;
     }
     close();
-    flash("Team-up invite sent to " + (toUser.full_name || "member") + "!", "ok");
+    flash("Team-up invite sent to " + (toUser.full_name || "member") + "! Check your dashboard to view squads.", "ok");
     awardXp(5, "team-up invite sent");
-    switchTab("teams");
-    loadTeamUps();
   });
 }
 
 // poll the open channel lightly when visible (realtime is primary) — incremental only
 setInterval(async () => {
-  if (!me || document.hidden || !activeChannel) return;
+  if (document.hidden || !activeChannel || !supabase) return;
   const inbox = $('[data-cpanel="inbox"]');
   if (!inbox || !inbox.classList.contains("active")) return;
   if (!lastMsgAt) return loadMessages();
-  const { data } = await supabase
-    .from("messages")
-    .select("*")
-    .eq("channel_id", activeChannel.id)
-    .gt("created_at", lastMsgAt)
-    .order("created_at", { ascending: true })
-    .limit(50);
-  (data || []).forEach(appendMsg);
+  try {
+    const { data } = await supabase
+      .from("messages")
+      .select("id, channel_id, user_id, body, created_at, profiles(id, full_name, email, role, avatar_url, pixel_art)")
+      .eq("channel_id", activeChannel.id)
+      .gt("created_at", lastMsgAt)
+      .order("created_at", { ascending: true })
+      .limit(50);
+    (data || []).forEach(appendMsg);
+  } catch (e) {}
 }, 10000);
 
 async function init() {
   loadSeen();
   wireTabs();
   wireThreadForm();
-  loadStories();
 
   if (supabase) {
     try {
@@ -1474,8 +1239,7 @@ async function init() {
   await loadDirectory();
 
   const hash = (location.hash || "").replace("#", "");
-  if (hash === "teams") switchTab("teams");
-  else if (hash === "board") switchTab("board");
+  if (hash === "board") switchTab("board");
   else if (hash === "directory") switchTab("directory");
   else {
     switchTab("inbox");
