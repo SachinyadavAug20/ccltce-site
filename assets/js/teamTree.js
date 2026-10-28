@@ -24,23 +24,23 @@
 
   var CONNECTIONS = [
     // Tier 0 -> Tier 1 (Presidents -> Vice President)
-    { from: "Aakash Gupta", to: "Vivek Tiwari" },
-    { from: "Nitesh Yadav", to: "Vivek Tiwari" },
+    { from: "Aakash Gupta", to: "Vivek Tiwari", grad: "grad-pres" },
+    { from: "Nitesh Yadav", to: "Vivek Tiwari", grad: "grad-pres" },
 
     // Tier 1 -> Tier 2 (Vice President -> Core Officers)
-    { from: "Vivek Tiwari", to: "Sachin Yadav" },
-    { from: "Vivek Tiwari", to: "Ayush Vishwakarma" },
-    { from: "Vivek Tiwari", to: "Shashank Suryawanshi" },
+    { from: "Vivek Tiwari", to: "Sachin Yadav", grad: "grad-vp" },
+    { from: "Vivek Tiwari", to: "Ayush Vishwakarma", grad: "grad-vp" },
+    { from: "Vivek Tiwari", to: "Shashank Suryawanshi", grad: "grad-vp" },
 
     // Tier 2 -> Tier 3 (Core Officers -> Domain Leads)
-    { from: "Sachin Yadav", to: "Rashi Kasotiya" },
-    { from: "Sachin Yadav", to: "Samiksha Patil" },
-    { from: "Ayush Vishwakarma", to: "Samiksha Patil" },
-    { from: "Ayush Vishwakarma", to: "Sanjana Jagtap" },
-    { from: "Ayush Vishwakarma", to: "Adarsh Mishra" },
-    { from: "Ayush Vishwakarma", to: "Rushi Jadhav" },
-    { from: "Shashank Suryawanshi", to: "Adarsh Mishra" },
-    { from: "Shashank Suryawanshi", to: "Rushi Jadhav" }
+    { from: "Sachin Yadav", to: "Rashi Kasotiya", grad: "grad-core" },
+    { from: "Sachin Yadav", to: "Samiksha Patil", grad: "grad-core" },
+    { from: "Ayush Vishwakarma", to: "Samiksha Patil", grad: "grad-core" },
+    { from: "Ayush Vishwakarma", to: "Sanjana Jagtap", grad: "grad-core" },
+    { from: "Ayush Vishwakarma", to: "Adarsh Mishra", grad: "grad-core" },
+    { from: "Ayush Vishwakarma", to: "Rushi Jadhav", grad: "grad-core" },
+    { from: "Shashank Suryawanshi", to: "Adarsh Mishra", grad: "grad-core" },
+    { from: "Shashank Suryawanshi", to: "Rushi Jadhav", grad: "grad-core" }
   ];
 
   var PROGRESS_MAP = {
@@ -58,10 +58,15 @@
   };
 
   var container, canvas, svg, teamData = [];
+  var currentScale = 1.0;
+  var isAutoFitted = false;
 
   function init() {
     container = document.getElementById("team-tree");
     if (!container) return;
+
+    wireViewSwitchers();
+    wireCanvasTools();
 
     document.body.classList.remove("team-mode-grid");
     document.body.classList.add("team-mode-tree");
@@ -85,6 +90,131 @@
     }
   }
 
+  function wireViewSwitchers() {
+    var btnTree = document.getElementById("btn-mode-tree");
+    var btnGrid = document.getElementById("btn-mode-grid");
+    var canvasTools = document.getElementById("team-canvas-tools");
+    var hint = document.getElementById("team-ctrl-hint");
+
+    if (btnTree) {
+      btnTree.addEventListener("click", function () {
+        btnTree.classList.add("active");
+        btnTree.setAttribute("aria-selected", "true");
+        if (btnGrid) {
+          btnGrid.classList.remove("active");
+          btnGrid.setAttribute("aria-selected", "false");
+        }
+        document.body.classList.remove("team-mode-grid");
+        document.body.classList.add("team-mode-tree");
+        if (canvasTools) canvasTools.style.display = "";
+        if (hint) hint.innerHTML = 'Tap any member to inspect bio &amp; stats • Drag canvas to pan';
+        requestAnimationFrame(function () {
+          if (window.innerWidth < 900) applyFit(false);
+          else { centerTree(); updateLines(); }
+        });
+      });
+    }
+
+    if (btnGrid) {
+      btnGrid.addEventListener("click", function () {
+        btnGrid.classList.add("active");
+        btnGrid.setAttribute("aria-selected", "true");
+        if (btnTree) {
+          btnTree.classList.remove("active");
+          btnTree.setAttribute("aria-selected", "false");
+        }
+        document.body.classList.add("team-mode-grid");
+        document.body.classList.remove("team-mode-tree");
+        if (canvasTools) canvasTools.style.display = "none";
+        if (hint) hint.innerHTML = 'Showing all 11 core team members &amp; domain leads';
+      });
+    }
+  }
+
+  function wireCanvasTools() {
+    var btnFit = document.getElementById("btn-tree-fit");
+    var btnZoomIn = document.getElementById("btn-tree-zoom-in");
+    var btnZoomOut = document.getElementById("btn-tree-zoom-out");
+    var btnReset = document.getElementById("btn-tree-reset");
+
+    if (btnFit) {
+      btnFit.addEventListener("click", function () {
+        applyFit(true);
+      });
+    }
+    if (btnZoomIn) {
+      btnZoomIn.addEventListener("click", function () {
+        zoomBy(0.15);
+      });
+    }
+    if (btnZoomOut) {
+      btnZoomOut.addEventListener("click", function () {
+        zoomBy(-0.15);
+      });
+    }
+    if (btnReset) {
+      btnReset.addEventListener("click", function () {
+        resetZoom(true);
+      });
+    }
+  }
+
+  function applyFit(smooth) {
+    if (!container || !canvas) return;
+    var availW = container.clientWidth - 16;
+    var naturalW = canvas.scrollWidth || 1200;
+    if (availW <= 0 || naturalW <= 0) return;
+
+    var targetScale = Math.min(1.0, Math.max(0.2, availW / naturalW));
+    setScale(targetScale, smooth);
+    isAutoFitted = true;
+    container.scrollLeft = 0;
+  }
+
+  function zoomBy(delta) {
+    var target = Math.min(1.5, Math.max(0.2, currentScale + delta));
+    isAutoFitted = false;
+    setScale(target, true);
+  }
+
+  function resetZoom(smooth) {
+    isAutoFitted = false;
+    setScale(1.0, smooth);
+    centerTree();
+  }
+
+  function setScale(scale, smooth) {
+    if (!canvas || !container) return;
+    currentScale = scale;
+    if (smooth) {
+      canvas.style.transition = "transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2)";
+    } else {
+      canvas.style.transition = "none";
+    }
+
+    var naturalW = canvas.scrollWidth || 1200;
+    var naturalH = canvas.scrollHeight || 800;
+
+    canvas.style.transformOrigin = "0 0";
+    var scaledW = naturalW * currentScale;
+    var offsetX = 0;
+    if (scaledW < container.clientWidth) {
+      offsetX = Math.max(0, Math.round((container.clientWidth - scaledW) / 2));
+    }
+    canvas.style.transform = "translate(" + offsetX + "px, 0px) scale(" + currentScale.toFixed(4) + ")";
+
+    // Adjust container height to avoid awkward empty space beneath scaled canvas
+    if (currentScale < 1.0) {
+      container.style.height = Math.round(naturalH * currentScale + 28) + "px";
+      container.style.overflowX = (scaledW > container.clientWidth) ? "auto" : "hidden";
+    } else {
+      container.style.height = "";
+      container.style.overflowX = "auto";
+    }
+
+    requestAnimationFrame(updateLines);
+  }
+
   function buildTree(list) {
     if (!container || !list || !list.length) return;
     teamData = list;
@@ -93,8 +223,25 @@
 
     var html = '<div class="tree-canvas">';
     html += '<svg class="tree-svg" aria-hidden="true">';
+    
+    // SVG Gradients & Filters
+    html += '<defs>';
+    html += '<linearGradient id="grad-pres" x1="0%" y1="0%" x2="0%" y2="100%">';
+    html += '<stop offset="0%" stop-color="#facc15" /><stop offset="100%" stop-color="#17dd62" />';
+    html += '</linearGradient>';
+    html += '<linearGradient id="grad-vp" x1="0%" y1="0%" x2="0%" y2="100%">';
+    html += '<stop offset="0%" stop-color="#17dd62" /><stop offset="100%" stop-color="#06b6d4" />';
+    html += '</linearGradient>';
+    html += '<linearGradient id="grad-core" x1="0%" y1="0%" x2="0%" y2="100%">';
+    html += '<stop offset="0%" stop-color="#06b6d4" /><stop offset="100%" stop-color="#c084fc" />';
+    html += '</linearGradient>';
+    html += '<filter id="tree-glow" x="-20%" y="-20%" width="140%" height="140%">';
+    html += '<feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#17dd62" flood-opacity="0.8"/>';
+    html += '</filter>';
+    html += '</defs>';
+
     CONNECTIONS.forEach(function (c, idx) {
-      html += '<path class="tree-edge" data-from="' + escapeAttr(c.from) + '" data-to="' + escapeAttr(c.to) + '" data-index="' + idx + '"></path>';
+      html += '<path class="tree-edge ' + c.grad + '" data-from="' + escapeAttr(c.from) + '" data-to="' + escapeAttr(c.to) + '" data-index="' + idx + '" stroke="url(#' + c.grad + ')"></path>';
     });
     html += '</svg>';
 
@@ -111,7 +258,7 @@
         var roleLabel = cleanRole(m.role);
 
         html += '<article class="tree-node" tabindex="0" role="button" aria-haspopup="dialog"';
-        html += ' style="--accent: ' + accent + '; --accent-glow: ' + hexToRgba(accent, 0.4) + ';"';
+        html += ' style="--accent: ' + accent + '; --accent-glow: ' + hexToRgba(accent, 0.45) + ';"';
         html += ' data-name="' + escapeAttr(m.name) + '"';
         html += ' data-role="' + escapeAttr(m.role) + '"';
         html += ' data-area="' + escapeAttr(m.area) + '"';
@@ -148,22 +295,22 @@
     setupPan();
 
     requestAnimationFrame(function () {
-      centerTree();
-      updateLines();
+      if (window.innerWidth < 900) {
+        applyFit(false);
+      } else {
+        centerTree();
+        updateLines();
+      }
     });
 
-    // Resize observer
-    if (window.ResizeObserver) {
-      var ro = new ResizeObserver(function () {
-        requestAnimationFrame(updateLines);
-      });
-      ro.observe(canvas);
-      ro.observe(container);
-    } else {
-      window.addEventListener("resize", function () {
-        requestAnimationFrame(updateLines);
-      });
-    }
+    // Resize handling
+    window.addEventListener("resize", function () {
+      if (window.innerWidth < 900 || isAutoFitted) {
+        applyFit(false);
+      } else {
+        updateLines();
+      }
+    });
   }
 
   function centerTree() {
@@ -175,13 +322,15 @@
 
   function updateLines() {
     if (!svg || !canvas) return;
-    var canvasRect = canvas.getBoundingClientRect();
-    var cW = canvas.scrollWidth;
-    var cH = canvas.scrollHeight;
+    var cW = canvas.offsetWidth || 1200;
+    var cH = canvas.offsetHeight || 800;
 
     svg.setAttribute("viewBox", "0 0 " + cW + " " + cH);
     svg.style.width = cW + "px";
     svg.style.height = cH + "px";
+
+    var canvasRect = canvas.getBoundingClientRect();
+    var s = canvasRect.width / cW || 1;
 
     CONNECTIONS.forEach(function (c, idx) {
       var pEl = canvas.querySelector('.tree-node[data-name="' + c.from + '"]');
@@ -192,16 +341,17 @@
       var pr = pEl.getBoundingClientRect();
       var chr = chEl.getBoundingClientRect();
 
-      var x1 = pr.left + pr.width / 2 - canvasRect.left;
-      var y1 = pr.bottom - canvasRect.top;
-      var x2 = chr.left + chr.width / 2 - canvasRect.left;
-      var y2 = chr.top - canvasRect.top;
+      // Transform viewport boundingClientRect back to unscaled canvas coordinate space
+      var x1 = (pr.left + pr.width / 2 - canvasRect.left) / s;
+      var y1 = (pr.bottom - canvasRect.top) / s;
+      var x2 = (chr.left + chr.width / 2 - canvasRect.left) / s;
+      var y2 = (chr.top - canvasRect.top) / s;
       var dy = Math.max(20, y2 - y1);
 
       // Smooth S-curve (Cubic Bezier)
       var d = "M " + x1.toFixed(1) + " " + y1.toFixed(1) +
-              " C " + x1.toFixed(1) + " " + (y1 + dy * 0.5).toFixed(1) +
-              ", " + x2.toFixed(1) + " " + (y2 - dy * 0.5).toFixed(1) +
+              " C " + x1.toFixed(1) + " " + (y1 + dy * 0.52).toFixed(1) +
+              ", " + x2.toFixed(1) + " " + (y2 - dy * 0.52).toFixed(1) +
               ", " + x2.toFixed(1) + " " + y2.toFixed(1);
       path.setAttribute("d", d);
     });
@@ -228,6 +378,18 @@
       node.addEventListener("blur", function () {
         clearGraphHighlight();
       });
+
+      // Mobile touch tap highlight
+      node.addEventListener("click", function () {
+        highlightGraph(name, accent);
+      });
+    });
+
+    // Tap background canvas to clear highlight
+    canvas.addEventListener("click", function (e) {
+      if (!e.target.closest(".tree-node")) {
+        clearGraphHighlight();
+      }
     });
   }
 
@@ -240,7 +402,7 @@
         e.classList.add("edge-highlight");
         e.classList.remove("edge-dim");
         e.style.setProperty("--edge-color", accent);
-        e.style.setProperty("--edge-glow", hexToRgba(accent, 0.7));
+        e.style.setProperty("--edge-glow", hexToRgba(accent, 0.8));
       } else {
         e.classList.remove("edge-highlight");
         e.classList.add("edge-dim");
@@ -276,19 +438,22 @@
 
   function setupPan() {
     var isDown = false, startX, scrollLeft;
-    container.addEventListener("mousedown", function (e) {
-      if (e.target.closest(".tree-node") || e.target.closest("button")) return;
+
+    container.addEventListener("pointerdown", function (e) {
+      if (e.target.closest(".tree-node") || e.target.closest("button") || e.target.closest("a")) return;
       isDown = true;
       startX = e.pageX - container.offsetLeft;
       scrollLeft = container.scrollLeft;
     });
-    window.addEventListener("mouseup", function () { isDown = false; });
-    container.addEventListener("mousemove", function (e) {
+
+    window.addEventListener("pointerup", function () { isDown = false; });
+    window.addEventListener("pointercancel", function () { isDown = false; });
+
+    container.addEventListener("pointermove", function (e) {
       if (!isDown) return;
-      e.preventDefault();
       var x = e.pageX - container.offsetLeft;
-      var walk = (x - startX) * 1.4;
-      container.scrollLeft = scrollLeft - walk;
+      var walkX = (x - startX) * 1.3;
+      container.scrollLeft = scrollLeft - walkX;
     });
   }
 

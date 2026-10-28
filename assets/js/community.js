@@ -51,7 +51,7 @@ const SEED_MEMBERS = [
     email: "sachin@ccltce.in",
     role: "president",
     bio: "CCLTCE President & Full-stack engineer. Building campus dev culture & organizing hackathons.",
-    avatar_url: "assets/img/avatar.png",
+    avatar_url: null,
     xp: 1420
   },
   {
@@ -60,7 +60,7 @@ const SEED_MEMBERS = [
     email: "nitesh@ccltce.in",
     role: "admin",
     bio: "Systems & DevOps admin. Docker, Linux kernels, cloud infra & distributed systems.",
-    avatar_url: "assets/img/avatar.png",
+    avatar_url: null,
     xp: 1180
   },
   {
@@ -69,7 +69,7 @@ const SEED_MEMBERS = [
     email: "aakash@ccltce.in",
     role: "coding_club_member",
     bio: "Algorithms lead & competitive programmer. Rust, C++ & WebAssembly explorer.",
-    avatar_url: "assets/img/avatar.png",
+    avatar_url: null,
     xp: 940
   },
   {
@@ -78,7 +78,7 @@ const SEED_MEMBERS = [
     email: "rashi@ccltce.in",
     role: "coding_club_member",
     bio: "Frontend dev & UI/UX designer. Pixel art, CSS animations & design systems.",
-    avatar_url: "assets/img/avatar.png",
+    avatar_url: null,
     xp: 760
   },
   {
@@ -87,7 +87,7 @@ const SEED_MEMBERS = [
     email: "rohan@student.ltce.in",
     role: "student",
     bio: "2nd year CS student exploring Web3, smart contracts, TypeScript & React.",
-    avatar_url: "assets/img/avatar.png",
+    avatar_url: null,
     xp: 410
   },
   {
@@ -96,7 +96,7 @@ const SEED_MEMBERS = [
     email: "priya@student.ltce.in",
     role: "student",
     bio: "Data science enthusiast. Python, PyTorch, pandas & exploratory data visualization.",
-    avatar_url: "assets/img/avatar.png",
+    avatar_url: null,
     xp: 320
   }
 ];
@@ -745,10 +745,20 @@ async function openChannel(c, isUserClick = false) {
   // On mobile (< 900px): slide to thread if explicitly tapped by user; on desktop keep side-by-side
   if (inbox && (isUserClick || window.innerWidth >= 900)) {
     inbox.classList.add("thread-active");
+    if (isUserClick && window.innerWidth < 900) {
+      setTimeout(() => {
+        inbox.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+    }
   }
 
   const body = $("#thread-body");
-  if (body) body.innerHTML = skelRows(4);
+  const seedMsgs = SEED_MESSAGES[chKey];
+  if (seedMsgs && seedMsgs.length) {
+    renderThread(seedMsgs);
+  } else if (body) {
+    body.innerHTML = skelRows(4);
+  }
 
   // Update active chat styling in sidebar
   const items = $$("#inbox-list .wa-chat-item");
