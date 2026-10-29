@@ -57,7 +57,7 @@
 /* minecraft clouds — sit between the 3D overworld scene and the hero text,
    drift steadily like mc clouds, then rise away as the hero fades on scroll */
 .hero-clouds { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
-.cloud { position: absolute; background: #f4f4f4; border-radius: 55%/42%; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.10); opacity: 0.92; will-change: transform; }
+.cloud { position: absolute; background: #f4f4f4; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12); opacity: 0.92; will-change: transform; }
 
 /* adventure quest subtext & college location */
 .hero-sub {
