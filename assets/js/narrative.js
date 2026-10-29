@@ -57,12 +57,12 @@
     heroClouds.forEach(function (c, i) {
       if (c.dataset.n) return;
       c.dataset.n = 1;
-      var w = 280 + (i % 3) * 70, h = 90 + (i % 2) * 40;
+      var w = 360 + (i % 3) * 80, h = 100 + (i % 2) * 50;
       c.style.width = w + "px"; c.style.height = h + "px";
-      var n = 14 + (i % 8);
+      var n = 22 + (i % 10);
       var frag = document.createDocumentFragment();
       for (var k = 0; k < n; k++) {
-        var size = 16 + Math.random() * 36;
+        var size = 18 + Math.random() * 44;
         var cube = document.createElement("div");
         cube.className = "cloud-cube";
         cube.style.left = (Math.random() * (w - size)) + "px";
