@@ -209,6 +209,8 @@ function wireTabs() {
         b.setAttribute("aria-selected", b === btn);
       });
       $$(".comm-panel").forEach((p) => p.classList.toggle("active", p.dataset.cpanel === id));
+      const np = document.querySelector(".comm-panel.active");
+      if (np) gsap.fromTo(np, { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" });
       history.replaceState(null, "", "#" + id);
       if (id === "inbox") loadChannelsPanel();
       if (id === "directory") loadDirectory();
