@@ -3,7 +3,7 @@
   position: relative; min-height: 100svh;
   display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
   text-align: center; gap: 0.6rem;
-  padding: clamp(6.5rem, 11vh, 8.5rem) 1.25rem 3rem;
+  padding: clamp(10.5rem, 17vh, 12.5rem) 1.25rem 3rem;
 }
 
 /* floating emblem — flat badge with a hard block shadow, no glow.
@@ -55,9 +55,11 @@
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 /* minecraft clouds — sit between the 3D overworld scene and the hero text,
-   drift steadily like mc clouds, then rise away as the hero fades on scroll */
+   built from blocky cubes (mc style), drift steadily, then rise away on scroll */
 .hero-clouds { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
-.cloud { position: absolute; background: #f4f4f4; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12); opacity: 0.92; will-change: transform; }
+.cloud { position: absolute; }
+.cloud-cube { position: absolute; background: #f4f4f4; box-shadow: 1px 1px 0 #c9c9c9; }
+.cloud-base { position: absolute; height: 3px; background: #d9d9d9; opacity: 0.85; }
 
 /* adventure quest subtext & college location */
 .hero-sub {

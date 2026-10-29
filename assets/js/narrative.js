@@ -55,10 +55,26 @@
     var heroOverlay = document.querySelector(".hero-overlay");
     var heroClouds = heroOverlay ? heroOverlay.querySelectorAll(".cloud") : [];
     heroClouds.forEach(function (c, i) {
-      if (!c.dataset.n) {
-        c.dataset.n = 1;
-        c.style.left = ((i / Math.max(heroClouds.length, 1)) * innerWidth + (i % 3) * 50) + "px";
+      if (c.dataset.n) return;
+      c.dataset.n = 1;
+      var w = 150 + (i % 3) * 45, h = 64 + (i % 2) * 26;
+      c.style.width = w + "px"; c.style.height = h + "px";
+      var n = 5 + (i % 6);
+      var frag = document.createDocumentFragment();
+      for (var k = 0; k < n; k++) {
+        var size = 10 + Math.random() * 22;
+        var cube = document.createElement("div");
+        cube.className = "cloud-cube";
+        cube.style.left = (Math.random() * (w - size)) + "px";
+        cube.style.top = (Math.random() * h * 0.55) + "px";
+        cube.style.width = size + "px"; cube.style.height = size + "px";
+        frag.appendChild(cube);
       }
+      var base = document.createElement("div"); base.className = "cloud-base";
+      base.style.left = (w * 0.1) + "px"; base.style.width = (w * 0.8) + "px"; base.style.bottom = "3px";
+      frag.appendChild(base);
+      c.appendChild(frag);
+      c.style.left = ((i / Math.max(heroClouds.length, 1)) * innerWidth + (i % 3) * 55) + "px";
     });
     var lastDim = "";
     function clamp01(v) { return Math.min(1, Math.max(0, v)); }
