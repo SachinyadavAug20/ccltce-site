@@ -53,6 +53,13 @@
       bedrock: wrapper.querySelector(".narrative-overlay.bedrock"),
     };
     var heroOverlay = document.querySelector(".hero-overlay");
+    var heroClouds = heroOverlay ? heroOverlay.querySelectorAll(".cloud") : [];
+    heroClouds.forEach(function (c, i) {
+      if (!c.dataset.n) {
+        c.dataset.n = 1;
+        c.style.left = ((i / Math.max(heroClouds.length, 1)) * innerWidth + (i % 3) * 50) + "px";
+      }
+    });
     var lastDim = "";
     function clamp01(v) { return Math.min(1, Math.max(0, v)); }
     function updateOverlays(t) {
@@ -81,8 +88,20 @@
       progress.t += (progress.raw - progress.t) * ease;
       progress.s += (progress.t - progress.s) * (1 - Math.pow(0.0004, dt));
       if (Math.abs(progress.t - progress.s) < 0.0002) progress.s = progress.t;
-      syncHud(progress.t);
-      if (document.hidden || !perf.visible()) return;   // off-screen: no draw, no light work
+    syncHud(progress.t);
+    // minecraft clouds between the 3D scene and the hero text: steady horizontal drift,
+    // then rise and fade away as the hero text fades out on scroll
+    if (heroClouds.length) {
+      var hf = clamp01((progress.t - 0.05) / 0.16);
+      heroClouds.forEach(function (c) {
+        var x = parseFloat(c.style.left || 0) + (16 + (+c.dataset.fast * 24)) * dt;
+        if (x > innerWidth + 180) x = -180;
+        c.style.left = x + "px";
+        c.style.transform = "translateY(" + (-70 * hf) + "px) scale(" + (1 - 0.55 * hf) + ")";
+        c.style.opacity = 0.9 * (1 - hf);
+      });
+    }
+    if (document.hidden || !perf.visible()) return;   // off-screen: no draw, no light work
       perf.frame(dt);
       if (stations.s1) stations.s1.rotation.y = Math.sin(el * 0.3) * 0.12;
       if (stations.s2) stations.s2.rotation.y = el * 0.15;
