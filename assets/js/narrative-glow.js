@@ -1,7 +1,5 @@
 // Wiki-accurate detail pass: shroomlights, soul fire, ores, hanging lanterns, glow squids, chorus.
-import {
-  END_ROD, AMETH, PURPUR, box, glowLight,
-} from "./narrative-blocks.js";
+import { END_ROD, box, glowLight } from "./narrative-blocks.js";
 
 function P(g, m, x, y, z) { m.position.set(x, y, z); g.add(m); return m; }
 
@@ -33,11 +31,6 @@ function glowSquid(g, x, y, z) {        // bioluminescent — the End light sour
   g.add(glowLight(0x2ee6d0, 12, 16, x, y, z));
 }
 
-function chorus(g, x, y, z, k) {       // chorus plant + flower (wiki: purpur stems, amethyst bloom)
-  for (var s = 0; s < 3; s++) P(g, box(0.6 * k, 1.4 * k, 0.6 * k, PURPUR), x + (s % 2) * 0.5 * k, y + s * 1.4 * k, z);
-  P(g, box(1.2 * k, 1.2 * k, 1.2 * k, AMETH, AMETH, 0.45), x + 0.4 * k, y + 3.7 * k, z);
-}
-
 function netherGlow(g) {
   for (var c = 0; c < 6; c++) shroom(g, 100 + c * 14, 4.9, c % 2 ? -14 : 14);
   for (var w = 0; w < 10; w += 2) shroom(g, 55 + w * 15, 6.1 + (w % 3), w % 2 ? -16 : 34);
@@ -59,10 +52,6 @@ function endGlow(g) {
   var D = 100;
   // 4 glow squids just outside the dragon ring (was 6 scattered + void glowstone)
   [[176, 10], [224, 4], [182, 40], [228, 34]].forEach(function (s) { glowSquid(g, s[0], -14 - D, s[1]); });
-  // compact chorus cluster on the top tier
-  [[184, 0], [190, 0], [196, 0], [184, 6], [190, 6]].forEach(function (b) {
-    chorus(g, b[0], -26 - D, b[1], 1 + (b[0] % 3) * 0.2);
-  });
   for (var r = 0; r < 5; r++) {        // end rod clusters low on the island
     var rx = 178 + (r * 7) % 44, rz = 2 + (r * 9) % 38;
     P(g, box(0.3, 1.8, 0.3, END_ROD, END_ROD, 1), rx, -25.6 - D, rz);

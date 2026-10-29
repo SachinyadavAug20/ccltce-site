@@ -1,7 +1,7 @@
 // The End — sunken island, banded obsidian pillars with breakable crystals, end city, gateway, boss.
 import * as THREE from "../vendor/three.module.js";
 import { ENDSTONE, PURPUR, END_ROD, AMETH, box, glowLight } from "./narrative-blocks.js";
-import { enderman, shulker, enderDragon } from "./narrative-endmobs.js";
+import { enderman, enderDragon } from "./narrative-endmobs.js";
 import { endermite } from "./narrative-mobs3.js";
 
 function P(g, m, x, y, z) { m.position.set(x, y, z); g.add(m); return m; }
@@ -58,18 +58,8 @@ function pillar(g, x, z, h, pi, D) {
   gl.userData.crystalLight = pi; g.add(gl);
 }
 
-// end city: 4 detailed towers + the ship moored off the island edge
+// end city: the ship moored off the island edge (the tower row was clutter — removed)
 function city(g, D) {
-  for (var t = 0; t < 4; t++) {
-    var x = 190 + t * 7, h = 10 + t * 2, y = -26 - D;
-    P(g, box(3.4, 1.2, 3.4, 0x8a6fa0), x, y + 0.6, 35);
-    P(g, box(2, h, 2, PURPUR), x, y + 1.2 + h / 2, 35);
-    P(g, box(0.8, 1.2, 0.2, WINDOW), x, y + 1.2 + h * 0.4, 36.01);
-    P(g, box(0.8, 1.2, 0.2, WINDOW), x, y + 1.2 + h * 0.4, 33.99);
-    P(g, box(2.5, 0.6, 2.5, CAP), x, y + 1.5 + h, 35);
-    P(g, box(1.7, 1, 1.7, PURPUR), x, y + 2.3 + h, 35);
-    P(g, box(0.3, 1.6, 0.3, END_ROD, END_ROD, 1), x, y + 3.6 + h, 35);
-  }
   P(g, box(8, 2, 4, PURPUR), 214, -15 - D, 70); P(g, box(6, 1.5, 3, CAP), 214, -13.5 - D, 70);
   P(g, box(0.4, 6, 0.4, END_ROD, END_ROD, 0.8), 214, -10 - D, 70); P(g, box(3, 2, 0.2, END_ROD, END_ROD, 0.6), 214, -7 - D, 70);
   P(g, box(1.5, 1.5, 1.5, AMETH, AMETH, 0.5), 218, -15 - D, 70);
@@ -96,7 +86,6 @@ export function buildEnd(g) {
   enderman(g, 190, -26 - D, 32); enderman(g, 210, -26 - D, 32);
   enderman(g, 195, -26 - D, 8); enderman(g, 215, -26 - D, 25);
   endermite(g, 197, -26 - D, 30);
-  shulker(g, 193, -26 - D, 35); shulker(g, 207, -26 - D, 35);
   enderDragon(g, 200, -5 - D, 20);
   g.add(glowLight(AMETH, 2, 80, 200, -15 - D, 20));
   g.add(glowLight(END_ROD, 1.5, 50, 200, -10 - D, 20));
