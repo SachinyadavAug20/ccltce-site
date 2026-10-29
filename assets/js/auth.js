@@ -250,30 +250,42 @@ function closeAllMenus() {
   $$("[data-auth-trigger]").forEach((b) => b.setAttribute("aria-expanded", "false"));
 }
 
+const busyMenus = new WeakSet();
 function wireDropdown(slot, profile) {
   const trigger = slot.querySelector("[data-auth-trigger]");
   const menu = slot.querySelector("[data-auth-menu]");
   if (!trigger || !menu) return;
 
+  function open() {
+    if (busyMenus.has(menu)) return;
+    closeAllMenus();
+    menu.hidden = false;
+    trigger.setAttribute("aria-expanded", "true");
+    busyMenus.add(menu);
+    gsap.fromTo(menu, { y: -10, opacity: 0 }, {
+      y: 0, opacity: 1, duration: 0.18, ease: "power2.out",
+      onComplete: () => busyMenus.delete(menu),
+    });
+  }
+  function close() {
+    if (busyMenus.has(menu)) return;
+    busyMenus.add(menu);
+    gsap.to(menu, { y: -10, opacity: 0, duration: 0.15, ease: "power2.in", onComplete: () => {
+      menu.hidden = true;
+      trigger.setAttribute("aria-expanded", "false");
+      busyMenus.delete(menu);
+    }});
+  }
+
   trigger.addEventListener("click", (e) => {
     e.stopPropagation();
-    const open = !menu.hidden;
-    closeAllMenus();
-    if (!open) {
-      menu.hidden = false;
-      trigger.setAttribute("aria-expanded", "true");
-    }
+    menu.hidden ? open() : close();
   });
 
   menu.addEventListener("click", (e) => {
     const a = e.target.closest("a");
-    if (a) {
-      closeAllMenus();
-      return;
-    }
-    if (e.target.closest("[data-logout]")) {
-      signOut();
-    }
+    if (a) { close(); return; }
+    if (e.target.closest("[data-logout]")) { close(); signOut(); }
   });
 }
 
