@@ -73,8 +73,11 @@
       requestAnimationFrame(animate);
       var el = clock.getElapsedTime(), dt = Math.min(0.1, Math.max(0.001, el - lastEl));
       lastEl = el;
-      // smooth cinematic scroll glide: responsive exponential tracking without runaway lag
-      var ease = 1 - Math.exp((progress.raw < 0.25 ? -5 : -10) * dt);
+      // smooth cinematic scroll glide: responsive exponential tracking without runaway lag.
+      // k blends 5→10 across raw 0.2–0.4 so the intro stays floaty and mid/late travel stays
+      // tight — a hard switch would jolt the camera as it crosses the threshold.
+      var k = 5 + 5 * clamp01((progress.raw - 0.2) / 0.2);
+      var ease = 1 - Math.exp(-k * dt);
       progress.t += (progress.raw - progress.t) * ease;
       progress.s += (progress.t - progress.s) * (1 - Math.pow(0.0004, dt));
       if (Math.abs(progress.t - progress.s) < 0.0002) progress.s = progress.t;
@@ -153,6 +156,7 @@
     addEventListener("resize", function () {
       camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
       perf.resize();
+      onScroll();   // viewport height changes (mobile URL bar) re-normalize raw
     });
     light.sky("overworld"); light.lights("overworld");
     updateOverlays(0); animate(); onScroll();

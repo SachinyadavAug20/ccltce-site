@@ -1,5 +1,5 @@
 /* ---------- narrative scroll — 3D journey overlays ---------- */
-#narrative-scroll { position: relative; height: 750vh; width: 100%; }
+#narrative-scroll { position: relative; height: 1100vh; width: 100%; }
 
 body.narrative-page main,
 body:has(#narrative-scroll) main {
