@@ -6,27 +6,16 @@
   padding: clamp(6.5rem, 11vh, 8.5rem) 1.25rem 3rem;
 }
 
-/* floating emblem — luminous beacon aura, no harsh black box */
+/* floating emblem — flat badge with a hard block shadow, no glow.
+   Hover motion (pop + Minecraft-item bob) is GSAP: assets/js/hero-fx.js */
 .hero-logo {
   width: clamp(115px, 14vw, 160px); height: clamp(115px, 14vw, 160px);
   object-fit: contain; image-rendering: auto; margin-bottom: 0.5rem;
   padding: 0;
   pointer-events: auto;   /* parent overlay is pointer-events:none — needed for :hover */
-  background: radial-gradient(circle, rgba(46, 230, 208, 0.12) 0%, rgba(255, 215, 106, 0.05) 55%, transparent 72%);
   border: none;
-  border-radius: 50%;
-  filter:
-    drop-shadow(0 0 8px rgba(46, 230, 208, 0.55))
-    drop-shadow(0 0 20px rgba(255, 215, 106, 0.25))
-    drop-shadow(0 6px 14px rgba(0, 0, 0, 0.8));
-  transition: transform 0.25s ease-out, filter 0.3s ease-out;
-}
-.hero-logo:hover {
-  transform: translateY(-4px) scale(1.06);
-  filter:
-    drop-shadow(0 0 13px rgba(46, 230, 208, 0.8))
-    drop-shadow(0 0 30px rgba(255, 215, 106, 0.4))
-    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.85));
+  filter: drop-shadow(0 5px 0 rgba(0, 0, 0, 0.45));
+  will-change: transform;
 }
 
 /* Hero Department label */
@@ -40,107 +29,27 @@
   box-shadow: none;
   padding: 0.2rem 0;
   margin: 0.1rem auto 0.5rem;
-  text-shadow: 0 0 6px rgba(23, 221, 98, 0.5), 1px 1px 0 #052312, 0 4px 10px rgba(0, 0, 0, 0.9);
+  text-shadow: 1px 1px 0 #052312;
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
 }
-.hb-gem { color: #ffd76a; text-shadow: 0 0 6px rgba(255, 215, 106, 0.5); }
+.hb-gem { color: #ffd76a; }
 
 /* no dark veil over the scene — the hero text carries its own contact shadows */
 
-/* block lettering — crisp pixel-neon ring (1px lattice) over a hard contact shadow:
-   letters stay pure, the glow is the outline, never a fog over the glyphs */
+/* block lettering — hard pixel contact shadow only, no neon glow */
 .hero-title {
   font-family: var(--disp); font-weight: 400;
   font-size: clamp(2rem, 7.6vw, 5rem); line-height: 1.22;
   text-transform: uppercase; color: #ffffff;
-  text-shadow:
-    /* inner neon ring */
-    1px 1px 0 rgba(46, 230, 208, 0.95), -1px 1px 0 rgba(46, 230, 208, 0.95),
-    1px -1px 0 rgba(46, 230, 208, 0.95), -1px -1px 0 rgba(46, 230, 208, 0.95),
-    1px 0 0 rgba(46, 230, 208, 0.95), -1px 0 0 rgba(46, 230, 208, 0.95),
-    0 1px 0 rgba(46, 230, 208, 0.95), 0 -1px 0 rgba(46, 230, 208, 0.95),
-    /* falloff ring */
-    2px 0 0 rgba(23, 221, 98, 0.35), -2px 0 0 rgba(23, 221, 98, 0.35),
-    0 2px 0 rgba(23, 221, 98, 0.35), 0 -2px 0 rgba(23, 221, 98, 0.35),
-    /* hard contact shadow + scene separation */
-    4px 4px 0 #07070a,
-    0 8px 18px rgba(0, 0, 0, 0.85);
+  text-shadow: 3px 3px 0 #07070a;
   margin: 0.2rem 0 0.6rem;
-  animation: heroGlow 3.4s ease-in-out infinite;
-  transition: filter 0.35s ease-out, transform 0.35s ease-out;
-  pointer-events: auto;   /* parent overlay is pointer-events:none — needed for :hover bloom */
-}
-/* hover: second pixel ring fans out via chained 0-blur drop-shadows (stays crisp) */
-.hero-title:hover {
-  transform: scale(1.03);
-  filter:
-    drop-shadow(1px 0 0 rgba(46, 230, 208, 0.75))
-    drop-shadow(-1px 0 0 rgba(46, 230, 208, 0.75))
-    drop-shadow(0 1px 0 rgba(46, 230, 208, 0.75))
-    drop-shadow(0 -1px 0 rgba(46, 230, 208, 0.75));
+  pointer-events: auto;   /* parent overlay is pointer-events:none — needed for :hover */
 }
 .hero-title em {
   font-style: normal; color: #ffd76a;
-  text-shadow:
-    1px 1px 0 rgba(255, 215, 106, 0.95), -1px 1px 0 rgba(255, 215, 106, 0.95),
-    1px -1px 0 rgba(255, 215, 106, 0.95), -1px -1px 0 rgba(255, 215, 106, 0.95),
-    1px 0 0 rgba(255, 215, 106, 0.95), -1px 0 0 rgba(255, 215, 106, 0.95),
-    0 1px 0 rgba(255, 215, 106, 0.95), 0 -1px 0 rgba(255, 215, 106, 0.95),
-    2px 0 0 rgba(234, 179, 8, 0.4), -2px 0 0 rgba(234, 179, 8, 0.4),
-    0 2px 0 rgba(234, 179, 8, 0.4), 0 -2px 0 rgba(234, 179, 8, 0.4),
-    4px 4px 0 #3a2604,
-    0 8px 18px rgba(0, 0, 0, 0.85);
-  animation: heroGlowGold 3.4s ease-in-out infinite;
-}
-
-/* Resting state IS the readable state: tight ring so letters stay crisp.
-   The pulse only pushes the falloff ring outward one pixel and lifts its alpha —
-   the glow breathes, the glyphs never fog. */
-@keyframes heroGlow {
-  0%, 100% {
-    text-shadow:
-      1px 1px 0 rgba(46, 230, 208, 0.95), -1px 1px 0 rgba(46, 230, 208, 0.95),
-      1px -1px 0 rgba(46, 230, 208, 0.95), -1px -1px 0 rgba(46, 230, 208, 0.95),
-      1px 0 0 rgba(46, 230, 208, 0.95), -1px 0 0 rgba(46, 230, 208, 0.95),
-      0 1px 0 rgba(46, 230, 208, 0.95), 0 -1px 0 rgba(46, 230, 208, 0.95),
-      2px 0 0 rgba(23, 221, 98, 0.35), -2px 0 0 rgba(23, 221, 98, 0.35),
-      0 2px 0 rgba(23, 221, 98, 0.35), 0 -2px 0 rgba(23, 221, 98, 0.35),
-      4px 4px 0 #07070a, 0 8px 18px rgba(0, 0, 0, 0.85);
-  }
-  50% {
-    text-shadow:
-      1px 1px 0 rgba(46, 230, 208, 0.95), -1px 1px 0 rgba(46, 230, 208, 0.95),
-      1px -1px 0 rgba(46, 230, 208, 0.95), -1px -1px 0 rgba(46, 230, 208, 0.95),
-      1px 0 0 rgba(46, 230, 208, 0.95), -1px 0 0 rgba(46, 230, 208, 0.95),
-      0 1px 0 rgba(46, 230, 208, 0.95), 0 -1px 0 rgba(46, 230, 208, 0.95),
-      3px 0 0 rgba(23, 221, 98, 0.55), -3px 0 0 rgba(23, 221, 98, 0.55),
-      0 3px 0 rgba(23, 221, 98, 0.55), 0 -3px 0 rgba(23, 221, 98, 0.55),
-      4px 4px 0 #07070a, 0 10px 22px rgba(0, 0, 0, 0.9);
-  }
-}
-@keyframes heroGlowGold {
-  0%, 100% {
-    text-shadow:
-      1px 1px 0 rgba(255, 215, 106, 0.95), -1px 1px 0 rgba(255, 215, 106, 0.95),
-      1px -1px 0 rgba(255, 215, 106, 0.95), -1px -1px 0 rgba(255, 215, 106, 0.95),
-      1px 0 0 rgba(255, 215, 106, 0.95), -1px 0 0 rgba(255, 215, 106, 0.95),
-      0 1px 0 rgba(255, 215, 106, 0.95), 0 -1px 0 rgba(255, 215, 106, 0.95),
-      2px 0 0 rgba(234, 179, 8, 0.4), -2px 0 0 rgba(234, 179, 8, 0.4),
-      0 2px 0 rgba(234, 179, 8, 0.4), 0 -2px 0 rgba(234, 179, 8, 0.4),
-      4px 4px 0 #3a2604, 0 8px 18px rgba(0, 0, 0, 0.85);
-  }
-  50% {
-    text-shadow:
-      1px 1px 0 rgba(255, 215, 106, 0.95), -1px 1px 0 rgba(255, 215, 106, 0.95),
-      1px -1px 0 rgba(255, 215, 106, 0.95), -1px -1px 0 rgba(255, 215, 106, 0.95),
-      1px 0 0 rgba(255, 215, 106, 0.95), -1px 0 0 rgba(255, 215, 106, 0.95),
-      0 1px 0 rgba(255, 215, 106, 0.95), 0 -1px 0 rgba(255, 215, 106, 0.95),
-      3px 0 0 rgba(234, 179, 8, 0.6), -3px 0 0 rgba(234, 179, 8, 0.6),
-      0 3px 0 rgba(234, 179, 8, 0.6), 0 -3px 0 rgba(234, 179, 8, 0.6),
-      4px 4px 0 #3a2604, 0 10px 22px rgba(0, 0, 0, 0.9);
-  }
+  text-shadow: 3px 3px 0 #3a2604;
 }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -157,7 +66,7 @@
   letter-spacing: 0.22em;
   color: #ffd76a;
   margin: 0;
-  text-shadow: 0 0 6px rgba(255, 215, 106, 0.4), 2px 2px 0 #2b1d04, 0 4px 12px rgba(0, 0, 0, 0.9);
+  text-shadow: 2px 2px 0 #2b1d04;
 }
 .hero-college {
   font-family: var(--mono);
@@ -167,7 +76,7 @@
   text-transform: uppercase;
   color: #ffffff;
   margin: 0;
-  text-shadow: 0 0 8px rgba(46, 230, 208, 0.3), 2px 2px 0 #000, 0 4px 12px rgba(0, 0, 0, 0.95);
+  text-shadow: 2px 2px 0 #000;
 }
 .hero-loc {
   font-family: var(--mono);
@@ -176,12 +85,12 @@
   text-transform: uppercase;
   color: #a8d5c8;
   margin: 0;
-  text-shadow: 1px 1px 0 #000, 0 2px 8px rgba(0, 0, 0, 0.85);
+  text-shadow: 1px 1px 0 #000;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
 }
-.loc-gem { color: #ffd76a; text-shadow: 0 0 6px rgba(255, 215, 106, 0.5); }
+.loc-gem { color: #ffd76a; }
 
 /* inventory buttons — rich emerald / stone bevels */
 .hero-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 0.8rem; }
@@ -190,6 +99,5 @@
 .hero-cta .btn:active { transform: translateY(1px); }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-cta .btn, .hero-logo { transition: none; }
-  .hero-title, .hero-title em { animation: none !important; }
+  .hero-cta .btn { transition: none; }
 }
