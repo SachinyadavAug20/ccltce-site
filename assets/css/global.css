@@ -53,17 +53,9 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body { user-select: none; -webkit-user-select: none; }
 input, textarea, select, .term-out, .golf-code { user-select: text; -webkit-user-select: text; }
 
-*, *::before, *::after { cursor: url("../cursors/iron-sword.svg") 0 0, default !important; }
-a, button, [role="button"], .clickable, summary, label, select, .nav-links a, .btn, .t-btn, .foot-links a, .foot-social a, .nav-cta a, .mobile-menu a, .sound-toggle, .nav-burger, .brand {
-  cursor: url("../cursors/gold-pickaxe.svg") 8 12, pointer !important;
-}
-a:active, button:active, [role="button"]:active, summary:active, .btn:active, .t-btn:active, .nav-cta a:active {
-  cursor: url("../cursors/netherite-axe.svg") 20 4, pointer !important;
-}
-p, span, h1, h2, h3, h4, h5, h6, input, textarea, label, li, td, th, .notice-item, .event summary, .res-card p, .ach p, .t-lore, .t-info, .ev-title, .ch-top, .section-title, .page-head, .page-head h1, .page-head p {
-  cursor: url("../cursors/redstone-torch.svg") 32 20, text !important;
-}
-[disabled], .disabled, .blocked, [aria-disabled="true"] { cursor: url("../cursors/shield.svg") 32 32, not-allowed !important; }
+/* Tool cursors are drawn by assets/js/toolcursor.js (GSAP layer) on fine-pointer
+   desktops; native cursors everywhere else. The old CSS url() swaps are gone —
+   they flashed on reload before the script ran and had mismatched hotspots. */
 
 body {
   min-height: 100svh; display: flex; flex-direction: column;

@@ -1,6 +1,11 @@
 // Tool cursor — GSAP-driven custom cursor (desktop, fine pointer, motion-OK).
-// Native CSS cursors stay for everyone else. Here the tool swap becomes an animated
-// "equip" (crossfade + pop) and the follow gets a short GSAP trail — no hotspot jumps.
+// Native cursors stay for everyone else. The tool swap is an animated "equip"
+// (crossfade + pop) and the follow is a short GSAP trail — no hotspot jumps.
+//
+// Visibility contract: the sprite is re-asserted on EVERY pointer event
+// (move + over + enter), so no leave/focus/reload race can leave a window
+// with cursor:none and no visible sprite. The native cursor is hidden only
+// after the first event seeds + equips the sprite.
 (function () {
   if (!window.gsap) return;
   // window.__TC_FORCE is a headless/probe hook only — never set on real pages
@@ -33,7 +38,7 @@
   wrap.setAttribute("aria-hidden", "true");
   var sprite = document.createElement("div");
   sprite.className = "tc-sprite";
-  var imgs = {};
+  var imgs = {}, imgReady = {};
   Object.keys(TOOLS).forEach(function (name) {
     var t = TOOLS[name];
     var im = new Image();
@@ -45,12 +50,13 @@
     gsap.set(im, { autoAlpha: 0, scale: 0.55, rotation: -20 });
     sprite.appendChild(im);
     imgs[name] = im;
+    imgReady[name] = false;
   });
   wrap.appendChild(sprite);
   document.body.appendChild(wrap);
-  // NOTE: cursor:none is applied only after the first pointermove seeds + equips the
-  // sprite — hiding the native cursor on load leaves a window with NO cursor until the
-  // mouse moves (visible gap on page load and after wheel-only interaction).
+  // cursor:none is applied only after the first pointer event seeds + equips the
+  // sprite — hiding the native cursor on load leaves a window with NO cursor
+  // until the mouse moves (visible gap on page load and wheel-only interaction).
   gsap.set(wrap, { autoAlpha: 0 });
 
   var xTo = gsap.quickTo(wrap, "x", { duration: 0.13, ease: "power3.out" });
@@ -61,30 +67,52 @@
   var baseState = "sword"; // resolved state when not pressing
   var pressed = false;
   var lastX = 0, lastY = 0, seeded = false;
+  var wrapVisible = false;
+
+  function showWrap(on) {
+    if (on === wrapVisible) return;
+    wrapVisible = on;
+    gsap.to(wrap, { autoAlpha: on ? 1 : 0, duration: on ? 0.12 : 0.1, overwrite: "auto" });
+  }
 
   function equip(name) {
-    if (name === current) return;
+    if (name === current) {
+      // self-heal: a leave/focus race must not leave the sprite hidden while
+      // the pointer is on the page. Never restart an in-flight pop — only
+      // re-assert once its tween has finished (or was killed).
+      if (name !== "hidden") {
+        if (imgReady[name] && !gsap.isTweening(imgs[name])) gsap.set(imgs[name], { autoAlpha: 1 });
+        showWrap(true);
+      }
+      return;
+    }
     var prevName = current;
     current = name;
     var prev = prevName && prevName !== "hidden" ? imgs[prevName] : null;
     var next = name === "hidden" ? null : imgs[name];
     if (prev) {
+      imgReady[prevName] = false;
       gsap.killTweensOf(prev);
       gsap.to(prev, { autoAlpha: 0, scale: 0.5, rotation: -24, duration: 0.1, ease: "power2.in", overwrite: "auto" });
     }
     if (next) {
+      imgReady[name] = false;
       gsap.killTweensOf(next);
       gsap.fromTo(next,
         { autoAlpha: 0, scale: 0.4, rotation: 26 },
-        { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.22, ease: "back.out(3)", overwrite: "auto", delay: prev ? 0.04 : 0 });
-      gsap.to(wrap, { autoAlpha: 1, duration: 0.12, overwrite: "auto" });
+        {
+          autoAlpha: 1, scale: 1, rotation: 0, duration: 0.22, ease: "back.out(3)", overwrite: "auto",
+          delay: prev ? 0.04 : 0,
+          onComplete: function () { imgReady[name] = true; },
+        });
+      showWrap(true);
     } else {
-      gsap.to(wrap, { autoAlpha: 0, duration: 0.1, overwrite: "auto" });
+      showWrap(false);
     }
   }
 
   function stateFor(el) {
-    if (!el || el === document.documentElement || el === document.body || el === document.documentElement) return "sword";
+    if (!el || el === document.documentElement || el === document.body) return "sword";
     if (el.closest && el.closest("[disabled], .disabled, .blocked, [aria-disabled='true']")) return "shield";
     if (el.closest && el.closest("input, textarea, select, [contenteditable='true']")) return "hidden";
     if (el.closest && el.closest("a, button, [role='button'], .clickable, summary, label, .btn, .t-btn, .foot-links a, .foot-social a, .nav-cta a, .mobile-menu a, .sound-toggle, .nav-burger, .brand, .tab, .home-tile")) return "pickaxe";
@@ -95,7 +123,7 @@
     equip(pressed && baseState !== "hidden" ? "axe" : baseState);
   }
 
-  document.addEventListener("pointermove", function (e) {
+  function drive(e) {
     if (e.pointerType && e.pointerType !== "mouse" && e.pointerType !== "pen") return;
     if (!seeded) {
       gsap.set(wrap, { x: e.clientX, y: e.clientY });
@@ -110,15 +138,14 @@
     lastY = e.clientY;
     var vel = Math.max(-14, Math.min(14, dx * 0.9));
     rotTo(vel);
+    baseState = stateFor(e.target);
+    apply(); // equip early-returns + self-heals, so running this every event is cheap
+  }
 
-    var next = stateFor(e.target);
-    if (next !== baseState) {
-      baseState = next;
-      apply();
-    } else if ((current === null || current === "hidden") && baseState !== "hidden") {
-      apply();
-    }
-  }, { passive: true });
+  document.addEventListener("pointermove", drive, { passive: true });
+  // pointerover also fires on element entry (and on some browsers at load under
+  // the resting pointer) — equipping here removes the pre-move dead window.
+  document.addEventListener("pointerover", drive, { passive: true });
 
   document.addEventListener("pointerdown", function (e) {
     if (e.pointerType && e.pointerType !== "mouse" && e.pointerType !== "pen") return;
@@ -136,17 +163,16 @@
   }, { passive: true });
 
   document.documentElement.addEventListener("mouseleave", function () {
-    gsap.to(wrap, { autoAlpha: 0, duration: 0.12, overwrite: "auto" });
     current = "hidden";
+    showWrap(false);
   });
   document.documentElement.addEventListener("pointerenter", function () {
-    // re-equip after a leave; the next pointermove also self-heals via current==="hidden"
-    if (seeded && baseState !== "hidden") apply();
+    if (seeded) apply();
   });
 
   if (window.__TC_FORCE) {
     window.__TC_DEBUG = {
-      state: function () { return { current: current, base: baseState, pressed: pressed }; },
+      state: function () { return { current: current, base: baseState, pressed: pressed, wrapVisible: wrapVisible }; },
       equip: equip,
     };
   }
