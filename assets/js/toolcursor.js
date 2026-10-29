@@ -48,7 +48,9 @@
   });
   wrap.appendChild(sprite);
   document.body.appendChild(wrap);
-  document.documentElement.classList.add("tool-cursor-on");
+  // NOTE: cursor:none is applied only after the first pointermove seeds + equips the
+  // sprite — hiding the native cursor on load leaves a window with NO cursor until the
+  // mouse moves (visible gap on page load and after wheel-only interaction).
   gsap.set(wrap, { autoAlpha: 0 });
 
   var xTo = gsap.quickTo(wrap, "x", { duration: 0.13, ease: "power3.out" });
@@ -98,6 +100,7 @@
     if (!seeded) {
       gsap.set(wrap, { x: e.clientX, y: e.clientY });
       seeded = true;
+      document.documentElement.classList.add("tool-cursor-on");
     }
     xTo(e.clientX);
     yTo(e.clientY);
@@ -135,6 +138,10 @@
   document.documentElement.addEventListener("mouseleave", function () {
     gsap.to(wrap, { autoAlpha: 0, duration: 0.12, overwrite: "auto" });
     current = "hidden";
+  });
+  document.documentElement.addEventListener("pointerenter", function () {
+    // re-equip after a leave; the next pointermove also self-heals via current==="hidden"
+    if (seeded && baseState !== "hidden") apply();
   });
 
   if (window.__TC_FORCE) {
