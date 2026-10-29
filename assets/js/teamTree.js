@@ -165,7 +165,9 @@
     var naturalW = canvas.scrollWidth || 1200;
     if (availW <= 0 || naturalW <= 0) return;
 
-    var targetScale = Math.min(1.0, Math.max(0.2, availW / naturalW));
+    // phones: never shrink below 50% — nodes stay legible/tappable, canvas scrolls horizontally
+    var minScale = matchMedia("(max-width: 899px), (pointer: coarse)").matches ? 0.5 : 0.2;
+    var targetScale = Math.min(1.0, Math.max(minScale, availW / naturalW));
     setScale(targetScale, smooth);
     isAutoFitted = true;
     container.scrollLeft = 0;

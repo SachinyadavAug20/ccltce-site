@@ -269,6 +269,8 @@ body:has(#narrative-scroll) footer {
     gap: 0.4rem;
   }
   .mobile-card-link {
+    display: inline-flex; align-items: center;
+    min-height: 44px; padding: 0 0.3rem;
     font-family: var(--disp);
     font-size: 0.42rem;
     color: var(--emerald);
