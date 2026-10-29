@@ -57,7 +57,7 @@
     heroClouds.forEach(function (c, i) {
       if (c.dataset.n) return;
       c.dataset.n = 1;
-      var w = 150 + (i % 3) * 45, h = 64 + (i % 2) * 26;
+      var w = 150 + (i % 3) * 45, h = 44 + (i % 2) * 22;
       c.style.width = w + "px"; c.style.height = h + "px";
       var n = 5 + (i % 6);
       var frag = document.createDocumentFragment();
