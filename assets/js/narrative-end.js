@@ -66,15 +66,36 @@ function city(g, D) {
   g.add(glowLight(AMETH, 1.5, 25, 218, -14 - D, 70));
 }
 
-// end gateway — obsidian frame with a pulsing amethyst portal
+// end gateway fountain — stepped obsidian plinth, gem-studded rim, corner posts,
+// the pulsing amethyst portal (the dragon rebirths it into the end portal), a white
+// beacon jet and drifting shards. The portal stays ONE mesh: dragon death scales it.
 function gateway(g, D) {
-  P(g, box(6, 0.6, 6, OB_DEEP), 200, -26.2 - D, 20);
-  [[-2, -2], [2, -2], [-2, 2], [2, 2]].forEach(function (p) {
-    P(g, box(0.7, 4.4, 0.7, OB_MAIN), 200 + p[0], -24 - D, 20 + p[1]);
-    P(g, box(1.1, 0.5, 1.1, OB_BAND), 200 + p[0], -21.55 - D, 20 + p[1]);
+  var y = -26 - D;                                     // island centre-tier top
+  P(g, box(7.6, 0.8, 7.6, OB_DEEP), 200, y + 0.4, 20);   // step 1  y..+0.8
+  P(g, box(6.2, 0.7, 6.2, OB_MAIN), 200, y + 1.15, 20);  // step 2  +0.8..+1.5
+  P(g, box(4.8, 0.6, 4.8, OB_BAND), 200, y + 1.8, 20);   // step 3  +1.5..+2.1
+  [[-3.45, -3.45], [3.45, -3.45], [-3.45, 3.45], [3.45, 3.45]].forEach(function (p, i) {
+    var gem = P(g, box(0.55, 0.55, 0.55, AMETH, AMETH, 0.85), 200 + p[0], y + 1.07, 20 + p[1]);
+    gem.userData.pulse = i * 0.8;
   });
-  var portal = P(g, box(3.4, 3.4, 0.3, AMETH, AMETH, 0.9), 200, -24 - D, 20);
+  [[-1.7, -1.7], [1.7, -1.7], [-1.7, 1.7], [1.7, 1.7]].forEach(function (p) {
+    P(g, box(0.6, 3.4, 0.6, OB_MAIN), 200 + p[0], y + 3.8, 20 + p[1]);   // posts  +2.1..+5.5
+    P(g, box(0.95, 0.45, 0.95, OB_BAND), 200 + p[0], y + 5.72, 20 + p[1]); // caps
+    var tip = P(g, box(0.3, 0.3, 0.3, AMETH, AMETH, 0.9), 200 + p[0], y + 6.1, 20 + p[1]);
+    tip.userData.pulse = p[0] + p[1];
+  });
+  var portal = P(g, box(2.9, 3.4, 0.28, AMETH, AMETH, 0.9), 200, y + 3.8, 20);
   portal.userData.pulse = 1; portal.userData.endPortal = true;
+  var jet = P(g, box(0.34, 12, 0.34, END_ROD, END_ROD, 0.75), 200, y + 11.5, 20);
+  jet.userData.gatewayBeam = true;
+  var halo = P(g, tint(1.2, 12, 1.2, 0xd8ccff, 0.13), 200, y + 11.5, 20);
+  halo.userData.gatewayBeam = true;
+  for (var i = 0; i < 10; i++) {                     // shards spiralling up the jet
+    var a = i * 0.628 + (i % 3), r = 1.5 + (i % 4) * 0.75;
+    var sh = P(g, box(0.26, 0.26, 0.26, i % 3 ? AMETH : END_ROD, i % 3 ? AMETH : END_ROD, 0.9),
+      200 + Math.cos(a) * r, y + 2.6 + (i % 5) * 1.15, 20 + Math.sin(a) * r);
+    sh.userData.float = i * 1.3;
+  }
 }
 
 export function buildEnd(g) {

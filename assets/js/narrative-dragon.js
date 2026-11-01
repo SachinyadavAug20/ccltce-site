@@ -6,12 +6,13 @@ var C = new THREE.Vector3(200, -105, 20); // orbit centre — island top (-126) 
 var ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 
 export function initDragon(scene, camera, host) {
-  var root = null, head = null, hitbox = null, portal = null;
+  var root = null, head = null, hitbox = null, portal = null, jets = [];
   scene.traverse(function (o) {
     if (o.userData.dragon) root = o;
     if (o.userData.dragonHead) head = o;
     if (o.userData.dragonHit) hitbox = o;
     if (o.userData.endPortal) portal = o;
+    if (o.userData.gatewayBeam) jets.push(o);
   });
   if (!root || !hitbox) return null;
   var wings = [];
@@ -62,6 +63,7 @@ export function initDragon(scene, camera, host) {
   }
   function boom() {
     state = "flash"; tBoom = prev; root.visible = false; beams.visible = false;
+    for (var j = 0; j < jets.length; j++) jets[j].visible = false;   // death beam owns the sky now
     flash.position.set(200, -107, 20); flash.visible = true;
     ring.position.set(200, -125.4, 20); ring.visible = true;
     for (var k = 0; k < orbs.length; k++) {
