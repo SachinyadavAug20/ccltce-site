@@ -1,6 +1,6 @@
 // Nether zone — heavy Minecraft terrain detail. The End lives in narrative-end.js.
 import {
-  GOLD, NETHERRACK, LAVA, GLOWSTONE, SOUL, WARP, box, glowLight, torch,
+  GOLD, NETHERRACK, LAVA, GLOWSTONE, SOUL, WARP, AMETH, OBSIDIAN, box, glowLight, torch,
 } from "./narrative-blocks.js";
 import { piglin, hoglin, ghast, magmaCube, blaze, witherSkeleton } from "./narrative-mobs.js";
 import { strider, piglinBrute, zombifiedPiglin } from "./narrative-mobs3.js";
@@ -23,6 +23,17 @@ export function buildNether(g) {
   // Without this the shell was open at x=200 and you saw the blue sky straight through the nether.
   P(g, box(4, 24, 46, NETHERRACK), 202, 9, -7); P(g, box(4, 24, 14, NETHERRACK), 202, 9, 43);
   P(g, box(4, 7, 20, NETHERRACK), 202, 19.5, 26);
+  // Exit portal — obsidian frame proud of the inner face + an amethyst veil the dive punches through
+  P(g, box(0.9, 18.4, 0.9, OBSIDIAN), 200.9, 7, 16);
+  P(g, box(0.9, 18.4, 0.9, OBSIDIAN), 200.9, 7, 36);
+  P(g, box(0.9, 1, 20.8, OBSIDIAN), 200.9, 16.5, 26);
+  P(g, box(0.9, 0.5, 20.8, OBSIDIAN), 200.9, -1.75, 26);
+  var veil = P(g, box(0.3, 17.5, 19, AMETH, AMETH, 0.95), 202, 6.75, 26);
+  veil.userData.pulse = 0.4;
+  [[-7.6, 7.25], [7.6, 7.25], [-7.6, -7.25], [7.6, -7.25]].forEach(function (s, i) {
+    var sh = P(g, box(0.45, 0.45, 0.45, AMETH, AMETH, 0.9), 200.9, 6.75 + s[1], 26 + s[0]);
+    sh.userData.pulse = i * 1.1;
+  });
   torch(g, 42.6, 0, 16); torch(g, 42.6, 0, 28);
   buildBiomes(g);   // crimson/warped/soul/basalt patches lining both sides of the camera path
   // Basalt delta pillars

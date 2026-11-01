@@ -182,6 +182,11 @@
       var u = Math.min(Math.max(progress.s, 0), 1);
       camera.position.copy(curve.getPointAt(u));
       var look = lookA.copy(curve.getPointAt(Math.min(u + 0.04, 1))), shake = 0;
+      if (u > 0.7 && u < 0.92) {
+        // dive: the spline looks east into the void — hold the island (and its beams) in frame
+        var iw = clamp01((u - 0.7) / 0.06) * (1 - clamp01((u - 0.88) / 0.04));
+        look.lerp(lookV.set(200, -118, 20), iw * 0.9);
+      }
       if (dragon) {
         dragon.update(el);
         var w = u > 0.75 ? clamp01((u - 0.75) / 0.1) : 0;   // dive → finale: keep the boss framed

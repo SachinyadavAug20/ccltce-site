@@ -40,9 +40,10 @@ export function phaseAt(t) {
   return "bedrock";
 }
 
-// dimension for fog + bg: overworld → nether (flip just inside the entry wall) → end (flip just before the open face)
+// dimension for fog + bg: overworld → nether (flip just inside the entry wall) → end (flip as the
+// camera punches the exit portal — x=202 sits at arc ≈0.69)
 export function dimAt(t) {
   if (t < 0.33) return "overworld";
-  if (t < 0.67) return "nether";
+  if (t < 0.69) return "nether";
   return "end";
 }

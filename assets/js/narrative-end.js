@@ -98,8 +98,36 @@ function gateway(g, D) {
   }
 }
 
+// dive shaft — floating outcrops hugging the fall line so the free-fall between the
+// nether exit (200,8,26) → (224,-34,46) → (246,-84,58) has parallax, not empty fog.
+function diveShaft(g) {
+  var rocks = [
+    [210, -4, 34, 1.2], [216, -14, 44, 1.6], [226, -26, 52, 1.3], [234, -40, 56, 1.8],
+    [242, -56, 62, 1.4], [248, -72, 58, 1.1], [238, -78, 46, 1.5], [228, -66, 40, 1.2],
+    [218, -50, 36, 1.7], [212, -34, 30, 1.1], [252, -48, 70, 2.2], [258, -72, 52, 2.6],
+    [206, -18, 40, 1.0], [232, -8, 50, 1.2],
+  ];
+  rocks.forEach(function (r, i) {
+    var s = r[3], grp = new THREE.Group();
+    grp.position.set(r[0], r[1], r[2]);
+    P(grp, box(4 * s, 2.4 * s, 4 * s, ENDSTONE), 0, 0, 0);
+    P(grp, box(2.6 * s, 1.6 * s, 2.6 * s, ENDSTONE), 0.8 * s, 2 * s, -0.5 * s);
+    if (i % 2) P(grp, box(1.6 * s, 1.2 * s, 1.6 * s, ENDSTONE), -s, 1.8 * s, s);
+    if (i % 3 === 0) P(grp, box(0.8 * s, 5 * s, 0.8 * s, OB_DEEP), 0.4 * s, 5.3 * s, -0.2 * s);
+    if (i % 3 === 1) P(grp, box(0.3, 3.4, 0.3, END_ROD, END_ROD, 0.85), 0.8 * s, 2.8 * s + 1.7, -0.5 * s);
+    if (i % 2 === 0) {
+      var am = P(grp, box(0.9 * s, 1.4 * s, 0.9 * s, AMETH, AMETH, 0.9), -1.2 * s, 1.9 * s, 0.8 * s);
+      am.userData.pulse = i * 0.7;
+    }
+    grp.userData.float = i * 0.9;
+    g.add(grp);
+  });
+  g.add(glowLight(AMETH, 1.5, 60, 230, -45, 52));
+}
+
 export function buildEnd(g) {
   var D = 100;   // the End sits far below the nether — the dive drops the full height
+  diveShaft(g);
   island(g, D);
   var pillars = [[-22, -22], [22, -22], [-22, 22], [22, 22], [0, -28], [0, 28], [-28, 0], [28, 0]];
   pillars.forEach(function (p, i) { pillar(g, 200 + p[0], 20 + p[1], 18 + i * 2, i, D); });
