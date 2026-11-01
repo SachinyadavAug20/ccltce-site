@@ -75,26 +75,53 @@ function rock(g, x, z, s) {
   P(g, box(0.8 * k, 0.6 * k, 0.7 * k, STONE2), x + 0.3 * k, 0.6 * k, z + 0.1 * k);
 }
 
-// puffy voxel clouds — stacked box clusters (not flat slabs), group drifts on userData.cloud
+// puffy voxel clouds — 18 randomized stacked box clusters
 function clouds(g) {
-  for (var c = 0; c < 10; c++) {
-    var cx = -70 + c * 16 + (c % 3) * 4;
-    var cy = 50 + (c % 4) * 5, cz = -40 + (c % 6) * 14;
-    var grp = new THREE.Group(), n = 4 + (c % 3);
+  for (var c = 0; c < 18; c++) {
+    var cx = -110 + Math.random() * 220;
+    var cy = 46 + Math.random() * 26, cz = -65 + Math.random() * 130;
+    var grp = new THREE.Group(), n = 4 + Math.floor(Math.random() * 4);
+    var scale = 0.7 + Math.random() * 1.2;
     for (var b = 0; b < n; b++) {
-      var bw = 9 + ((c + b) % 4) * 5, bh = 3 + ((c * 2 + b) % 3) * 1.6, bd = 7 + ((c + b * 2) % 3) * 4;
+      var bw = (8 + Math.random() * 14) * scale, bh = (2.8 + Math.random() * 4) * scale, bd = (7 + Math.random() * 10) * scale;
       var m = box(bw, bh, bd, 0xffffff, 0xffffff, 0.28);
       m.position.set(
-        (b - (n - 1) / 2) * 7 + (b % 2 ? 2 : -1),
-        ((b * 5 + c) % 3) * 1.8 - 0.5,
-        ((b * 7 + c) % 5 - 2) * 3
+        (b - (n - 1) / 2) * 7.5 * scale + (Math.random() - 0.5) * 3,
+        (Math.random() - 0.3) * 2.5 * scale,
+        (Math.random() - 0.5) * 5 * scale
       );
       grp.add(m);
     }
     grp.position.set(cx, cy, cz);
-    grp.userData.cloud = c * 0.8;
+    grp.userData.cloud = c * 0.7;
     grp.userData.baseX = cx;
     g.add(grp);
+  }
+}
+
+// front lawn clutter: dense greenery, flank trees, camp props, tufts, critters
+function lawn(g) {
+  [[-14, 16, 1.1], [15, 20, 1], [-21, 32, 1.2], [23, 36, 1.1], [-29, 48, 1], [31, 52, 1.2],
+   [-37, 66, 1.1], [39, 70, 1], [-15, 74, 1.2], [19, 80, 1.1], [-43, 88, 1], [43, 92, 1.1],
+   [-11, 58, 0.9], [12, 62, 1], [-22, 12, 1], [24, 16, 1.1], [-32, 22, 1.2], [33, 24, 1]].forEach(function (t) {
+    tree(g, t[0], t[1], t[2]);
+  });
+  [[-9, 12], [10, 15], [-17, 24], [18, 26], [-25, 40], [26, 42], [-33, 56], [34, 58], [-13, 68], [14, 72], [-20, 82], [22, 85]].forEach(function (b, i) {
+    bush(g, b[0], b[1]);
+    if (i % 2) rock(g, b[0] + 3, b[1] + 2, 0.8 + (i % 3) * 0.35);
+  });
+  for (var tg = 0; tg < 75; tg++) {
+    var tx = (Math.random() - 0.5) * 94, tz = 6 + Math.random() * 90;
+    if (Math.abs(tx) < 4.5) tx += tx < 0 ? -4.5 : 4.5;
+    var th = 0.5 + Math.random() * 0.8;
+    P(g, box(0.28, th, 0.28, Math.random() < 0.5 ? LEAF : LEAF2), tx, -1 + th / 2, tz);
+  }
+  [14, 30, 46, 62, 78].forEach(function (z, i) { lampPost(g, i % 2 ? -7 : 7, z); });
+  // butterflies
+  for (var bf = 0; bf < 16; bf++) {
+    var bfly = P(g, box(0.35, 0.25, 0.35, [0xff66cc, 0x66ccff, 0xffee55, 0x55ffaa][bf % 4], [0xff66cc, 0x66ccff, 0xffee55, 0x55ffaa][bf % 4], 0.9),
+      (Math.random() - 0.5) * 75, 1 + Math.random() * 5, 8 + Math.random() * 80);
+    bfly.userData.float = Math.random() * 6.28;
   }
 }
 
@@ -120,6 +147,7 @@ export function buildCampus(g) {
   bush(g, -8, -36); bush(g, 8, -36); bush(g, -34, -4); bush(g, 34, -4);
   rock(g, -14, -42, 1.2); rock(g, 14, -44, 1); rock(g, -36, -46, 1.4); rock(g, 30, -16, 0.9);
   clouds(g);
+  lawn(g);
   for (var fl = 0; fl < 15; fl++) P(g, box(0.4, 0.8, 0.4, fl % 3 === 0 ? 0xff3355 : fl % 3 === 1 ? 0xffaa00 : 0xff66cc, fl % 3 === 2 ? 0xff66cc : 0, 0.3), -30 + Math.random() * 60, 0, -50 + Math.random() * 45);
   villageHouse(g, -32, -14, 1); villageHouse(g, 32, -14, 1.1); villageHouse(g, -28, -38, 0.9);
   well(g, 0, -14); lampPost(g, -8, -14); lampPost(g, 8, -14); lampPost(g, -8, -28); lampPost(g, 8, -28);

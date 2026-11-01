@@ -20,23 +20,41 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
-  function cloudSprite(w, h, seed, pal) {
+  function cloudSprite(w, h, seed, band) {
+    var pals = band === "sky" ? [["#eef3fa", "#d5deea", "#bcc9db"], ["#e9eff8", "#ced9e8", "#b6c4d8"]]
+      : band === "mid" ? [["#ffffff", "#e8eef6", "#ccd6e2"], ["#fbfcff", "#e3eaf4", "#c8d3e1"]]
+      : [["#ffffff", "#eef3f9", "#d4dce6"], ["#f6f9fd", "#e6ecf4", "#ccd6e1"]];
+    var pal = pals[seed & 1];
     var dpr = 2, cv = document.createElement("canvas");
     cv.width = Math.max(16, Math.round(w * dpr));
     cv.height = Math.max(16, Math.round(h * dpr));
     var g = cv.getContext("2d"), rnd = mulberry32(seed);
-    var c = Math.max(12, Math.min(40, Math.round(h / 3.8)));   // cube screen size
-    var rows = 2, cols = Math.max(4, Math.floor((w - c) / c) - rows + 2);
-    var cells = [], mid = (cols - 1) / 2;
+    var rows = 1 + (rnd() < 0.5 ? 1 : 0) + (rnd() < 0.22 ? 1 : 0);
+    var sizeK = 0.78 + rnd() * 0.5;
+    var c = Math.max(10, Math.min(44, Math.round((h / 3.8) * sizeK)));
+    var cols = Math.max(4, Math.floor((w - c) / c) - rows + 2);
+    var cells = [], mid = (cols - 1) * (0.36 + rnd() * 0.28);
+    var falloff = 0.55 + rnd() * 0.35, peakK = 0.7 + rnd() * 0.75;
     for (var i = 0; i < cols; i++) {
-      var edge = Math.abs(i - mid) / (mid || 1);                 // 0 centre → 1 edge
-      var peak = Math.max(1, Math.round((1 - edge * 0.72) * 2.4 + rnd() * 1.6));
+      var edge = Math.abs(i - mid) / (mid || 1);
+      var peak = Math.max(1, Math.round((1 - edge * falloff) * 2.4 * peakK + rnd() * 1.8));
       for (var j = 0; j < rows; j++) {
         if (rnd() < edge * 0.3) continue;
         var hh = Math.max(1, peak - (j === 1 && rnd() < 0.5 ? 1 : 0));
         for (var k = 0; k < hh; k++) cells.push([i, j, k]);
       }
     }
+    // random bumps & overhangs
+    var bumps = 2 + Math.floor(rnd() * 4);
+    for (var bi = 0; bi < bumps && cells.length; bi++) {
+      var src = cells[Math.floor(rnd() * cells.length)], mk = -1;
+      for (var ci = 0; ci < cells.length; ci++)
+        if (cells[ci][0] === src[0] && cells[ci][1] === src[1] && cells[ci][2] > mk) mk = cells[ci][2];
+      cells.push([src[0], src[1], mk + 1]);
+    }
+    if (rnd() < 0.7) cells.push([rnd() < 0.5 ? -1 : cols, Math.floor(rnd() * rows), 0]);
+    if (rnd() < 0.5) cells.push([Math.floor(rnd() * cols), rows, 0]);
+
     if (!cells.length) cells.push([0, 0, 0]);
     cells.sort(function (a, b) { return (a[0] + a[1]) - (b[0] + b[1]) || a[2] - b[2]; });
     var pts = cells.map(function (q) {
@@ -55,7 +73,6 @@
     g.setTransform(dpr * sc, 0, 0, dpr * sc, ox * dpr, oy * dpr);
     pts.forEach(function (p) {
       var x = p[0], y = p[1];
-      // top diamond → right face → left face (painter order: back-to-front, base first)
       [[0, [[x, y], [x + c, y + c / 2], [x, y + c], [x - c, y + c / 2]]],
        [1, [[x + c, y + c / 2], [x, y + c], [x, y + 2 * c], [x + c, y + 1.5 * c]]],
        [2, [[x - c, y + c / 2], [x, y + c], [x, y + 2 * c], [x - c, y + 1.5 * c]]]].forEach(function (f) {
@@ -64,7 +81,7 @@
         g.moveTo(f[1][0][0], f[1][0][1]);
         for (var q = 1; q < f[1].length; q++) g.lineTo(f[1][q][0], f[1][q][1]);
         g.closePath(); g.fill();
-        g.strokeStyle = pal[f[0]]; g.lineWidth = 0.6; g.stroke();   // seal AA seams
+        g.strokeStyle = pal[f[0]]; g.lineWidth = 0.6; g.stroke();
       });
     });
     return cv.toDataURL("image/png");
@@ -124,10 +141,7 @@
       c.style.width = w + "px"; c.style.height = h + "px";
       var band = c.classList.contains("cloud-near") ? "near" : c.classList.contains("cloud-mid") ? "mid" : "sky";
       if (c.offsetParent) {   // layer is display:none on mobile — skip the canvas work
-        var pal = band === "sky" ? ["#eef3fa", "#d5deea", "#bcc9db"]
-          : band === "mid" ? ["#ffffff", "#e8eef6", "#ccd6e2"]
-          : ["#ffffff", "#eef3f9", "#d4dce6"];
-        c.style.backgroundImage = "url(" + cloudSprite(w, h, i * 7919 + 17, pal) + ")";
+        c.style.backgroundImage = "url(" + cloudSprite(w, h, i * 7919 + 17, band) + ")";
         c.style.backgroundSize = "100% 100%";
         c.style.backgroundRepeat = "no-repeat";
       }

@@ -25,6 +25,18 @@ body:has(#narrative-scroll) footer {
   overflow: hidden; z-index: 1;
 }
 
+.sky-veil {
+  position: absolute; inset: 0; z-index: 9;
+  background: #f0f4f8; pointer-events: none;
+  animation: veil-lift 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+}
+@keyframes veil-lift {
+  to { opacity: 0; }
+}
+@media (max-width: 899px), (prefers-reduced-motion: reduce) {
+  .sky-veil { display: none !important; animation: none !important; }
+}
+
 /* hero sits inside narrative, fades on scroll.
    Content rides HIGH in the frame (padding-bottom pushes the block up) so it feels
    detached from the ground content below — it arrived from the sky. */

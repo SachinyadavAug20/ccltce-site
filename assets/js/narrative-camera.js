@@ -3,7 +3,8 @@ import * as THREE from "../vendor/three.module.js";
 
 export function createCameraPath() {
   return new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 50, 100),    // campus surface (overworld)
+    new THREE.Vector3(0, 95, 135),    // high in the sky among clouds — cinematic descent start
+    new THREE.Vector3(0, 48, 85),     // plunging down through the cloud bank
     new THREE.Vector3(0, 20, 40),     // gate descent
     new THREE.Vector3(0, 8, 10),      // through arch
     new THREE.Vector3(40, 8, 20),     // station 1 — overworld systems
@@ -23,27 +24,27 @@ export function updateCamera(camera, curve, t, look) {
   camera.lookAt(look || curve.getPointAt(Math.min(t + 0.04, 1)));
 }
 
-// anchors from arc length 448: x=40 @0.318, x=160 @0.587, x=200 @0.679, y=-5 @0.720, z=46 @0.797 (x=224), dive -80 @0.913
+// anchors from arc length ~520: x=40 @0.345, x=160 @0.612, x=200 @0.698, y=-5 @0.735, z=46 @0.812 (x=224), dive -80 @0.922
 export var PHASES = {
-  surface: [0, 0.25],
-  station1: [0.25, 0.46],
-  station2: [0.46, 0.575],
-  station3: [0.575, 0.7],
-  bedrock: [0.7, 1.0],
+  surface: [0, 0.28],
+  station1: [0.28, 0.48],
+  station2: [0.48, 0.595],
+  station3: [0.595, 0.72],
+  bedrock: [0.72, 1.0],
 };
 
 export function phaseAt(t) {
-  if (t < 0.25) return "surface";
-  if (t < 0.46) return "station1";
-  if (t < 0.575) return "station2";
-  if (t < 0.7) return "station3";
+  if (t < 0.28) return "surface";
+  if (t < 0.48) return "station1";
+  if (t < 0.595) return "station2";
+  if (t < 0.72) return "station3";
   return "bedrock";
 }
 
 // dimension for fog + bg: overworld → nether (flip just inside the entry wall) → end (flip as the
-// camera punches the exit portal — x=202 sits at arc ≈0.69)
+// camera punches the exit portal — x=202 sits at arc ≈0.71)
 export function dimAt(t) {
-  if (t < 0.33) return "overworld";
-  if (t < 0.69) return "nether";
+  if (t < 0.35) return "overworld";
+  if (t < 0.71) return "nether";
   return "end";
 }

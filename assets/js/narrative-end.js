@@ -127,7 +127,6 @@ function diveShaft(g) {
 
 export function buildEnd(g) {
   var D = 100;   // the End sits far below the nether — the dive drops the full height
-  diveShaft(g);
   island(g, D);
   var pillars = [[-22, -22], [22, -22], [-22, 22], [22, 22], [0, -28], [0, 28], [-28, 0], [28, 0]];
   pillars.forEach(function (p, i) { pillar(g, 200 + p[0], 20 + p[1], 18 + i * 2, i, D); });
