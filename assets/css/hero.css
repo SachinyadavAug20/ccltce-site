@@ -80,6 +80,9 @@
 .cloud-mid { opacity: 0.82; }
 .cloud-mid .cloud-cube { background: #fafafa; box-shadow: 1px 1px 0 #d4d4d4; }
 .cloud-sky { opacity: 0.9; }
+/* near band: big, low, closest to camera — sweeps the hardest on part */
+.cloud-near { opacity: 0.78; }
+.cloud-near .cloud-cube { background: #ffffff; box-shadow: 2px 2px 0 #cfcfcf; }
 
 /* adventure quest subtext & college location */
 .hero-sub {

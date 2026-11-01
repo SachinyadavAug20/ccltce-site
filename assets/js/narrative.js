@@ -77,22 +77,26 @@
       base.style.left = (w * 0.1) + "px"; base.style.width = (w * 0.8) + "px"; base.style.bottom = "3px";
       frag.appendChild(base);
       c.appendChild(frag);
-      // normalize left to px (mid band uses % in markup — parseFloat would read "64%" as 64)
+      // normalize left to px (mid band uses % in markup — parseFloat would read "64%" as 64),
+      // then zero it: position now lives in c._x and is composed into transform only
       var leftRaw = c.style.left || "";
       var leftPx = leftRaw.indexOf("%") > -1
         ? (parseFloat(leftRaw) / 100) * innerWidth
         : (parseFloat(leftRaw) || 0);
-      c.style.left = leftPx + "px";
+      c.style.left = "0px";
       // parting lane: clouds split to the side their center sits on (fly-through feel)
       var cx = leftPx + w / 2;
       c.dataset.side = cx < innerWidth / 2 ? "-1" : "1";
       // stagger the part start so the bank peels open instead of snapping
       c.dataset.lag = (Math.random() * 0.35).toFixed(3);
-      // per-cloud drift speed multiplier (mid band drifts slower — it hugs the text)
-      c.dataset.drift = c.classList.contains("cloud-mid") ? "0.45" : "1";
+      // band depth: near sweeps hardest (closest to camera), sky barely moves
+      var band = c.classList.contains("cloud-near") ? "near" : c.classList.contains("cloud-mid") ? "mid" : "sky";
+      c.dataset.band = band;
+      c.dataset.drift = band === "mid" ? "0.45" : band === "near" ? "1.4" : "1";
       // remember base top so parting can lift each cloud at its own rate
       c.dataset.baseTop = (parseFloat(c.style.top) || 0);
       c.dataset.bob = (Math.random() * Math.PI * 2).toFixed(3);
+      c._x = leftPx;   // drift lives in JS — transform only, never layout
     });
     var lastDim = "";
     function clamp01(v) { return Math.min(1, Math.max(0, v)); }
@@ -136,17 +140,19 @@
         var lp = clamp01((he - lag) / (1 - lag)); // per-cloud stagger of the part
         var le = lp * lp;                          // ease-in: clouds accelerate as they sweep past
         var side = +c.dataset.side;
-        var drift = +c.dataset.drift;
-        var x = parseFloat(c.style.left || 0) + (16 + (+c.dataset.fast * 24)) * drift * dt;
-        if (x > innerWidth + 180) x = -180;
-        c.style.left = x + "px";
-        // sweep outward: left clouds exit left, right clouds exit right + slight rise
-        var sweepX = side * le * innerWidth * 0.85;
+        var band = c.dataset.band;
+        // depth-based parting: near band rushes past the camera, sky barely peels
+        var sweep = band === "near" ? 1.35 : band === "mid" ? 0.9 : 0.55;
+        var grow = band === "near" ? 1.6 : band === "mid" ? 0.8 : 0.45;
+        // drift accumulates in JS, composed into transform — no layout writes per frame
+        c._x += (16 + (+c.dataset.fast * 24)) * (+c.dataset.drift) * dt;
+        if (c._x > innerWidth + 180) c._x = -180;
+        var sweepX = side * le * innerWidth * sweep;
         var bob = Math.sin(el * 0.6 + (+c.dataset.bob)) * 6 * (1 - he);
         var lift = (-70 * he) + bob;
-        var scale = 1 + le * 0.9;                  // grow as it rushes the camera
-        c.style.transform = "translate3d(" + sweepX + "px," + lift + "px,0) scale(" + scale + ")";
-        c.style.opacity = (c.classList.contains("cloud-mid") ? 0.82 : 0.9) * (1 - lp * lp);
+        var scale = 1 + le * grow;                 // grow as it rushes the camera
+        c.style.transform = "translate3d(" + (c._x + sweepX) + "px," + lift + "px,0) scale(" + scale + ")";
+        c.style.opacity = (band === "mid" ? 0.82 : band === "near" ? 0.78 : 0.9) * (1 - lp * lp);
       });
       if (heroHaze) {
         // mist thins out as you punch through it
