@@ -62,8 +62,6 @@
    Lives OUTSIDE .hero-overlay so the bank keeps peeling open after the type fades. */
 .hero-clouds { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
 .cloud { position: absolute; will-change: transform, opacity; }
-.cloud-cube { position: absolute; background: #f4f4f4; box-shadow: 1px 1px 0 #c9c9c9; }
-.cloud-base { position: absolute; height: 3px; background: #d9d9d9; opacity: 0.85; }
 
 /* soft mist layer directly behind the hero text: mutes the busy 3D scene so the
    hard-shadowed type stays crisp, while clouds drift around it */
@@ -81,11 +79,9 @@
 
 /* mid-band clouds ride lower — behind the type, framing it left/right */
 .cloud-mid { opacity: 0.82; }
-.cloud-mid .cloud-cube { background: #fafafa; box-shadow: 1px 1px 0 #d4d4d4; }
 .cloud-sky { opacity: 0.9; }
 /* near band: big, low, closest to camera — sweeps the hardest on part */
 .cloud-near { opacity: 0.78; }
-.cloud-near .cloud-cube { background: #ffffff; box-shadow: 2px 2px 0 #cfcfcf; }
 
 /* adventure quest subtext & college location */
 .hero-sub {

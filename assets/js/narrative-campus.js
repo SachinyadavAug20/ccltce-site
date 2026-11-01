@@ -1,4 +1,5 @@
 // Overworld campus: village, farms, pond, lamps, animals, hostiles.
+import * as THREE from "../vendor/three.module.js";
 import { GOLD, STONE, STONE2, DARKOAK, OAK, GRASS, DIRT, LEAF, LEAF2, WATER, PATH, box, glowLight, tree, torch } from "./narrative-blocks.js";
 import { cow, pig, sheep, chicken, villager } from "./narrative-mobs.js";
 import { wolf, cat, horse, rabbit, fox, bee, mooshroom, turtle, panda, polarBear, goat, llama, bat, parrot, axolotl, armadillo, frog } from "./narrative-mobs2.js";
@@ -74,12 +75,26 @@ function rock(g, x, z, s) {
   P(g, box(0.8 * k, 0.6 * k, 0.7 * k, STONE2), x + 0.3 * k, 0.6 * k, z + 0.1 * k);
 }
 
+// puffy voxel clouds — stacked box clusters (not flat slabs), group drifts on userData.cloud
 function clouds(g) {
   for (var c = 0; c < 10; c++) {
     var cx = -70 + c * 16 + (c % 3) * 4;
-    var cl = P(g, box(14 + (c % 4) * 8, 2.5, 10 + (c % 3) * 5, 0xffffff, 0xffffff, 0.25), cx, 50 + (c % 4) * 5, -40 + (c % 6) * 14);
-    cl.material.transparent = true; cl.material.opacity = 0.88;
-    cl.userData.cloud = c * 0.8; cl.userData.baseX = cx;
+    var cy = 50 + (c % 4) * 5, cz = -40 + (c % 6) * 14;
+    var grp = new THREE.Group(), n = 4 + (c % 3);
+    for (var b = 0; b < n; b++) {
+      var bw = 9 + ((c + b) % 4) * 5, bh = 3 + ((c * 2 + b) % 3) * 1.6, bd = 7 + ((c + b * 2) % 3) * 4;
+      var m = box(bw, bh, bd, 0xffffff, 0xffffff, 0.28);
+      m.position.set(
+        (b - (n - 1) / 2) * 7 + (b % 2 ? 2 : -1),
+        ((b * 5 + c) % 3) * 1.8 - 0.5,
+        ((b * 7 + c) % 5 - 2) * 3
+      );
+      grp.add(m);
+    }
+    grp.position.set(cx, cy, cz);
+    grp.userData.cloud = c * 0.8;
+    grp.userData.baseX = cx;
+    g.add(grp);
   }
 }
 

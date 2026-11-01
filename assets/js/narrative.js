@@ -10,6 +10,66 @@
     matchMedia("(max-width: 899px), (pointer: coarse)").matches
   ) return;
 
+  // one-shot isometric voxel-cloud sprite: shaded cubes (light top, cool sides) drawn
+  // once per cloud as its background — reads as 3D without DOM cube spam.
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6d2b79f5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function cloudSprite(w, h, seed, pal) {
+    var dpr = 2, cv = document.createElement("canvas");
+    cv.width = Math.max(16, Math.round(w * dpr));
+    cv.height = Math.max(16, Math.round(h * dpr));
+    var g = cv.getContext("2d"), rnd = mulberry32(seed);
+    var c = Math.max(12, Math.min(40, Math.round(h / 3.8)));   // cube screen size
+    var rows = 2, cols = Math.max(4, Math.floor((w - c) / c) - rows + 2);
+    var cells = [], mid = (cols - 1) / 2;
+    for (var i = 0; i < cols; i++) {
+      var edge = Math.abs(i - mid) / (mid || 1);                 // 0 centre → 1 edge
+      var peak = Math.max(1, Math.round((1 - edge * 0.72) * 2.4 + rnd() * 1.6));
+      for (var j = 0; j < rows; j++) {
+        if (rnd() < edge * 0.3) continue;
+        var hh = Math.max(1, peak - (j === 1 && rnd() < 0.5 ? 1 : 0));
+        for (var k = 0; k < hh; k++) cells.push([i, j, k]);
+      }
+    }
+    if (!cells.length) cells.push([0, 0, 0]);
+    cells.sort(function (a, b) { return (a[0] + a[1]) - (b[0] + b[1]) || a[2] - b[2]; });
+    var pts = cells.map(function (q) {
+      return [(q[0] - q[1]) * c, (q[0] + q[1]) * (c / 2) - q[2] * c];
+    });
+    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    pts.forEach(function (p) {
+      if (p[0] - c < minX) minX = p[0] - c;
+      if (p[0] + c > maxX) maxX = p[0] + c;
+      if (p[1] < minY) minY = p[1];
+      if (p[1] + 2 * c > maxY) maxY = p[1] + 2 * c;
+    });
+    var sc = Math.min((w * 0.97) / (maxX - minX), (h * 0.97) / (maxY - minY));
+    var ox = (w - (maxX - minX) * sc) / 2 - minX * sc;
+    var oy = (h - (maxY - minY) * sc) / 2 - minY * sc;
+    g.setTransform(dpr * sc, 0, 0, dpr * sc, ox * dpr, oy * dpr);
+    pts.forEach(function (p) {
+      var x = p[0], y = p[1];
+      // top diamond → right face → left face (painter order: back-to-front, base first)
+      [[0, [[x, y], [x + c, y + c / 2], [x, y + c], [x - c, y + c / 2]]],
+       [1, [[x + c, y + c / 2], [x, y + c], [x, y + 2 * c], [x + c, y + 1.5 * c]]],
+       [2, [[x - c, y + c / 2], [x, y + c], [x, y + 2 * c], [x - c, y + 1.5 * c]]]].forEach(function (f) {
+        g.fillStyle = pal[f[0]];
+        g.beginPath();
+        g.moveTo(f[1][0][0], f[1][0][1]);
+        for (var q = 1; q < f[1].length; q++) g.lineTo(f[1][q][0], f[1][q][1]);
+        g.closePath(); g.fill();
+        g.strokeStyle = pal[f[0]]; g.lineWidth = 0.6; g.stroke();   // seal AA seams
+      });
+    });
+    return cv.toDataURL("image/png");
+  }
+
   async function start() {
     var THREE = await import("../vendor/three.module.js");
     var [{ buildScene }, { createCameraPath, phaseAt, dimAt }, { initDragon }, { createLighting }, { createPerf }, { initCrystals }] =
@@ -62,21 +122,15 @@
       var w = parseFloat(c.style.width) || 360 + (i % 3) * 80;
       var h = parseFloat(c.style.height) || 100 + (i % 2) * 50;
       c.style.width = w + "px"; c.style.height = h + "px";
-      var n = 22 + (i % 10);
-      var frag = document.createDocumentFragment();
-      for (var k = 0; k < n; k++) {
-        var size = 18 + Math.random() * 44;
-        var cube = document.createElement("div");
-        cube.className = "cloud-cube";
-        cube.style.left = (Math.random() * (w - size)) + "px";
-        cube.style.top = (Math.random() * h * 0.55) + "px";
-        cube.style.width = size + "px"; cube.style.height = size + "px";
-        frag.appendChild(cube);
+      var band = c.classList.contains("cloud-near") ? "near" : c.classList.contains("cloud-mid") ? "mid" : "sky";
+      if (c.offsetParent) {   // layer is display:none on mobile — skip the canvas work
+        var pal = band === "sky" ? ["#eef3fa", "#d5deea", "#bcc9db"]
+          : band === "mid" ? ["#ffffff", "#e8eef6", "#ccd6e2"]
+          : ["#ffffff", "#eef3f9", "#d4dce6"];
+        c.style.backgroundImage = "url(" + cloudSprite(w, h, i * 7919 + 17, pal) + ")";
+        c.style.backgroundSize = "100% 100%";
+        c.style.backgroundRepeat = "no-repeat";
       }
-      var base = document.createElement("div"); base.className = "cloud-base";
-      base.style.left = (w * 0.1) + "px"; base.style.width = (w * 0.8) + "px"; base.style.bottom = "3px";
-      frag.appendChild(base);
-      c.appendChild(frag);
       // normalize left to px (mid band uses % in markup — parseFloat would read "64%" as 64),
       // then zero it: position now lives in c._x and is composed into transform only
       var leftRaw = c.style.left || "";
@@ -90,7 +144,6 @@
       // stagger the part start so the bank peels open instead of snapping
       c.dataset.lag = (Math.random() * 0.35).toFixed(3);
       // band depth: near sweeps hardest (closest to camera), sky barely moves
-      var band = c.classList.contains("cloud-near") ? "near" : c.classList.contains("cloud-mid") ? "mid" : "sky";
       c.dataset.band = band;
       c.dataset.drift = band === "mid" ? "0.45" : band === "near" ? "1.4" : "1";
       // remember base top so parting can lift each cloud at its own rate
