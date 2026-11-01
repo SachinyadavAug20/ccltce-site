@@ -25,11 +25,14 @@ body:has(#narrative-scroll) footer {
   overflow: hidden; z-index: 1;
 }
 
-/* hero sits inside narrative, fades on scroll */
+/* hero sits inside narrative, fades on scroll.
+   Content rides HIGH in the frame (padding-bottom pushes the block up) so it feels
+   detached from the ground content below — it arrived from the sky. */
 .hero-overlay {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
+  padding-bottom: clamp(4rem, 14vh, 9rem);
   text-align: center; z-index: 5;
   pointer-events: none; transition: none;
 }
