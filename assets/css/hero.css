@@ -55,11 +55,31 @@
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 /* minecraft clouds — sit between the 3D overworld scene and the hero text,
-   built from blocky cubes (mc style), drift steadily, then rise away on scroll */
-.hero-clouds { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
-.cloud { position: absolute; }
+   built from blocky cubes (mc style), drift steadily, then part to the sides on scroll.
+   Lives OUTSIDE .hero-overlay so the bank keeps peeling open after the type fades. */
+.hero-clouds { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+.cloud { position: absolute; will-change: transform, opacity; }
 .cloud-cube { position: absolute; background: #f4f4f4; box-shadow: 1px 1px 0 #c9c9c9; }
 .cloud-base { position: absolute; height: 3px; background: #d9d9d9; opacity: 0.85; }
+
+/* soft mist layer directly behind the hero text: mutes the busy 3D scene so the
+   hard-shadowed type stays crisp, while clouds drift around it */
+.hero-haze {
+  position: absolute; left: 50%; top: 48%;
+  width: min(1100px, 96vw); height: min(560px, 64vh);
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse at center,
+    rgba(255, 255, 255, 0.42) 0%,
+    rgba(255, 255, 255, 0.26) 42%,
+    rgba(255, 255, 255, 0.08) 68%,
+    transparent 82%);
+  will-change: opacity, transform;
+}
+
+/* mid-band clouds ride lower — behind the type, framing it left/right */
+.cloud-mid { opacity: 0.82; }
+.cloud-mid .cloud-cube { background: #fafafa; box-shadow: 1px 1px 0 #d4d4d4; }
+.cloud-sky { opacity: 0.9; }
 
 /* adventure quest subtext & college location */
 .hero-sub {

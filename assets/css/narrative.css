@@ -124,6 +124,7 @@ body:has(#narrative-scroll) footer {
   #narrative-scroll { height: auto !important; padding-bottom: 2rem; }
   #narrative-webgl { display: none !important; }
   .narrative-viewport { position: static !important; height: auto !important; overflow: visible !important; }
+  .hero-clouds { display: none !important; }
   .hero-overlay {
     position: relative; inset: auto;
     min-height: auto; padding: 4.8rem 1rem 1.25rem;

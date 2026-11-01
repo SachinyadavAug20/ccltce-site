@@ -53,11 +53,14 @@
       bedrock: wrapper.querySelector(".narrative-overlay.bedrock"),
     };
     var heroOverlay = document.querySelector(".hero-overlay");
-    var heroClouds = heroOverlay ? heroOverlay.querySelectorAll(".cloud") : [];
+    var cloudLayer = viewport.querySelector(".hero-clouds");
+    var heroClouds = cloudLayer ? cloudLayer.querySelectorAll(".cloud") : [];
+    var heroHaze = cloudLayer ? cloudLayer.querySelector(".hero-haze") : null;
     heroClouds.forEach(function (c, i) {
       if (c.dataset.n) return;
       c.dataset.n = 1;
-      var w = 360 + (i % 3) * 80, h = 100 + (i % 2) * 50;
+      var w = parseFloat(c.style.width) || 360 + (i % 3) * 80;
+      var h = parseFloat(c.style.height) || 100 + (i % 2) * 50;
       c.style.width = w + "px"; c.style.height = h + "px";
       var n = 22 + (i % 10);
       var frag = document.createDocumentFragment();
@@ -74,7 +77,22 @@
       base.style.left = (w * 0.1) + "px"; base.style.width = (w * 0.8) + "px"; base.style.bottom = "3px";
       frag.appendChild(base);
       c.appendChild(frag);
-      c.style.left = ((i / Math.max(heroClouds.length, 1)) * innerWidth + (i % 3) * 55) + "px";
+      // normalize left to px (mid band uses % in markup — parseFloat would read "64%" as 64)
+      var leftRaw = c.style.left || "";
+      var leftPx = leftRaw.indexOf("%") > -1
+        ? (parseFloat(leftRaw) / 100) * innerWidth
+        : (parseFloat(leftRaw) || 0);
+      c.style.left = leftPx + "px";
+      // parting lane: clouds split to the side their center sits on (fly-through feel)
+      var cx = leftPx + w / 2;
+      c.dataset.side = cx < innerWidth / 2 ? "-1" : "1";
+      // stagger the part start so the bank peels open instead of snapping
+      c.dataset.lag = (Math.random() * 0.35).toFixed(3);
+      // per-cloud drift speed multiplier (mid band drifts slower — it hugs the text)
+      c.dataset.drift = c.classList.contains("cloud-mid") ? "0.45" : "1";
+      // remember base top so parting can lift each cloud at its own rate
+      c.dataset.baseTop = (parseFloat(c.style.top) || 0);
+      c.dataset.bob = (Math.random() * Math.PI * 2).toFixed(3);
     });
     var lastDim = "";
     function clamp01(v) { return Math.min(1, Math.max(0, v)); }
@@ -105,17 +123,35 @@
       progress.s += (progress.t - progress.s) * (1 - Math.pow(0.0004, dt));
       if (Math.abs(progress.t - progress.s) < 0.0002) progress.s = progress.t;
     syncHud(progress.t);
-    // minecraft clouds between the 3D scene and the hero text: steady horizontal drift,
-    // then rise and fade away as the hero text fades out on scroll
+    // minecraft clouds between the 3D scene and the hero text:
+    // steady drift at rest → on scroll the bank PEELS OPEN to either side (fly-through),
+    // each cloud accelerating outward on its own lane with stagger + scale-up as it passes the camera
     if (heroClouds.length) {
-      var hf = clamp01((progress.t - 0.05) / 0.16);
+      // cloud peel outlives the hero text: type is gone by t≈0.21, banks keep opening until t≈0.32
+      var hf = clamp01((progress.t - 0.04) / 0.28);
+      var he = hf * hf * (3 - 2 * hf);            // smoothstep — soft launch, hard finish
       heroClouds.forEach(function (c) {
-        var x = parseFloat(c.style.left || 0) + (16 + (+c.dataset.fast * 24)) * dt;
+        var lag = +c.dataset.lag;
+        var lp = clamp01((he - lag) / (1 - lag)); // per-cloud stagger of the part
+        var le = lp * lp;                          // ease-in: clouds accelerate as they sweep past
+        var side = +c.dataset.side;
+        var drift = +c.dataset.drift;
+        var x = parseFloat(c.style.left || 0) + (16 + (+c.dataset.fast * 24)) * drift * dt;
         if (x > innerWidth + 180) x = -180;
         c.style.left = x + "px";
-        c.style.transform = "translateY(" + (-70 * hf) + "px) scale(" + (1 - 0.55 * hf) + ")";
-        c.style.opacity = 0.9 * (1 - hf);
+        // sweep outward: left clouds exit left, right clouds exit right + slight rise
+        var sweepX = side * le * innerWidth * 0.85;
+        var bob = Math.sin(el * 0.6 + (+c.dataset.bob)) * 6 * (1 - he);
+        var lift = (-70 * he) + bob;
+        var scale = 1 + le * 0.9;                  // grow as it rushes the camera
+        c.style.transform = "translate3d(" + sweepX + "px," + lift + "px,0) scale(" + scale + ")";
+        c.style.opacity = (c.classList.contains("cloud-mid") ? 0.82 : 0.9) * (1 - lp * lp);
       });
+      if (heroHaze) {
+        // mist thins out as you punch through it
+        heroHaze.style.opacity = 1 - he;
+        heroHaze.style.transform = "translate(-50%,-50%) scale(" + (1 + he * 0.6) + ")";
+      }
     }
     if (document.hidden || !perf.visible()) return;   // off-screen: no draw, no light work
       perf.frame(dt);
