@@ -1,5 +1,6 @@
 /* ---------- narrative scroll — 3D journey overlays ---------- */
-#narrative-scroll { position: relative; height: 1100vh; width: 100%; }
+/* 1500vh: cinema-length journey — every phase gets room to breathe */
+#narrative-scroll { position: relative; height: 1500vh; width: 100%; }
 
 body.narrative-page main,
 body:has(#narrative-scroll) main {

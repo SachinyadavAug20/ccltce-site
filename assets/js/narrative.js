@@ -100,7 +100,8 @@
       var phase = phaseAt(t);
       for (var key in overlays) { var el = overlays[key]; if (el) el.classList.toggle("on", key === phase); }
       if (heroOverlay) {
-        var hf = clamp01((t - 0.05) / 0.16);
+        // normalized to scroll length: gone by t≈0.16 (~2 screens) at 1500vh
+        var hf = clamp01((t - 0.04) / 0.12);
         heroOverlay.style.opacity = 1 - hf;
         heroOverlay.style.transform = "translateY(" + (-50 * hf) + "px)";
         heroOverlay.style.display = hf >= 1 ? "none" : "";
@@ -127,8 +128,8 @@
     // steady drift at rest → on scroll the bank PEELS OPEN to either side (fly-through),
     // each cloud accelerating outward on its own lane with stagger + scale-up as it passes the camera
     if (heroClouds.length) {
-      // cloud peel outlives the hero text: type is gone by t≈0.21, banks keep opening until t≈0.32
-      var hf = clamp01((progress.t - 0.04) / 0.28);
+      // cloud peel outlives the hero text: type is gone by t≈0.16, banks keep opening until t≈0.24
+      var hf = clamp01((progress.t - 0.04) / 0.20);
       var he = hf * hf * (3 - 2 * hf);            // smoothstep — soft launch, hard finish
       heroClouds.forEach(function (c) {
         var lag = +c.dataset.lag;
