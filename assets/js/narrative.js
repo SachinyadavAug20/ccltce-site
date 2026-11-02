@@ -198,10 +198,14 @@
     // minecraft clouds between the 3D scene and the hero text:
     // steady drift at rest → on scroll the bank PEELS OPEN to either side (fly-through),
     // each cloud accelerating outward on its own lane with stagger + scale-up as it passes the camera
+    // hero mist fades on scroll whether or not any DOM clouds remain
+    var hf = clamp01((progress.t - 0.04) / 0.20);
+    var he = hf * hf * (3 - 2 * hf);            // smoothstep — soft launch, hard finish
+    if (heroHaze) {
+      heroHaze.style.opacity = 1 - he;
+      heroHaze.style.transform = "translate(-50%,-50%) scale(" + (1 + he * 0.6) + ")";
+    }
     if (heroClouds.length) {
-      // cloud peel outlives the hero text: type is gone by t≈0.16, banks keep opening until t≈0.24
-      var hf = clamp01((progress.t - 0.04) / 0.20);
-      var he = hf * hf * (3 - 2 * hf);            // smoothstep — soft launch, hard finish
       heroClouds.forEach(function (c) {
         var lag = +c.dataset.lag;
         var lp = clamp01((he - lag) / (1 - lag)); // per-cloud stagger of the part
@@ -221,11 +225,6 @@
         c.style.transform = "translate3d(" + (c._x + sweepX) + "px," + lift + "px,0) scale(" + scale + ")";
         c.style.opacity = (band === "mid" ? 0.82 : band === "near" ? 0.78 : 0.9) * (1 - lp * lp);
       });
-      if (heroHaze) {
-        // mist thins out as you punch through it
-        heroHaze.style.opacity = 1 - he;
-        heroHaze.style.transform = "translate(-50%,-50%) scale(" + (1 + he * 0.6) + ")";
-      }
     }
     if (document.hidden || !perf.visible()) return;   // off-screen: no draw, no light work
       perf.frame(dt);
@@ -269,6 +268,8 @@
         camera.position.y += (Math.random() - 0.5) * shake;
         camera.rotateZ((Math.random() - 0.5) * shake * 0.12);
       }
+      var ov = window.CCLTCE_CAM_OVERRIDE;   // debug camera pose { px,py,pz, lx,ly,lz } — overrides the fly-through
+      if (ov) { camera.position.set(ov.px, ov.py, ov.pz); camera.lookAt(ov.lx, ov.ly, ov.lz); }
       light.tick(progress.dim, camera);
       renderer.render(scene, camera);
     }
@@ -311,6 +312,7 @@
     light.sky("overworld"); light.lights("overworld");
     updateOverlays(0); animate(); onScroll();
     window.CCLTCE_PROGRESS = progress;   // live scroll glide { raw, t, s } — tests + debug console
+    window.CCLTCE_CAM = camera;          // camera handle — debug views for the frame-loop-owned camera
   }
   start().catch(function (err) {
     console.warn("Narrative WebGL path unavailable —", err);

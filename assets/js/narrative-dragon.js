@@ -6,12 +6,13 @@ var C = new THREE.Vector3(200, -105, 20); // orbit centre — island top (-126) 
 var ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 
 export function initDragon(scene, camera, host) {
-  var root = null, head = null, hitbox = null, portal = null, jets = [];
+  var root = null, head = null, hitbox = null, portal = null, egg = null, jets = [];
   scene.traverse(function (o) {
     if (o.userData.dragon) root = o;
     if (o.userData.dragonHead) head = o;
     if (o.userData.dragonHit) hitbox = o;
     if (o.userData.endPortal) portal = o;
+    if (o.userData.endEgg) egg = o;
     if (o.userData.gatewayBeam) jets.push(o);
   });
   if (!root || !hitbox) return null;
@@ -74,6 +75,7 @@ export function initDragon(scene, camera, host) {
       o.life = 2.2 + Math.random() * 1.6;
     }
     if (portal) portal.userData.pulse = undefined;
+    if (egg) egg.visible = true;                // dragon egg spawns on the portal
     if (window.CCLTCE_SFX) CCLTCE_SFX.levelUp();
     if (window.CCLTCE_HUD) CCLTCE_HUD.addXP(200);
   }

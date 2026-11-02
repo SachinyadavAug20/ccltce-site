@@ -75,13 +75,16 @@ function rock(g, x, z, s) {
   P(g, box(0.8 * k, 0.6 * k, 0.7 * k, STONE2), x + 0.3 * k, 0.6 * k, z + 0.1 * k);
 }
 
-// puffy voxel clouds — 18 randomized stacked box clusters
+// puffy voxel clouds — randomized stacked box clusters, stratified up the sky
+// (two bands: campus roofline ~46-72, hero fly-through layer ~74-108)
 function clouds(g) {
-  for (var c = 0; c < 18; c++) {
+  for (var c = 0; c < 26; c++) {
     var cx = -110 + Math.random() * 220;
-    var cy = 46 + Math.random() * 26, cz = -65 + Math.random() * 130;
+    var high = c % 5 >= 2;                       // ~40% of the bank sits above the hero
+    var cy = high ? 74 + Math.random() * 34 : 46 + Math.random() * 26;
+    var cz = -65 + Math.random() * 130;
     var grp = new THREE.Group(), n = 4 + Math.floor(Math.random() * 4);
-    var scale = 0.7 + Math.random() * 1.2;
+    var scale = (0.7 + Math.random() * 1.2) * (high ? 1.25 : 1);
     for (var b = 0; b < n; b++) {
       var bw = (8 + Math.random() * 14) * scale, bh = (2.8 + Math.random() * 4) * scale, bd = (7 + Math.random() * 10) * scale;
       var m = box(bw, bh, bd, 0xffffff, 0xffffff, 0.28);

@@ -1,6 +1,6 @@
 // The End — sunken island, banded obsidian pillars with breakable crystals, end city, gateway, boss.
 import * as THREE from "../vendor/three.module.js";
-import { ENDSTONE, PURPUR, END_ROD, AMETH, box, glowLight } from "./narrative-blocks.js";
+import { ENDSTONE, PURPUR, END_ROD, AMETH, GLOWSTONE, box, glowLight } from "./narrative-blocks.js";
 import { enderman, enderDragon } from "./narrative-endmobs.js";
 import { endermite } from "./narrative-mobs3.js";
 
@@ -12,10 +12,17 @@ function tint(w, h, d, c, op) {
 var OB_MAIN = 0x2e2450, OB_BAND = 0x4b3a7d, OB_DEEP = 0x1a1430, LIP = 0xb8a54e, STONE_D = 0xc9b96a;
 var IRON = 0x8a8a8a, FIRE = 0xff7a1a, CAP = 0xc4b4d4, WINDOW = 0x241a30;
 
-// two-tier island: clean slabs + flush border stripe + raised stones (the old floating rim slabs are gone)
+// two-tier island: clean slabs + flush border stripe + raised stones. Both tiers leave a
+// 20-wide centre hole — the bedrock exit-portal fountain bowl is carved into it (vanilla-style).
 function island(g, D) {
-  P(g, box(64, 4, 64, ENDSTONE), 200, -30 - D, 20);
-  P(g, box(44, 3, 44, ENDSTONE), 200, -27.5 - D, 20);
+  P(g, box(64, 4, 22, ENDSTONE), 200, -30 - D, -1);    // base tier strips hug the centre hole
+  P(g, box(64, 4, 22, ENDSTONE), 200, -30 - D, 41);
+  P(g, box(22, 4, 20, ENDSTONE), 179, -30 - D, 20);
+  P(g, box(22, 4, 20, ENDSTONE), 221, -30 - D, 20);
+  P(g, box(44, 3, 12, ENDSTONE), 200, -27.5 - D, 4);   // centre tier strips, same hole
+  P(g, box(44, 3, 12, ENDSTONE), 200, -27.5 - D, 36);
+  P(g, box(12, 3, 20, ENDSTONE), 184, -27.5 - D, 20);
+  P(g, box(12, 3, 20, ENDSTONE), 216, -27.5 - D, 20);
   P(g, box(64, 1, 3, LIP), 200, -27.5 - D, -10.5);
   P(g, box(64, 1, 3, LIP), 200, -27.5 - D, 50.5);
   P(g, box(3, 1, 58, LIP), 169.5, -27.5 - D, 20);
@@ -66,36 +73,53 @@ function city(g, D) {
   g.add(glowLight(AMETH, 1.5, 25, 218, -14 - D, 70));
 }
 
-// end gateway fountain — stepped obsidian plinth, gem-studded rim, corner posts,
-// the pulsing amethyst portal (the dragon rebirths it into the end portal), a white
-// beacon jet and drifting shards. The portal stays ONE mesh: dragon death scales it.
+// end exit portal fountain — vanilla-style: sunken stepped bedrock bowl flush with the
+// surface, central bedrock pedestal topped by the dark starry portal block, dragon egg
+// (spawns when the dragon is slain), four torch stubs on the floor, and the blue-white
+// beam that dies with the dragon. The portal stays ONE mesh: dragon death scales it.
 function gateway(g, D) {
-  var y = -26 - D;                                     // island centre-tier top
-  P(g, box(7.6, 0.8, 7.6, OB_DEEP), 200, y + 0.4, 20);   // step 1  y..+0.8
-  P(g, box(6.2, 0.7, 6.2, OB_MAIN), 200, y + 1.15, 20);  // step 2  +0.8..+1.5
-  P(g, box(4.8, 0.6, 4.8, OB_BAND), 200, y + 1.8, 20);   // step 3  +1.5..+2.1
-  [[-3.45, -3.45], [3.45, -3.45], [-3.45, 3.45], [3.45, 3.45]].forEach(function (p, i) {
-    var gem = P(g, box(0.55, 0.55, 0.55, AMETH, AMETH, 0.85), 200 + p[0], y + 1.07, 20 + p[1]);
-    gem.userData.pulse = i * 0.8;
-  });
-  [[-1.7, -1.7], [1.7, -1.7], [-1.7, 1.7], [1.7, 1.7]].forEach(function (p) {
-    P(g, box(0.6, 3.4, 0.6, OB_MAIN), 200 + p[0], y + 3.8, 20 + p[1]);   // posts  +2.1..+5.5
-    P(g, box(0.95, 0.45, 0.95, OB_BAND), 200 + p[0], y + 5.72, 20 + p[1]); // caps
-    var tip = P(g, box(0.3, 0.3, 0.3, AMETH, AMETH, 0.9), 200 + p[0], y + 6.1, 20 + p[1]);
-    tip.userData.pulse = p[0] + p[1];
-  });
-  var portal = P(g, box(2.9, 3.4, 0.28, AMETH, AMETH, 0.9), 200, y + 3.8, 20);
+  var y = -26 - D;                                    // island surface
+  var b1 = 0x2c2b31, b2 = 0x1f1e24, b3 = 0x35343a;    // bedrock speckle grays
+  // rim ring, flush with the island — fills the carved hole mouth (vanilla stepped rim)
+  P(g, box(20.4, 1.05, 3.5, b1), 200, y - 0.47, 11.7);
+  P(g, box(20.4, 1.05, 3.5, b1), 200, y - 0.47, 28.3);
+  P(g, box(3.5, 1.05, 13.4, b2), 191.7, y - 0.47, 20);
+  P(g, box(3.5, 1.05, 13.4, b2), 208.3, y - 0.47, 20);
+  // the bowl hollows into the island: descending bedrock steps to the floor
+  P(g, box(13, 2.2, 13, b3), 200, y - 2.1, 20);
+  P(g, box(9, 2.2, 9, b3), 200, y - 4.25, 20);
+  P(g, box(5, 0.7, 5, b2), 200, y - 5.65, 20);
+  // central pedestal + starry exit-portal block (stars ride the mesh, they scale on reveal)
+  P(g, box(2.2, 2.3, 2.2, b1), 200, y - 4.15, 20);
+  var portal = P(g, box(2.6, 1.9, 2.6, 0x0b0a12, 0x8fd0ff, 0.28), 200, y - 2.05, 20);
   portal.userData.pulse = 1; portal.userData.endPortal = true;
-  var jet = P(g, box(0.34, 12, 0.34, END_ROD, END_ROD, 0.75), 200, y + 11.5, 20);
+  [[1.31, 0.5, 0.2], [-1.31, 0.4, -0.6], [0.7, 1.28, -0.9], [0.4, -1.28, 0.5],
+   [-0.8, 0.1, 1.31], [0.9, 0.55, -1.31], [-0.5, 0.8, -1.31], [-1.31, -0.5, 0.8],
+   [1.31, -0.35, -0.4], [0.05, 1.28, 0.85], [-0.9, -1.28, -0.3], [1.31, 0, 0.05]].forEach(function (s, i) {
+    var w = 0.13 + (i % 3) * 0.05;
+    var star = box(w, w, w, i % 4 ? 0xffffff : 0xd8ccff, i % 4 ? 0xffffff : 0xd8ccff, 0.9);
+    star.position.set(s[0], s[1], s[2]);
+    portal.add(star);
+  });
+  // dragon egg — spawns only after the dragon is slain
+  var egg = new THREE.Group();
+  P(egg, box(1.2, 1.5, 1.2, 0x14103a), 0, 0.75, 0);
+  P(egg, box(0.7, 0.6, 0.7, 0x14103a), 0, 1.75, 0);
+  egg.position.set(200, y - 1.1, 20);
+  egg.userData.endEgg = true; egg.visible = false;
+  g.add(egg);
+  // four torch stubs on the bowl floor (vanilla fountain torches)
+  [[-2.2, 0], [2.2, 0], [0, -2.2], [0, 2.2]].forEach(function (p, i) {
+    P(g, box(0.9, 1, 0.9, i % 2 ? b1 : b2), 200 + p[0], y - 4.85, 20 + p[1]);
+    var f = P(g, box(0.5, 0.7, 0.5, GLOWSTONE, GLOWSTONE, 1), 200 + p[0], y - 4.0, 20 + p[1]);
+    f.userData.pulse = i * 0.8;
+    g.add(glowLight(GLOWSTONE, 1.1, 9, 200 + p[0], y - 4.1, 20 + p[1]));
+  });
+  // exit-portal beam — thin white jet rising from the portal top
+  var jet = P(g, box(0.34, 12, 0.34, END_ROD, END_ROD, 0.75), 200, y + 4.9, 20);
   jet.userData.gatewayBeam = true;
-  var halo = P(g, tint(1.2, 12, 1.2, 0xd8ccff, 0.13), 200, y + 11.5, 20);
+  var halo = P(g, tint(1.2, 12, 1.2, 0xd8ccff, 0.13), 200, y + 4.9, 20);
   halo.userData.gatewayBeam = true;
-  for (var i = 0; i < 10; i++) {                     // shards spiralling up the jet
-    var a = i * 0.628 + (i % 3), r = 1.5 + (i % 4) * 0.75;
-    var sh = P(g, box(0.26, 0.26, 0.26, i % 3 ? AMETH : END_ROD, i % 3 ? AMETH : END_ROD, 0.9),
-      200 + Math.cos(a) * r, y + 2.6 + (i % 5) * 1.15, 20 + Math.sin(a) * r);
-    sh.userData.float = i * 1.3;
-  }
 }
 
 // dive shaft — floating outcrops hugging the fall line so the free-fall between the
