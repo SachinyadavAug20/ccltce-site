@@ -108,6 +108,7 @@
     var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false, powerPreference: "high-performance" });
     var camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 500);
     var built = buildScene(), scene = built.scene, L = built.lights;
+    window.CCLTCE_SCENE = scene;         // scene handle — debug inspection of the End/campus builds
     var curve = createCameraPath(), stations = built.stations;
     var viewport = wrapper.querySelector(".narrative-viewport");
     var perf = createPerf({ renderer: renderer, scene: scene, section: wrapper, camera: camera });

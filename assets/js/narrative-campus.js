@@ -76,18 +76,30 @@ function rock(g, x, z, s) {
 }
 
 // puffy voxel clouds — randomized stacked box clusters, stratified up the sky
-// (two bands: campus roofline ~46-72, hero fly-through layer ~74-108)
+// (campus roofline ~46-72, hero fly-through layer ~74-108, plus a descent corridor band)
 function clouds(g) {
   for (var c = 0; c < 26; c++) {
-    var cx = -110 + Math.random() * 220;
-    var high = c % 5 >= 2;                       // ~40% of the bank sits above the hero
-    var cy = high ? 74 + Math.random() * 34 : 46 + Math.random() * 26;
-    var cz = -65 + Math.random() * 130;
+    var cx, cy, cz;
+    if (c < 7) {
+      // corridor band: clouds flank the hero fly-through lane (camera dives y95→48) so the
+      // view frames the campus through open sky, and the scroll parting sweeps a real bank
+      cx = (Math.random() < 0.5 ? -1 : 1) * (6 + Math.random() * 39);
+      cy = 42 + Math.random() * 30;
+      cz = 50 + Math.random() * 65;
+    } else {
+      var high = c % 5 >= 2;                       // ~40% of the outer bank sits above the hero
+      cx = -110 + Math.random() * 220;
+      cy = high ? 74 + Math.random() * 34 : 46 + Math.random() * 26;
+      cz = -65 + Math.random() * 130;
+    }
     var grp = new THREE.Group(), n = 4 + Math.floor(Math.random() * 4);
-    var scale = (0.7 + Math.random() * 1.2) * (high ? 1.25 : 1);
+    var scale = 0.7 + Math.random() * 1.2;
     for (var b = 0; b < n; b++) {
       var bw = (8 + Math.random() * 14) * scale, bh = (2.8 + Math.random() * 4) * scale, bd = (7 + Math.random() * 10) * scale;
       var m = box(bw, bh, bd, 0xffffff, 0xffffff, 0.28);
+      m.material.transparent = true;               // sky shows through — see-through vanilla clouds
+      m.material.opacity = 0.55;
+      m.material.depthWrite = false;
       m.position.set(
         (b - (n - 1) / 2) * 7.5 * scale + (Math.random() - 0.5) * 3,
         (Math.random() - 0.3) * 2.5 * scale,
