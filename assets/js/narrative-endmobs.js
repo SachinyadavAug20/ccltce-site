@@ -9,6 +9,8 @@ function add(grp, mesh, x, y, z) {
 
 export function enderman(g, x, y, z) {
   var grp = new THREE.Group(); grp.position.set(x, y, z);
+  grp.userData.enderman = true;                                  // dragon-kill dance troupe
+  grp.userData.baseY = y;                                        // dance bob anchors here
   add(grp, M(0.6, 1.8, 0.35, 0x0a0a0a), 0, 1.8, 0);
   add(grp, M(0.55, 0.55, 0.55, 0x0a0a0a), 0, 3.0, 0);
   add(grp, M(0.18, 0.1, 0.1, 0xd4a0f0), -0.12, 3.0, 0.3);

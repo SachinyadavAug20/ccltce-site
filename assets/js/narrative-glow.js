@@ -1,4 +1,4 @@
-// Wiki-accurate detail pass: shroomlights, soul fire, ores, hanging lanterns, glow squids, chorus.
+// Wiki-accurate detail pass: shroomlights, soul fire, ores, hanging lanterns.
 import { END_ROD, box, glowLight } from "./narrative-blocks.js";
 
 function P(g, m, x, y, z) { m.position.set(x, y, z); g.add(m); return m; }
@@ -48,16 +48,4 @@ function netherGlow(g) {
   for (var f = 0; f < 9; f++) flame(g, 0xff7a1a, 6, 14, 60 + f * 16, -0.4, f % 2 ? -25.6 : 45.6);
 }
 
-function endGlow(g) {
-  var D = 100;
-  // 4 glow squids just outside the dragon ring (was 6 scattered + void glowstone)
-  [[176, 10], [224, 4], [182, 40], [228, 34]].forEach(function (s) { glowSquid(g, s[0], -14 - D, s[1]); });
-  for (var r = 0; r < 5; r++) {        // end rod clusters low on the island
-    var rx = 178 + (r * 7) % 44, rz = 2 + (r * 9) % 38;
-    P(g, box(0.3, 1.8, 0.3, END_ROD, END_ROD, 1), rx, -25.6 - D, rz);
-    P(g, box(0.7, 0.7, 0.7, END_ROD, END_ROD, 1), rx, -24.4 - D, rz);
-    if (r % 2) g.add(glowLight(END_ROD, 9, 15, rx, -24.4 - D, rz));
-  }
-}
-
-export function buildGlow(g) { netherGlow(g); endGlow(g); }
+export function buildGlow(g) { netherGlow(g); }

@@ -21,7 +21,7 @@ export function createCameraPath() {
 export function updateCamera(camera, curve, t, look) {
   var p = curve.getPointAt(Math.min(Math.max(t, 0), 1));
   camera.position.copy(p);
-  camera.lookAt(look || curve.getPointAt(Math.min(t + 0.04, 1)));
+  camera.lookAt(look || curve.getPointAt(Math.min(t + 0.028, 1)));
 }
 
 // anchors from arc length ~520: x=40 @0.345, x=160 @0.612, x=200 @0.698, y=-5 @0.735, z=46 @0.812 (x=224), dive -80 @0.922
