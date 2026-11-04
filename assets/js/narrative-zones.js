@@ -22,8 +22,11 @@ export function buildNether(g) {
   // Real nether portal in the doorway — obsidian frame + purple swirl interior the camera
   // punches through (vanilla build: filled frame, oily multi-layer surface)
   var PX = 38.7;
-  P(g, box(1.2, 16, 1.2, OBSIDIAN), PX, 7.5, 13.4);          // frame columns, z 12.8..14 / 30..31.2
-  P(g, box(1.2, 16, 1.2, OBSIDIAN), PX, 7.5, 30.6);
+  // Columns live inside the doorway opening, clear of the wall faces (z 14 / 30) and 1.0 wide
+  // so no face is coplanar with lintel/sill (both sit at x 38.1..39.3) — buried columns were
+  // invisible and shone through the wall face as flickering strips.
+  P(g, box(1.0, 16, 1.2, OBSIDIAN), PX, 7.5, 14.7);          // frame columns, z 14.1..15.3 / 28.7..29.9
+  P(g, box(1.0, 16, 1.2, OBSIDIAN), PX, 7.5, 29.3);
   P(g, box(1.2, 1.2, 19.6, OBSIDIAN), PX, 14.6, 22);          // lintel
   P(g, box(1.2, 1.2, 19.6, OBSIDIAN), PX, 0.7, 22);           // sill
   var swirl = P(g, box(0.4, 13.2, 15.6, 0xa855f7, 0xa855f7, 0.9), PX, 7.6, 22);
@@ -44,15 +47,15 @@ export function buildNether(g) {
   // the floor up to a platform where a ring of green end frames surrounds the starry field —
   // the dive falls right through the field (camera crosses its plane at x≈200, z≈26).
   for (var stp = 0; stp < 7; stp++) {
-    var stop = 0.2 + stp * 1.2, sx = 189.8 + stp * 1.8;
+    var stop = 0.1 + stp * 1.2, sx = 189.8 + stp * 1.8;       // top step 7.3, just shy of the platform's 7.4 — an exact match shared a coplanar top face
     P(g, box(1.8, stop + 2, 9, 0x8f8f89), sx, (stop - 2) / 2, 34);
   }
   P(g, box(10.2, 9.4, 11, 0x8f8f89), 202.5, 2.7, 26);          // platform: y -2..7.4, x 197.4..207.6
   var FR = 0x3f5f44, FRT = 0x17dd62;
-  for (var r = 0; r < 12; r++) {                              // 12 end-portal-frame blocks in the ring
-    var side = Math.floor(r / 3), q = (r % 3) - 1;
-    var fx2 = side % 2 ? (side < 2 ? 4.3 : -4.3) : q * 4.3;
-    var fz2 = side % 2 ? q * 4.3 : (side < 2 ? 4.3 : -4.3);
+  for (var r = 0; r < 12; r++) {                              // 12 vanilla end-portal frames per ring: 3 per side, corners empty
+    var side = Math.floor(r / 3), q = ((r % 3) - 1) * 2.15;
+    var fx2 = side % 2 ? (side < 2 ? 4.3 : -4.3) : q;
+    var fz2 = side % 2 ? q : (side < 2 ? 4.3 : -4.3);
     var fb = P(g, box(2, 1.1, 2, FR, FRT, 0.22), 202.5 + fx2, 7.95, 26 + fz2);
     fb.userData.pulse = side * 0.55;
   }

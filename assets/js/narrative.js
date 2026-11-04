@@ -187,9 +187,9 @@
       requestAnimationFrame(animate);
       var el = clock.getElapsedTime(), dt = Math.min(0.1, Math.max(0.001, el - lastEl));
       lastEl = el;
-      // slow single-stage cinematic glide: one exponential follow, no cascaded damping
+      // slow single-stage cinematic glide: one fixed-rate exponential follow, no cascaded damping
       // (the old raw→t→s double lag rang the camera into little useless wiggles on stop)
-      var k = 2.0 + 2.2 * clamp01((progress.raw - 0.2) / 0.2);
+      var k = 1.5;
       progress.t += (progress.raw - progress.t) * (1 - Math.exp(-k * dt));
       progress.s = progress.t;
     syncHud(progress.t);
@@ -245,7 +245,7 @@
       // damped scroll follow — the frame loop owns the camera so nothing drifts off-screen
       var u = Math.min(Math.max(progress.s, 0), 1);
       camera.position.copy(curve.getPointAt(u));
-      var look = lookA.copy(curve.getPointAt(Math.min(u + 0.028, 1))), shake = 0;
+      var look = lookA.copy(curve.getPointAt(Math.min(u + 0.012, 1))), shake = 0;
       if (u > 0.7 && u < 0.92) {
         // dive: the spline looks east into the void — hold the island (and its beams) in frame
         var iw = clamp01((u - 0.7) / 0.06) * (1 - clamp01((u - 0.88) / 0.04));
@@ -259,7 +259,7 @@
       }
       crystals.update(dt);
       if (firstLook) { lookSm.copy(look); firstLook = false; }
-      else lookSm.lerp(look, 1 - Math.exp(-2.5 * dt));   // slow steady gaze — no snap, no swing
+      else lookSm.lerp(look, 1 - Math.exp(-1.8 * dt));   // slow steady gaze — no snap, no swing
       camera.lookAt(lookSm);
       if (shake > 0) {
         camera.position.x += (Math.random() - 0.5) * shake;
