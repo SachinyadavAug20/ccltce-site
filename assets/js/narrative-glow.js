@@ -1,5 +1,5 @@
 // Wiki-accurate detail pass: shroomlights, soul fire, ores, hanging lanterns.
-import { END_ROD, box, glowLight } from "./narrative-blocks.js";
+import { box, glowLight } from "./narrative-blocks.js";
 
 function P(g, m, x, y, z) { m.position.set(x, y, z); g.add(m); return m; }
 
