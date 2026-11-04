@@ -23,6 +23,31 @@
     }
   }
 
+  // ── vanilla splash text — yellow, rotated, pulsing twice per second like the real menu ──
+  var SPLASHES = [
+    "Also try the shell!", "Turing complete!", "Exploding creepers!", "Read more books!",
+    "The creeper is a spy!", "Made by students!", "Has an ending!", "100% vanilla!",
+    "Don't waste iron!", "Now in beta!", "Closed source!", "The bee's knees!",
+    "Kinda dragon free!", "As seen on TV!", "CTRL+` or Ctrl+`!", "Removed Herobrine",
+    "Place ALL the blocks!", "Leveraging synergy!", "Bread is pain!", "90% pure!",
+    "More polygons!", "Local multiplayer!", "farm up!", "Missingno is watching",
+  ];
+  var title = overlay && overlay.querySelector(".hero-title");
+  if (title && !title.dataset.splash) {
+    title.dataset.splash = 1;
+    var sp = document.createElement("span");
+    sp.className = "hero-splash";
+    sp.textContent = SPLASHES[Math.floor(Math.random() * SPLASHES.length)];
+    title.appendChild(sp);
+    if (!reduce) {
+      setInterval(function () {                            // fade-swap every 4s, like re-entering the menu
+        var rng = Math.floor(Math.random() * SPLASHES.length);
+        sp.textContent = SPLASHES[rng];
+        gsap.fromTo(sp, { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(3)" });
+      }, 4000);
+    }
+  }
+
   // ── emblem hover bob (fine pointers only) ─────────────────────────
   if (reduce || !fine) return;
   var logo = document.querySelector(".hero-logo");

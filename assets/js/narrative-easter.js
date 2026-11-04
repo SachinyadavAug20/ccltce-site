@@ -9,13 +9,60 @@ import { box, glowLight, GOLD, EMER, RED, STONE, DARK, DARKOAK, OAK, NETHERRACK,
 
 function P(g, m, x, y, z) { m.position.set(x, y, z); g.add(m); return m; }
 
-var creepers = [], ghasts = [], notes = [], mites = [], books = [], shulkers = [], withers = [];
+var creepers = [], ghasts = [], notes = [], mites = [], books = [], shulkers = [], withers = [], smokes = [], jebs = [], rodCage = null;
 
 export function buildEaster(scene) {
   // ---- OVERWORLD: campus lawn (ground top y = -1, camera lane z = 10 + x/2) ----
   var camp = new THREE.Group(); scene.add(camp);
 
-  var sx80 = P(camp, box(0.22, 1.7, 0.22, OAK), 1.8, -0.15, 17.8);   // gate sign post
+  // jeb_ — the name-tag rainbow sheep, canon from the wiki
+  var jeb = new THREE.Group(); camp.add(jeb); jeb.position.set(28, -1, 20.5);
+  var jebBody = P(jeb, box(1, 1.05, 1.55, 0xf4f4f4), 0, 1.1, 0);
+  P(jeb, box(0.72, 0.75, 0.72, 0xebe0d0), 0, 0.9, 1.05);              // head (front)
+  P(jeb, box(0.16, 0.16, 0.06, 0x101010), -0.18, 1, 1.44);
+  P(jeb, box(0.16, 0.16, 0.06, 0x101010), 0.18, 1, 1.44);
+  [[-0.3, 0.62], [0.3, 0.62], [-0.3, -0.62], [0.3, -0.62]].forEach(function (lg) {
+    P(jeb, box(0.22, 0.75, 0.22, 0xffffff), lg[0], 0.35, lg[1]);
+  });
+  var jebs = [{ m: jebBody, mat: jebBody.material }];
+
+  // Dinnerbone pig — named mobs render upside-down, kept so on purpose
+  var pigD = new THREE.Group(); camp.add(pigD); pigD.position.set(25, -1, 18); pigD.rotation.z = Math.PI;
+  var pigBody = P(pigD, box(1, 0.95, 1.5, 0xeda3a1), 0, 0.85, 0);
+  P(pigD, box(0.74, 0.74, 0.64, 0xeda3a1), 0, 0.62, 0.95);
+  P(pigD, box(0.36, 0.18, 0.08, 0xd18a88), 0, 0.55, 1.32);            // snout
+  [[-0.24, 0.55], [0.24, 0.55], [-0.24, -0.55], [0.24, -0.55]].forEach(function (lg) {
+    P(pigD, box(0.2, 0.45, 0.2, 0xeda3a1), lg[0], 0.25, lg[1]);
+  });
+
+  // herobrine — a steve figure with solid white eyes watching from the brush (removed, allegedly)
+  var hrb = new THREE.Group(); camp.add(hrb); hrb.position.set(26, -1, 35.5);
+  P(hrb, box(0.72, 1.05, 0.4, 0x2f7d7d), 0, 1.35, 0);                // teal shirt torso
+  P(hrb, box(0.52, 0.52, 0.52, 0xc4916e), 0, 2.15, 0);               // head skin tone
+  P(hrb, box(0.6, 0.35, 0.56, 0x4a3524), 0, 1.62, 0);                // beard band w/ hair
+  P(hrb, box(0.6, 0.12, 0.56, 0x4a3524), 0, 2.4, 0);
+  var hEyes = P(hrb, box(0.4, 0.14, 0.06, 0xffffff, 0xffffff, 1.8), 0, 2.2, 0.28);   // WHITE glowing eyes
+  P(hrb, box(0.66, 0.95, 0.34, 0x3a4aa2), 0, 0.4, 0);                // jeans body block
+  P(hrb, box(0.26, 1, 0.3, 0x2f7d7d), -0.48, 1.45, 0);               // arms
+  P(hrb, box(0.26, 1, 0.3, 0x2f7d7d), 0.48, 1.45, 0);
+  P(hrb, box(0.24, 0.85, 0.3, 0x3a4aa2), -0.2, 0.42, 0);
+  P(hrb, box(0.24, 0.85, 0.3, 0x3a4aa2), 0.2, 0.42, 0);
+  creepers.push(hrb);                                                // it watches, like the creeper
+
+  // campfire with rising smoke right by the furnace
+  var cf = new THREE.Group(); camp.add(cf); cf.position.set(-6.4, -0.9, 16.2);
+  P(cf, box(1.4, 0.18, 1.4, OAK), 0, 0.1, 0);                        // base
+  P(cf, box(0.2, 0.5, 1.1, DARKOAK), 0, 0.4, 0).rotation.z = 1.2;     // crossed logs
+  var log2 = P(cf, box(0.2, 1.1, 0.5, DARKOAK), 0, 0.4, 0); log2.rotation.x = 1.2;
+  P(cf, box(0.55, 0.4, 0.55, GOLD, GOLD, 1.3), 0, 0.62, 0);          // ember mound
+  cf.add(glowLight(GOLD, 1.5, 10, -6.4, 0.2, 16.2));
+  for (var smk = 0; smk < 5; smk++) {
+    var sf = P(camp, box(0.22, 0.22, 0.22, 0xdddddd), -6.4, 0.6, 16.2);
+    sf.material.transparent = true;
+    smokes.push({ m: sf, base: 0.6, ph: smk * 0.85, bx: -6.4, bz: 16.2 });
+  }
+
+  var sign = P(camp, box(0.22, 1.7, 0.22, OAK), 1.8, -0.15, 17.8);   // gate sign post
   var board = P(camp, box(2, 1.2, 0.16, OAK), 1.8, 0.6, 17.8);
   for (var l = 0; l < 3; l++) P(camp, box(1.5, 0.09, 0.18, DARK), 1.8, 0.95 - l * 0.32, 17.8);
 
@@ -127,6 +174,18 @@ export function buildEaster(scene) {
     neth.add(glowLight(0xff5533, 0.9, 8, p[0], p[1], p[2]));
   });
 
+  // blaze spawner — a mob spawner cage with rods spinning inside (pillar corner x 148)
+  var cage = new THREE.Group(); neth.add(cage); cage.position.set(150, 2.6, 32.5);
+  P(cage, box(1.7, 0.18, 1.7, 0x2a2a2a), 0, -0.8, 0);                 // bottom plate
+  P(cage, box(1.7, 0.18, 1.7, 0x3a3a3e), 0, 0.8, 0);                  // top plate
+  [[0, 0], [0.78, 0], [0, 0.78], [0.78, 0.78]].forEach(function (cc) {
+    P(cage, box(0.14, 1.6, 0.14, 0x33333a), cc[0] - 0.39, 0, cc[1] - 0.39);  // corner pillars
+  });
+  var rodA = P(cage, box(0.24, 1.15, 0.24, GOLD, GOLD, 1.2), -0.1, 0.1, -0.1);
+  var rodB = P(cage, box(0.2, 0.9, 0.2, 0xffd86b, 0xffd86b, 1), 0.15, -0.1, 0.15);
+  rodCage = { a: rodA, b: rodB };
+  neth.add(glowLight(GOLD, 1.3, 12, 150, 2.6, 32.5));
+
   // cozy bookshelves — reading corner deep in the fortress
   [[163, 36.4], [164.2, 36.4]].forEach(function (p, i) {
     P(neth, box(1.05, 2.2, 0.6, OAK), p[0], 0.2, p[1]);
@@ -177,13 +236,18 @@ export function buildEaster(scene) {
   mites.push({ g: mite, cx: 196.5, cz: 10.5, r: 2.2, ph: 0 });
 
   // floating enchanting book — knowingly NOT a dragon egg
-  var bg2 = new THREE.Group(); end.add(bg2);
+  var bg2 = new THREE.Group(); end.add(bg2); bg2.position.set(207.2, -124.15, 17);
   P(bg2, box(1.05, 0.14, 1.3, 0xb0682e), 0, 0, 0);
   P(bg2, box(0.8, 0.1, 1.16, 0xf4efe0), 0, 0.1, 0).rotation.z = 0.25; // pages fan
   var tassel = P(bg2, box(0.1, 0.4, 0.1, 0xd8b13c), -0.35, -0.18, 0.5);
   tassel.rotation.x = 0.7;
   var blinker = P(bg2, box(0.14, 0.14, 0.14, 0xd0b0ff, 0xd0b0ff, 1.2), 0.2, 0.35, 0.15);
   blinker.userData.blink = 0;
+  // standard galactic glyphs on the page — lore-accurate unreadable enchant text
+  [[-0.1, 0.16, 0.58, 0], [0.12, 0.18, 0.5, 1], [-0.02, 0.2, 0.44, 0]].forEach(function (gl, gi) {
+    var gm = P(bg2, box(0.16, 0.05, 0.2, 0x9a6bd8, 0xb28ce8, 1.1), gl[0], gl[1], gl[2]);
+    if (gi % 2) gm.rotation.z = 0.5;
+  });
   books.push({ g: bg2, base: -124.15, ph: 0 });
 
   // wither silhouette lurking in the void below — coming soon, tag it if you spot it
@@ -239,6 +303,20 @@ export function buildEaster(scene) {
         var w2 = withers[i];
         w2.g.position.y = w2.base + Math.sin(el * 0.35 + i) * 2.2;
         w2.g.rotation.y += 0.0025;
+      }
+      if (rodCage) {                                                   // blaze spawner rods spin
+        rodCage.a.rotation.x = el * 3.1; rodCage.a.rotation.y = el * 1.3;
+        rodCage.b.rotation.x = -el * 3.4; rodCage.b.rotation.y = -el * 1.7;
+      }
+      for (i = 0; i < jebs.length; i++) {                             // jeb_ rainbow sheep
+        jebs[i].mat.color.setHSL((el * 0.12) % 1, 0.85, 0.55);
+      }
+      for (i = 0; i < smokes.length; i++) {                           // campfire smoke
+        var sk = smokes[i], sf2 = (el * 0.9 + sk.ph) % 3.4;
+        sk.m.position.y = sk.base + sf2;
+        sk.m.position.x = sk.bx + Math.sin(el * 0.8 + sk.ph) * 0.35;
+        sk.m.material.opacity = Math.max(0, 0.8 - sf2 / 3.4 * 0.85);
+        sk.m.scale.setScalar(1 + sf2 * 0.7);
       }
     },
   };
