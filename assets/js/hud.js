@@ -7,7 +7,7 @@
   var QUICK = [["⌂", "Home", "index.html"], ["E", "Events", "events.html"], ["T", "Team", "team.html"],
     ["⚔", "Challenges", "challenges.html"], ["R", "Resources", "resources.html"], ["N", "Notices", "notices.html"],
     ["★", "Achievements", "achievements.html"], ["$", "Open shell (Ctrl+`)", null], ["W", "CCLTCE Week", "challenges.html"]];
-  var fill, tip, slots, rail, toast, toastT;
+  var fill, tip, slots, rail, toast, toastT, seen = {};
   // batch localStorage writes — clicks earn XP constantly; don't hit storage every time
   var xpDirty = false, relicsDirty = false, saveT = 0;
   function flush() {
@@ -74,6 +74,13 @@
   function tipText() {
     return "Lv " + level() + " · " + rank() + "\n" + (xp % 100) + "% to next · " + need() + " XP left\n" +
       "Earn XP by clicking, shell (Ctrl+`), events,\nchallenges. Relics fill the hotbar below.";
+  }
+  // vanilla-style advancement toast — "Achievement Get! <Name>" (used by the narrative dims + boss)
+  function achievement(name) {
+    if (!name || seen[name]) return;   // each advancement toasts once per session
+    seen[name] = true;
+    addXP(25);
+    showToast("Achievement Get! " + name);
   }
   function showTip() { if (!tip) return; tip.textContent = tipText(); tip.hidden = false; }
   function hideTip() { if (tip) tip.hidden = true; }
@@ -161,5 +168,5 @@
     });
     slots[0].classList.add("sel");
   }
-  window.CCLTCE_HUD = { mount: mount, addXP: addXP, relic: relic, level: level, rank: rank, need: need, xp: function () { return xp; }, flush: flush };
+  window.CCLTCE_HUD = { mount: mount, addXP: addXP, achievement: achievement, relic: relic, level: level, rank: rank, need: need, xp: function () { return xp; }, flush: flush };
 })();

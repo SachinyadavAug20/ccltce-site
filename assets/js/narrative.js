@@ -89,7 +89,7 @@
 
   async function start() {
     var THREE = await import("../vendor/three.module.js");
-    var [{ buildScene }, { createCameraPath, phaseAt, dimAt }, { initDragon }, { createLighting }, { createPerf }, { initCrystals }] =
+    var [{ buildScene }, { createCameraPath, phaseAt, dimAt }, { initDragon }, { createLighting }, { createPerf }, { initCrystals }, { buildEaster }] =
       await Promise.all([
         import("./narrative-scene.js"),
         import("./narrative-camera.js"),
@@ -97,6 +97,7 @@
         import("./narrative-light.js"),
         import("./narrative-perf.js"),
         import("./narrative-crystals.js"),
+        import("./narrative-easter.js"),
       ]);
     var canvas = document.getElementById("narrative-webgl");
     if (!canvas) {
@@ -118,6 +119,7 @@
     window.CCLTCE_DRAGON = dragon;
     var crystals = initCrystals(scene, camera, viewport);
     window.CCLTCE_CRYSTALS = crystals;
+    var easter = buildEaster(scene);
     var hint = wrapper.querySelector(".narrative-hint");
     var lookV = new THREE.Vector3(), lookA = new THREE.Vector3();
     var light = createLighting(scene, L);
@@ -130,6 +132,22 @@
       station3: wrapper.querySelector(".narrative-overlay.station-3"),
       bedrock: wrapper.querySelector(".narrative-overlay.bedrock"),
     };
+    // F3 easter egg — vanilla debug screen (toggle with the F3 key, camera coords + biome)
+    var dbgBox = null, dbgOn = false, dbgFace = new THREE.Vector3();
+    addEventListener("keydown", function (e) {
+      if (e.key !== "F3") return;
+      e.preventDefault();
+      if (!dbgBox) {
+        dbgBox = document.createElement("pre");
+        dbgBox.style.cssText = "position:fixed;left:14px;top:70px;z-index:70;margin:0;padding:8px 11px;" +
+          "background:rgba(16,16,18,.82);color:#d8dee6;font:11px/1.55 ui-monospace,Menlo,monospace;" +
+          "border:1px solid #3a3a3c;border-radius:4px;pointer-events:none;white-space:pre;display:none;backdrop-filter:blur(2px)";
+        document.body.appendChild(dbgBox);
+      }
+      dbgOn = !dbgOn;
+      dbgBox.style.display = dbgOn ? "block" : "none";
+      if (window.CCLTCE_SFX && window.CCLTCE_SFX.tick) window.CCLTCE_SFX.tick();
+    });
     var heroOverlay = document.querySelector(".hero-overlay");
     var cloudLayer = viewport.querySelector(".hero-clouds");
     var heroClouds = cloudLayer ? cloudLayer.querySelectorAll(".cloud") : [];
@@ -258,6 +276,7 @@
         shake = Math.max(dragon.shake(), crystals.shake());
       }
       crystals.update(dt);
+      if (easter) easter.update(el, camera);
       if (firstLook) { lookSm.copy(look); firstLook = false; }
       else lookSm.lerp(look, 1 - Math.exp(-1.8 * dt));   // slow steady gaze — no snap, no swing
       camera.lookAt(lookSm);
@@ -268,6 +287,20 @@
       }
       var ov = window.CCLTCE_CAM_OVERRIDE;   // debug camera pose { px,py,pz, lx,ly,lz } — overrides the fly-through
       if (ov) { camera.position.set(ov.px, ov.py, ov.pz); camera.lookAt(ov.lx, ov.ly, ov.lz); }
+      if (dbgOn && dbgBox) {
+        var bx = camera.position, bw = camera.getWorldDirection(dbgFace);
+        var biome = bx.x < 40 ? "plains" : bx.x < 80 ? "camp_inside" : bx.x < 205 ? "nether_wastes" : (u > 0.7 ? "the_end" : "small_islands");
+        var perfNow = typeof window.CCLTCE_PERF_LIVE === "function" ? window.CCLTCE_PERF_LIVE() : null;
+        var heading = Math.round((Math.atan2(bw.x, bw.z) * 180 / Math.PI + 360) % 360);
+        dbgBox.textContent =
+          "CCLTCE vanilla-cine 1.0 (" + Math.round(perfNow ? perfNow.fps || 60 : 60) + " fps)\n" +
+          "XYZ: " + bx.x.toFixed(3) + " / " + bx.y.toFixed(3) + " / " + bx.z.toFixed(3) + "\n" +
+          "Dim: " + progress.dim + "   Biome: " + biome + "\n" +
+          "Facing: " + heading + "\u00b0\n" +
+          "Scroll: u = " + u.toFixed(3) + "   Glide: k = 1.5\n" +
+          "Sneak: no   Sprint: no   Fly: spline\n" +
+          "Easter eggs: creeper \u263a ghast TNT mossy & more \u2014 keep looking";
+      }
       light.tick(progress.dim, camera);
       renderer.render(scene, camera);
     }
@@ -283,6 +316,11 @@
         crystals.armed = dim === "end";
         window.CCLTCE_DIM = dim;
         document.documentElement.setAttribute("data-dim", dim);
+        if (window.CCLTCE_HUD && window.CCLTCE_HUD.achievement) {
+          if (dim === "nether") CCLTCE_HUD.achievement("We Need To Go Deeper");
+          else if (dim === "end") CCLTCE_HUD.achievement("The End?");
+          else if (dim === "bedrock") CCLTCE_HUD.achievement("Into The Void");
+        }
         if (window.CCLTCE_SFX && window.CCLTCE_SFX.setPhase) window.CCLTCE_SFX.setPhase(dim);
       }
     }

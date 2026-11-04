@@ -133,7 +133,10 @@ export function initDragon(scene, camera, host) {
     if (egg) egg.visible = true;                // dragon egg spawns on the portal
     rally();                                    // endermen mob the island, dancing
     if (window.CCLTCE_SFX) CCLTCE_SFX.levelUp();
-    if (window.CCLTCE_HUD) CCLTCE_HUD.addXP(200);
+    if (window.CCLTCE_HUD) {
+      if (CCLTCE_HUD.addXP) CCLTCE_HUD.addXP(200);
+      if (CCLTCE_HUD.achievement) CCLTCE_HUD.achievement("Free The End");
+    }
   }
   var api = {
     armed: false,
