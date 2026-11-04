@@ -1,6 +1,6 @@
 /* ---------- narrative scroll — 3D journey overlays ---------- */
-/* 1500vh: cinema-length journey — every phase gets room to breathe */
-#narrative-scroll { position: relative; height: 1500vh; width: 100%; }
+/* 1750vh: cinema-length journey — the overworld and the nether both get real runway */
+#narrative-scroll { position: relative; height: 1750vh; width: 100%; }
 
 body.narrative-page main,
 body:has(#narrative-scroll) main {

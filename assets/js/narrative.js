@@ -122,6 +122,14 @@
     var easter = buildEaster(scene);
     var hint = wrapper.querySelector(".narrative-hint");
     var lookV = new THREE.Vector3(), lookA = new THREE.Vector3();
+    // campus cloud fade — they thin out as the camera nears the portal so the punch
+    // into the nether reads clean (no flat white slab crowding the obsidian frame)
+    var cloudGrps = [];
+    scene.traverse(function (o) { if (o.userData && o.userData.cloud !== undefined) cloudGrps.push(o); });
+    cloudGrps.forEach(function (g) {
+      g.userData.mats = [];
+      g.children.forEach(function (m) { if (m.material && m.material.transparent) g.userData.mats.push(m.material); });
+    });
     var light = createLighting(scene, L);
     var progress = { raw: 0, t: 0, s: 0, dim: "overworld" };
     var lastHud = -1;
@@ -264,19 +272,29 @@
       var u = Math.min(Math.max(progress.s, 0), 1);
       camera.position.copy(curve.getPointAt(u));
       var look = lookA.copy(curve.getPointAt(Math.min(u + 0.012, 1))), shake = 0;
-      if (u > 0.7 && u < 0.92) {
+      if (u > 0.7415 && u < 0.9215) {
         // dive: the spline looks east into the void — hold the island (and its beams) in frame
-        var iw = clamp01((u - 0.7) / 0.06) * (1 - clamp01((u - 0.88) / 0.04));
+        var iw = clamp01((u - 0.7415) / 0.06) * (1 - clamp01((u - 0.8815) / 0.04));
         look.lerp(lookV.set(200, -118, 20), iw * 0.9);
       }
       if (dragon) {
         dragon.update(el);
-        var w = u > 0.75 ? clamp01((u - 0.75) / 0.1) : 0;   // dive → finale: keep the boss framed
+        var w = u > 0.772 ? clamp01((u - 0.772) / 0.1) : 0;   // dive → finale: keep the boss framed
         if (w > 0) look.lerp(dragon.look(lookV), w);
         shake = Math.max(dragon.shake(), crystals.shake());
       }
       crystals.update(dt);
       if (easter) easter.update(el, camera);
+      if (cloudGrps.length) {
+        var cd = clamp01((26 - camera.position.x) / 11);   // full at lawn, gone by x = 26
+        if (cd < 1) {
+          for (var cg = 0; cg < cloudGrps.length; cg++) {
+            var gm = cloudGrps[cg].userData.mats;
+            for (var ci = 0; ci < gm.length; ci++) gm[ci].opacity = 0.55 * cd;
+            cloudGrps[cg].visible = cd > 0.02;
+          }
+        }
+      }
       if (firstLook) { lookSm.copy(look); firstLook = false; }
       else lookSm.lerp(look, 1 - Math.exp(-1.8 * dt));   // slow steady gaze — no snap, no swing
       camera.lookAt(lookSm);

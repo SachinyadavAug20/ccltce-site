@@ -123,6 +123,31 @@ export function buildNether(g) {
   P(g, box(18, 2, 12, BK), 168, 12, -18); P(g, box(12, 3, 8, 0x1a1a1e), 168, 14.5, -18);
   P(g, box(6, 5, 6, GOLD, GOLD, 0.3), 168, 17, -18);
   g.add(glowLight(GOLD, 2, 30, 168, 18, -18));
+  // soul-sand valley alcove — sits where the camera's first southern swing lands (x≈98, z≈17)
+  P(g, box(7, 0.9, 3.4, 0x4a3a3a), 96, -1.55, 11.5);            // soul sand ridge
+  P(g, box(5, 0.6, 1.6, 0x553f38), 95, -2.1, 12.6);
+  var soulFire = P(g, box(0.45, 1.35, 0.45, 0x53d3e0, 0x53d3e0, 1.4), 96, -0.75, 11.5);
+  soulFire.userData.pulse = 1.1;
+  var soulFire2 = P(g, box(0.4, 1.05, 0.4, 0x7fe6f0, 0x7fe6f0, 1.2), 99.5, -0.85, 12.3);
+  soulFire2.userData.pulse = 2.6;
+  P(g, box(0.22, 1.1, 0.22, 0x30302e), 97.6, -1.35, 12.1);      // soul lantern pole
+  P(g, box(0.5, 0.6, 0.5, 0x63c9d8, 0x9ff0fa, 0.9), 97.6, -0.6, 12.1);
+  g.add(glowLight(0x53d3e0, 1.8, 20, 96, 0, 11.5));
+  // basalt break + lava fall — behind the second nether bend (x≈186, z≈9)
+  P(g, box(2.6, 15, 2.6, 0x3a3a3e), 186, 5.5, 9);
+  P(g, box(2, 11, 2, B), 189.5, 3.5, 11.5);
+  P(g, box(1.6, 8.5, 1.6, 0x2e2e33), 182.6, 2.25, 12.5);
+  var lfall = P(g, box(1.3, 12, 0.5, LAVA, LAVA, 0.9), 186, 4.5, 7.4);
+  lfall.userData.pulse = 3.1;
+  g.add(glowLight(LAVA, 2, 26, 186, 6, 7.4));
+  P(g, box(4.5, 0.5, 4.5, LAVA, LAVA, 0.9), 187.5, -0.25, 7.5);  // fall pool
+  // bastion watchtower with a gold hoard cap — juts where the S bumps north (x≈174, z≈10)
+  P(g, box(4.6, 9, 4.6, 0x2a2a2e), 174, 2.5, 10);
+  P(g, box(3.4, 1.4, 3.4, 0x1f1f23), 174, 7.7, 10);
+  P(g, box(2.6, 1.6, 2.6, GOLD, GOLD, 0.35), 174, 9.2, 10);
+  P(g, box(1.1, 0.55, 1.1, GOLD, GOLD, 0.5), 172.4, 6.1, 10.4);  // hoop nuggets
+  P(g, box(1, 0.5, 1, GOLD, GOLD, 0.5), 175.6, 4.6, 9.4);
+  g.add(glowLight(GOLD, 1.4, 24, 174, 9.5, 10));
   // Mobs — grounded on the floor top (y=-2); striders stand on lava (top y=-0.2)
   piglin(g, 55, -2, -4); piglin(g, 95, -2, 5); piglin(g, 140, -2, -3);
   piglinBrute(g, 152, -2, 14); piglinBrute(g, 110, 4, 0);
