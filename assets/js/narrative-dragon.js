@@ -18,7 +18,7 @@ export function initDragon(scene, camera, host) {
   if (!root || !hitbox) return null;
   var wings = [];
   root.traverse(function (o) { if (o.userData.wingL || o.userData.wingR) wings.push(o); });
-  var hp = 3, state = "alive", tHit = -9, tDie = -9, tBoom = -9, tOrb = -9, prev = 0;
+  var hp = 3, state = "alive", tHit = -9, tDie = -9, tBoom = -9, tOrb = -9, prev = 0, lastFw = 0;
   var beams = new THREE.Group(), orbs = [];
   for (var i = 0; i < 8; i++) {          // beam = bright core + additive halo (no pink monolith)
     var bg = new THREE.Group();
@@ -38,6 +38,61 @@ export function initDragon(scene, camera, host) {
     pbeam.add(m); pbm.push([m.material, pb[2]]);
   });
   pbeam.position.set(200, -124, 20); scene.add(pbeam);
+  // fireworks + the enderman dance troupe — the island cheers when the boss drops
+  var FW = [], fwPool = [];
+  var FW_COLORS = [0xffaa00, 0x17dd62, 0xc026d3, 0xffffff, 0xe879f9, 0xff5533];
+  for (var fp = 0; fp < 60; fp++) {
+    var fwm = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.32, 0.32),
+      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true }));
+    fwm.visible = false; scene.add(fwm); fwPool.push(fwm);
+  }
+  function burst() {
+    var cx = 188 + Math.random() * 24, cy = -98 - Math.random() * 10, cz = 6 + Math.random() * 28;
+    var col = FW_COLORS[Math.floor(Math.random() * FW_COLORS.length)];
+    for (var n = 0; n < 12 && fwPool.length; n++) {
+      var m = fwPool.pop();
+      m.material.color.setHex(Math.random() < 0.6 ? col : 0xffffff); m.material.opacity = 1;
+      m.position.set(cx, cy, cz); m.visible = true;
+      var ang = Math.random() * Math.PI * 2, sp = 7 + Math.random() * 9;
+      FW.push({ m: m, v: new THREE.Vector3(Math.cos(ang) * sp, 3 + Math.random() * 6, Math.sin(ang) * sp), life: 1.5 + Math.random() * 0.8, max: 2 });
+    }
+  }
+  function stepFw(dt) {
+    for (var i = FW.length - 1; i >= 0; i--) {
+      var f = FW[i]; f.life -= dt;
+      if (f.life <= 0) { f.m.visible = false; fwPool.push(f.m); FW.splice(i, 1); continue; }
+      f.m.position.addScaledVector(f.v, dt); f.v.y -= 8 * dt;
+      f.m.material.opacity = Math.min(1, f.life / f.max * 2.2);
+    }
+  }
+  var men = [], menReady = false;
+  function rally() {                                   // one-time: gather endermen + their limbs
+    if (menReady) return; menReady = true;
+    scene.traverse(function (o) {
+      if (!o.userData.enderman) return;
+      var arms = [], legs = [];
+      o.traverse(function (c) {
+        if (c.userData.armL || c.userData.armR) arms.push(c);
+        if (c.userData.legL || c.userData.legR) legs.push(c);
+      });
+      men.push({ e: o, ph: Math.random() * 6.28, arms: arms, legs: legs });
+    });
+  }
+  function dance(el) {
+    for (var i = 0; i < men.length; i++) {
+      var d = men[i], e = d.e;
+      e.rotation.y = el * (1.4 + i * 0.25) + d.ph;                       // spinning victory twirls
+      e.position.y = e.userData.baseY + Math.abs(Math.sin(el * 3.2 + d.ph)) * 0.8;  // hops
+      if (d.arms.length) {
+        d.arms[0].rotation.z = 2.3 + Math.sin(el * 5 + d.ph) * 0.35;     // arms thrust up, waving
+        d.arms[1].rotation.z = -2.3 + Math.sin(el * 5 + d.ph) * 0.35;
+      }
+      if (d.legs.length) {
+        d.legs[0].rotation.x = Math.sin(el * 4.2 + d.ph) * 0.55;         // kick steps
+        d.legs[1].rotation.x = -Math.sin(el * 4.2 + d.ph) * 0.55;
+      }
+    }
+  }
   for (var n = 0; n < 40; n++) {
     var m = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4),
       new THREE.MeshBasicMaterial({ color: n % 3 ? 0xffaa00 : 0x17dd62 }));
@@ -76,6 +131,7 @@ export function initDragon(scene, camera, host) {
     }
     if (portal) portal.userData.pulse = undefined;
     if (egg) egg.visible = true;                // dragon egg spawns on the portal
+    rally();                                    // endermen mob the island, dancing
     if (window.CCLTCE_SFX) CCLTCE_SFX.levelUp();
     if (window.CCLTCE_HUD) CCLTCE_HUD.addXP(200);
   }
@@ -117,6 +173,9 @@ export function initDragon(scene, camera, host) {
         if (portal) { portal.scale.set(1 + 1.3 * ko, 1 + 1.3 * ko, 1); portal.material.emissiveIntensity = 0.9 + 1.2 * ko; }
         if (ko >= 1) state = "dead";
         fallOrbs(dt);
+        if (el - lastFw > 1.05) { lastFw = el; burst(); }   // celebration fireworks over the island
+        stepFw(dt);
+        dance(el);
       }
     },
     hover: function (e) { host.style.cursor = api.armed && state === "alive" && pick(e) ? "crosshair" : ""; },

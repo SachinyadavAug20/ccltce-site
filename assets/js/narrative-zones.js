@@ -19,21 +19,53 @@ export function buildNether(g) {
   // Entry face sealed with a doorway (z 14..30, y -1..16) so no overworld sky leaks through
   P(g, box(4, 24, 44, NETHERRACK), 40, 9, -8); P(g, box(4, 24, 20, NETHERRACK), 40, 9, 40);
   P(g, box(4, 7, 16, NETHERRACK), 40, 19.5, 22);
+  // Real nether portal in the doorway — obsidian frame + purple swirl interior the camera
+  // punches through (vanilla build: filled frame, oily multi-layer surface)
+  var PX = 38.7;
+  P(g, box(1.2, 16, 1.2, OBSIDIAN), PX, 7.5, 13.4);          // frame columns, z 12.8..14 / 30..31.2
+  P(g, box(1.2, 16, 1.2, OBSIDIAN), PX, 7.5, 30.6);
+  P(g, box(1.2, 1.2, 19.6, OBSIDIAN), PX, 14.6, 22);          // lintel
+  P(g, box(1.2, 1.2, 19.6, OBSIDIAN), PX, 0.7, 22);           // sill
+  var swirl = P(g, box(0.4, 13.2, 15.6, 0xa855f7, 0xa855f7, 0.9), PX, 7.6, 22);
+  swirl.userData.pulse = 2.2;
+  P(g, box(0.25, 12, 14.4, 0xd946ef, 0xd946ef, 0.55), PX - 0.35, 7.6, 22);
+  P(g, box(0.2, 11, 13.2, 0x8b2fc9, 0x8b2fc9, 0.75), PX + 0.3, 7.6, 22);
+  for (var sp = 0; sp < 7; sp++) {                            // oily vortex specks drifting in the field
+    var sme = P(g, box(0.55, 0.55, 0.55, 0xc084fc, 0xc084fc, 1),
+      PX + (Math.random() - 0.5) * 0.6, 1.6 + Math.random() * 11.4, 14.8 + Math.random() * 14.4);
+    sme.userData.float = Math.random() * Math.PI * 2;
+  }
+  g.add(glowLight(0xa855f7, 3, 30, 37, 7.6, 22));
   // Exit face sealed with a doorway (z 16..36) — the dive flies straight through it.
   // Without this the shell was open at x=200 and you saw the blue sky straight through the nether.
   P(g, box(4, 24, 46, NETHERRACK), 202, 9, -7); P(g, box(4, 24, 14, NETHERRACK), 202, 9, 43);
   P(g, box(4, 7, 20, NETHERRACK), 202, 19.5, 26);
-  // Exit portal — obsidian frame proud of the inner face + an amethyst veil the dive punches through
-  P(g, box(0.9, 18.4, 0.9, OBSIDIAN), 200.9, 7, 16);
-  P(g, box(0.9, 18.4, 0.9, OBSIDIAN), 200.9, 7, 36);
-  P(g, box(0.9, 1, 20.8, OBSIDIAN), 200.9, 16.5, 26);
-  P(g, box(0.9, 0.5, 20.8, OBSIDIAN), 200.9, -1.75, 26);
-  var veil = P(g, box(0.3, 17.5, 19, AMETH, AMETH, 0.95), 202, 6.75, 26);
-  veil.userData.pulse = 0.4;
-  [[-7.6, 7.25], [7.6, 7.25], [-7.6, -7.25], [7.6, -7.25]].forEach(function (s, i) {
-    var sh = P(g, box(0.45, 0.45, 0.45, AMETH, AMETH, 0.9), 200.9, 6.75 + s[1], 26 + s[0]);
-    sh.userData.pulse = i * 1.1;
+  // Stronghold-styled exit portal room (out of the camera lane): stone-brick stairs rise from
+  // the floor up to a platform where a ring of green end frames surrounds the starry field —
+  // the dive falls right through the field (camera crosses its plane at x≈200, z≈26).
+  for (var stp = 0; stp < 7; stp++) {
+    var stop = 0.2 + stp * 1.2, sx = 189.8 + stp * 1.8;
+    P(g, box(1.8, stop + 2, 9, 0x8f8f89), sx, (stop - 2) / 2, 34);
+  }
+  P(g, box(10.2, 9.4, 11, 0x8f8f89), 202.5, 2.7, 26);          // platform: y -2..7.4, x 197.4..207.6
+  var FR = 0x3f5f44, FRT = 0x17dd62;
+  for (var r = 0; r < 12; r++) {                              // 12 end-portal-frame blocks in the ring
+    var side = Math.floor(r / 3), q = (r % 3) - 1;
+    var fx2 = side % 2 ? (side < 2 ? 4.3 : -4.3) : q * 4.3;
+    var fz2 = side % 2 ? q * 4.3 : (side < 2 ? 4.3 : -4.3);
+    var fb = P(g, box(2, 1.1, 2, FR, FRT, 0.22), 202.5 + fx2, 7.95, 26 + fz2);
+    fb.userData.pulse = side * 0.55;
+  }
+  [[-1.6, 3.2], [1.6, 3.2]].forEach(function (p) {            // 6.4×6.4 starry field, two panels
+    var pf = P(g, box(6.4, 0.7, 3.2, 0x060a14, 0x8fd0ff, 0.3), 202.5, 7.75, 26 + p[0]);
+    pf.userData.pulse = 1.4 + p[0];
+    for (var st2 = 0; st2 < 6; st2++) {
+      var star = box(0.12, 0.12, 0.12, st2 % 2 ? 0xffffff : 0xd8ccff, st2 % 2 ? 0xffffff : 0xd8ccff, 0.9);
+      star.position.set((Math.random() - 0.5) * 5, 0.36, (Math.random() - 0.5) * 2.2);
+      pf.add(star);
+    }
   });
+  g.add(glowLight(0x8fd0ff, 2, 22, 201, 9, 26));
   torch(g, 42.6, 0, 16); torch(g, 42.6, 0, 28);
   buildBiomes(g);   // crimson/warped/soul/basalt patches lining both sides of the camera path
   // Basalt delta pillars

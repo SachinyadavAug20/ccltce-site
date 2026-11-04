@@ -15,10 +15,10 @@ export function enderman(g, x, y, z) {
   add(grp, M(0.55, 0.55, 0.55, 0x0a0a0a), 0, 3.0, 0);
   add(grp, M(0.18, 0.1, 0.1, 0xd4a0f0), -0.12, 3.0, 0.3);
   add(grp, M(0.18, 0.1, 0.1, 0xd4a0f0), 0.12, 3.0, 0.3);
-  add(grp, M(0.15, 1.8, 0.15, 0x0a0a0a), -0.45, 1.6, 0);
-  add(grp, M(0.15, 1.8, 0.15, 0x0a0a0a), 0.45, 1.6, 0);
-  add(grp, M(0.18, 1.5, 0.18, 0x0a0a0a), -0.18, 0.75, 0);
-  add(grp, M(0.18, 1.5, 0.18, 0x0a0a0a), 0.18, 0.75, 0);
+  add(grp, M(0.15, 1.8, 0.15, 0x0a0a0a), -0.45, 1.6, 0).userData.armL = true;
+  add(grp, M(0.15, 1.8, 0.15, 0x0a0a0a), 0.45, 1.6, 0).userData.armR = true;
+  add(grp, M(0.18, 1.5, 0.18, 0x0a0a0a), -0.18, 0.75, 0).userData.legL = true;
+  add(grp, M(0.18, 1.5, 0.18, 0x0a0a0a), 0.18, 0.75, 0).userData.legR = true;
   g.add(grp); return grp;
 }
 

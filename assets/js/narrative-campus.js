@@ -116,12 +116,12 @@ function clouds(g) {
 
 // front lawn clutter: dense greenery, flank trees, camp props, tufts, critters
 function lawn(g) {
-  [[-14, 16, 1.1], [15, 20, 1], [-21, 32, 1.2], [23, 36, 1.1], [-29, 48, 1], [31, 52, 1.2],
+  [[-14, 16, 1.1], [-21, 32, 1.2], [23, 36, 1.1], [-29, 48, 1], [31, 52, 1.2],
    [-37, 66, 1.1], [39, 70, 1], [-15, 74, 1.2], [19, 80, 1.1], [-43, 88, 1], [43, 92, 1.1],
-   [-11, 58, 0.9], [12, 62, 1], [-22, 12, 1], [24, 16, 1.1], [-32, 22, 1.2], [33, 24, 1]].forEach(function (t) {
+   [-11, 58, 0.9], [12, 62, 1], [-22, 12, 1], [-32, 22, 1.2]].forEach(function (t) {
     tree(g, t[0], t[1], t[2]);
   });
-  [[-9, 12], [10, 15], [-17, 24], [18, 26], [-25, 40], [26, 42], [-33, 56], [34, 58], [-13, 68], [14, 72], [-20, 82], [22, 85]].forEach(function (b, i) {
+  [[-9, 12], [-17, 24], [18, 26], [-25, 40], [26, 42], [-33, 56], [34, 58], [-13, 68], [14, 72], [-20, 82], [22, 85]].forEach(function (b, i) {
     bush(g, b[0], b[1]);
     if (i % 2) rock(g, b[0] + 3, b[1] + 2, 0.8 + (i % 3) * 0.35);
   });
@@ -131,7 +131,7 @@ function lawn(g) {
     var th = 0.5 + Math.random() * 0.8;
     P(g, box(0.28, th, 0.28, Math.random() < 0.5 ? LEAF : LEAF2), tx, -1 + th / 2, tz);
   }
-  [14, 30, 46, 62, 78].forEach(function (z, i) { lampPost(g, i % 2 ? -7 : 7, z); });
+  [30, 46, 62, 78].forEach(function (z, i) { lampPost(g, i % 2 ? -7 : 7, z); });
   // butterflies
   for (var bf = 0; bf < 16; bf++) {
     var bfly = P(g, box(0.35, 0.25, 0.35, [0xff66cc, 0x66ccff, 0xffee55, 0x55ffaa][bf % 4], [0xff66cc, 0x66ccff, 0xffee55, 0x55ffaa][bf % 4], 0.9),
