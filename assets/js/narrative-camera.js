@@ -3,14 +3,16 @@ import * as THREE from "../vendor/three.module.js";
 
 export function createCameraPath() {
   return new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 115, 140),   // higher sky start — long vanilla-flavored descent
-    new THREE.Vector3(0, 78, 108),
-    new THREE.Vector3(0, 40, 74),
-    new THREE.Vector3(-8, 17, 34),    // swoop west over the lawn — gate sign / crafting side
-    new THREE.Vector3(6, 9, 15),      // through arch, low over the tiles
-    new THREE.Vector3(22, 7, 26),     // lawn S-weave — creepers and golem in frame
-    new THREE.Vector3(36, 7.5, 19.5), // line up the portal punch
-    new THREE.Vector3(40.5, 8, 21),   // punch — through the obsidian frame
+    new THREE.Vector3(0, 115, 140),   // high sky start — long vanilla-flavored descent
+    new THREE.Vector3(0, 80, 112),
+    new THREE.Vector3(0, 46, 84),
+    new THREE.Vector3(-16, 20, 56),   // swoop west over the dorm tree line
+    new THREE.Vector3(-8, 12.5, 36),  // low over the west lawn — crafting/furnace side
+    new THREE.Vector3(2, 11, 19),     // cross the path tiles beside the gate sign
+    new THREE.Vector3(16, 11, 25),    // lawn S — planters and golem below, canopies clear of the lens
+    new THREE.Vector3(30, 11, 28),    // east lawn bend over the homestead street
+    new THREE.Vector3(34, 10.5, 24),  // line up the portal punch
+    new THREE.Vector3(40.5, 10, 21),  // punch — through the obsidian frame
     new THREE.Vector3(58, 6.5, 25),
     new THREE.Vector3(78, 6, 30),     // nether S: first north bump
     new THREE.Vector3(98, 7, 17),     // swing south across the wastes
@@ -31,28 +33,28 @@ export function updateCamera(camera, curve, t, look) {
   camera.lookAt(look || curve.getPointAt(Math.min(t + 0.012, 1)));
 }
 
-// anchors from arc length ~544 (re-probed 2026-11): arch@0.296, punch@0.391-0.394, x=80 @0.469,
-// x=160 @0.648, x=202 @0.7465, y=-5 @0.766, z=46 @0.832 (x=224), dive -58 @0.8835, -80 ~0.9215
+// anchors from arc length ~548 (re-probed 2026-11): arch@0.2865, punch@0.3948-0.3978, x=80 @0.473,
+// x=160 @0.650, x=202 @0.7482, y=-5 @0.7675, z=46 @0.8333 (x=224), dive -58 @0.8843, -80 ~0.9225
 export var PHASES = {
-  surface: [0, 0.296],
-  station1: [0.296, 0.469],
-  station2: [0.469, 0.648],
-  station3: [0.648, 0.7525],
-  bedrock: [0.7525, 1.0],
+  surface: [0, 0.2865],
+  station1: [0.2865, 0.473],
+  station2: [0.473, 0.6503],
+  station3: [0.6503, 0.7542],
+  bedrock: [0.7542, 1.0],
 };
 
 export function phaseAt(t) {
-  if (t < 0.296) return "surface";
-  if (t < 0.469) return "station1";
-  if (t < 0.648) return "station2";
-  if (t < 0.7525) return "station3";
+  if (t < 0.2865) return "surface";
+  if (t < 0.473) return "station1";
+  if (t < 0.6503) return "station2";
+  if (t < 0.7542) return "station3";
   return "bedrock";
 }
 
-// dimension for fog + bg: overworld → nether (flip just inside the entry wall — punch ends ~0.394)
-// → end (flip as the camera crosses the exit ring — x=202 sits at arc ~0.7465)
+// dimension for fog + bg: overworld → nether (flip just inside the entry wall — punch ends ~0.3978)
+// → end (flip as the camera crosses the exit ring — x=202 sits at arc ~0.7482)
 export function dimAt(t) {
-  if (t < 0.398) return "overworld";
-  if (t < 0.7565) return "nether";
+  if (t < 0.4015) return "overworld";
+  if (t < 0.7582) return "nether";
   return "end";
 }

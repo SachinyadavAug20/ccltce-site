@@ -109,7 +109,7 @@ const RANKS = [
   [1, "Guest Explorer"], [5, "Script Kiddie"], [10, "Bug Hunter"],
   [25, "Kernel Crafter"], [50, "Redstone Sage"], [100, "Diamond Dev"],
 ];
-export function levelOf(xp) { return 1 + Math.floor((Number(xp) || 0) / 100); }
+export function levelOf(xp) { return Math.max(1, 1 + Math.floor((Number(xp) || 0) / 100)); }
 export function rankOf(xp) {
   const lv = levelOf(xp);
   let r = RANKS[0][1];

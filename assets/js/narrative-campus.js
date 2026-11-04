@@ -116,9 +116,10 @@ function clouds(g) {
 
 // front lawn clutter: dense greenery, flank trees, camp props, tufts, critters
 function lawn(g) {
-  [[-14, 16, 1.1], [-21, 32, 1.2], [23, 36, 1.1], [-29, 48, 1], [31, 52, 1.2],
+  // three near-lane trees pushed out of the glide lane — canopies used to fill the lens
+  [[-20, 6, 1.1], [-21, 32, 1.2], [26, 48, 1.1], [-29, 48, 1], [31, 52, 1.2],
    [-37, 66, 1.1], [39, 70, 1], [-15, 74, 1.2], [19, 80, 1.1], [-43, 88, 1], [43, 92, 1.1],
-   [-11, 58, 0.9], [12, 62, 1], [-22, 12, 1], [-32, 22, 1.2]].forEach(function (t) {
+   [-11, 58, 0.9], [12, 62, 1], [-34, 10, 1], [-32, 22, 1.2]].forEach(function (t) {
     tree(g, t[0], t[1], t[2]);
   });
   [[-9, 12], [-17, 24], [18, 26], [-25, 40], [26, 42], [-33, 56], [34, 58], [-13, 68], [14, 72], [-20, 82], [22, 85]].forEach(function (b, i) {

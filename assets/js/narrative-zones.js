@@ -1,6 +1,6 @@
 // Nether zone — heavy Minecraft terrain detail. The End lives in narrative-end.js.
 import {
-  GOLD, NETHERRACK, LAVA, GLOWSTONE, SOUL, WARP, AMETH, OBSIDIAN, box, glowLight, torch,
+  GOLD, NETHERRACK, LAVA, GLOWSTONE, SOUL, WARP, AMETH, OBSIDIAN, box, glowLight, torch, tree,
 } from "./narrative-blocks.js";
 import { piglin, hoglin, ghast, magmaCube, blaze, witherSkeleton } from "./narrative-mobs.js";
 import { strider, piglinBrute, zombifiedPiglin } from "./narrative-mobs3.js";
@@ -39,6 +39,21 @@ export function buildNether(g) {
     sme.userData.float = Math.random() * Math.PI * 2;
   }
   g.add(glowLight(0xa855f7, 3, 30, 37, 7.6, 22));
+  // Warm sandstone hill façade over the raw red entry wall — from the lawn the
+  // portal now reads as a vanilla doorway set into a grassy/sand hill (the big red
+  // slab that dominated the approach read far too harsh).
+  var SS = 0xc6a86e, SCAP = 0x6a9a3f, BSK = 0x9aa08a;
+  P(g, box(1.6, 24, 45.3, SS), 37, 9, -8.6);                    // south hill plane
+  P(g, box(1.6, 24, 19.55, SS), 37, 9, 39.7);                   // north hill plane
+  P(g, box(1.6, 4.8, 16, SS), 37, 18.6, 22);                    // hill over the doorway
+  P(g, box(2.2, 1.1, 45.3, SCAP), 37, 21.6, -8.6);              // grass caps — reads as hills
+  P(g, box(2.2, 1.1, 19.55, SCAP), 37, 21.6, 39.7);
+  P(g, box(2.2, 1.1, 16, SCAP), 37, 21.6, 22);
+  P(g, box(2.4, 2, 45.3, BSK), 36.8, -1, -8.6);                 // mossy stone skirt at the foot
+  P(g, box(2.4, 2, 19.55, BSK), 36.8, -1, 39.7);
+  P(g, box(2.4, 2, 16, BSK), 36.8, -1, 22);
+  tree(g, 34, -18, 0.9); tree(g, 34.5, 44, 1);                  // lone saplings on the hill foot
+  torch(g, 36.6, 12, 11.4); torch(g, 36.6, 12, 32.6);           // torches flank the portal door
   // Exit face sealed with a doorway (z 16..36) — the dive flies straight through it.
   // Without this the shell was open at x=200 and you saw the blue sky straight through the nether.
   P(g, box(4, 24, 46, NETHERRACK), 202, 9, -7); P(g, box(4, 24, 14, NETHERRACK), 202, 9, 43);

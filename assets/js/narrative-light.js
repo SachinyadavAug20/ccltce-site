@@ -24,10 +24,19 @@ export function getTOD() {
   return TOD.night;
 }
 
+// golden hour, always — the journey is a curated cinematic, so the lawn is shot in
+// the one hour of light that makes grass glow and canopies read (vanilla sunset vibe).
+// Muddy dark-lawn screenshots happened at the real dusk/night presets.
+TOD.golden = {
+  sky: 0xffa470, fog: 0xffc093, d: 0.0026,
+  sun: 0xffd9a0, sunI: 1.0, amb: 0x9a8fae, ambI: 0.62,
+  hemiS: 0xffd0a0, hemiG: 0x5a7a48, pos: [-70, 38, 25],
+};
+
 export function createLighting(scene, L) {
   var presets = scene.userData.skyPresets || {};
   var t = { sky: new THREE.Color(0x78a7ff), fog: new THREE.Color(0xbdd5ff), d: 0.0026 };
-  var tod = getTOD(), lastHour = -1;
+  var tod = TOD.golden;
   var follow = new THREE.PointLight(0xffd9a8, 45, 60);
   follow.position.set(0, 14, 0);
   scene.add(follow);
@@ -46,8 +55,6 @@ export function createLighting(scene, L) {
     follow.color.setHex(dim === "end" ? 0xd8c0ff : 0xffd9a8);
   }
   function tick(dim, cam) {
-    var hr = new Date().getHours();
-    if (hr !== lastHour) { lastHour = hr; tod = getTOD(); sky(dim); lights(dim); }
     follow.position.copy(cam.position);
     if (scene.fog) {
       scene.fog.color.lerp(t.fog, 0.09);

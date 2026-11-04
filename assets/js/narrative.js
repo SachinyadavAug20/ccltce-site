@@ -272,14 +272,14 @@
       var u = Math.min(Math.max(progress.s, 0), 1);
       camera.position.copy(curve.getPointAt(u));
       var look = lookA.copy(curve.getPointAt(Math.min(u + 0.012, 1))), shake = 0;
-      if (u > 0.7415 && u < 0.9215) {
+      if (u > 0.7432 && u < 0.9225) {
         // dive: the spline looks east into the void — hold the island (and its beams) in frame
-        var iw = clamp01((u - 0.7415) / 0.06) * (1 - clamp01((u - 0.8815) / 0.04));
+        var iw = clamp01((u - 0.7432) / 0.06) * (1 - clamp01((u - 0.8825) / 0.04));
         look.lerp(lookV.set(200, -118, 20), iw * 0.9);
       }
       if (dragon) {
         dragon.update(el);
-        var w = u > 0.772 ? clamp01((u - 0.772) / 0.1) : 0;   // dive → finale: keep the boss framed
+        var w = u > 0.7733 ? clamp01((u - 0.7733) / 0.1) : 0;   // dive → finale: keep the boss framed
         if (w > 0) look.lerp(dragon.look(lookV), w);
         shake = Math.max(dragon.shake(), crystals.shake());
       }
