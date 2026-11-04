@@ -56,23 +56,25 @@
     -1px -1px 0 #04180c, 1px -1px 0 #04180c, -1px 1px 0 #04180c, 1px 1px 0 #04180c;
 }
 
-/* vanilla splash text — yellow, tilted, pulsing 2 Hz exactly like the title screen */
+/* vanilla splash text — yellow, tilted, pulsing 2 Hz exactly like the title screen.
+   Anchored ABOVE the title block's right shoulder so it can never run into the
+   motto/college/location lines below (it was colliding with them on wide screens). */
 .hero-splash {
   position: absolute;
-  right: -1.2em; bottom: 0.55em;
+  top: -1.35em; right: -0.6em;
   font-family: var(--disp); font-weight: 400;
-  font-size: clamp(0.55rem, 1.5vw, 0.95rem); text-transform: none;
+  font-size: clamp(0.52rem, 1.35vw, 0.9rem); text-transform: none;
   color: #ffff55;
   text-shadow: 2px 2px 0 #3f3f15;
-  transform: rotate(-16deg);
+  transform: rotate(-14deg);
   transform-origin: center;
   animation: splash-pulse 0.5s ease-in-out infinite alternate;
   pointer-events: none;
   white-space: nowrap;
 }
 @keyframes splash-pulse {
-  from { transform: rotate(-16deg) scale(0.94); }
-  to   { transform: rotate(-16deg) scale(1.08); }
+  from { transform: rotate(-14deg) scale(0.94); }
+  to   { transform: rotate(-14deg) scale(1.08); }
 }
 @media (prefers-reduced-motion: reduce) {
   .hero-splash { animation: none; }
@@ -93,9 +95,9 @@
   width: min(1160px, 98vw); height: min(580px, 66vh);
   transform: translate(-50%, -50%);
   background: radial-gradient(ellipse at center,
-    rgba(255, 255, 255, 0.58) 0%,
-    rgba(255, 255, 255, 0.36) 40%,
-    rgba(255, 255, 255, 0.12) 68%,
+    rgba(255, 255, 255, 0.46) 0%,
+    rgba(255, 253, 246, 0.3) 40%,
+    rgba(255, 253, 246, 0.1) 68%,
     transparent 85%);
   pointer-events: none;
   z-index: 2;
@@ -108,42 +110,46 @@
 /* near band: big, low, closest to camera — sweeps the hardest on part */
 .cloud-near { opacity: 0.78; }
 
-/* adventure quest subtext & college location */
+/* adventure quest subtext & college location — three tiers: kicker, headline, meta */
 .hero-sub {
-  display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
-  margin: 0.4rem auto 1.15rem;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.55rem;
+  margin: 0.55rem auto 1.15rem;
   z-index: 10;
 }
 .hero-motto {
   font-family: var(--disp);
-  font-size: clamp(0.62rem, 1.3vw, 0.82rem);
-  letter-spacing: 0.22em;
-  color: #ffd76a;
+  font-size: clamp(0.55rem, 1.05vw, 0.72rem);
+  letter-spacing: 0.3em;
+  color: #e8c34e;
   margin: 0;
-  text-shadow: 2px 2px 0 #2b1d04;
+  text-shadow: 1px 1px 0 #2b1d04;
+  display: inline-flex; align-items: center; gap: 0.7rem;
 }
+.hero-motto::before, .hero-motto::after { content: "\25C6"; font-size: 0.6em; color: #b98a1e; }
 .hero-college {
   font-family: var(--mono);
-  font-size: clamp(14px, 2vw, 16px);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: clamp(15px, 2.35vw, 19px);
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #ffd76a;
+  color: #ffe9a8;
   margin: 0;
-  text-shadow: 2px 2px 0 #000,
-    -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  text-shadow: 2px 2px 0 #3a2604,
+    -1px -1px 0 #201604, 1px -1px 0 #201604, -1px 1px 0 #201604, 1px 1px 0 #201604;
 }
 .hero-loc {
   font-family: var(--mono);
-  font-size: clamp(11px, 1.5vw, 13px);
+  font-size: clamp(10px, 1.3vw, 12px);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #a8d5c8;
+  color: #9fc8bb;
   margin: 0;
-  text-shadow: 1px 1px 0 #000;
+  text-shadow: 1px 1px 0 #101a14;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+  opacity: 0.92;
 }
 .loc-gem { color: #ffd76a; }
 
