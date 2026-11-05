@@ -1,21 +1,47 @@
 /* ==========================================================================
-   CCLTCE — Swarm Rebuild Opening Experience (Minecraft Edition)
-   Collaborative Minecraft-themed cursors assembling the site blueprint.
-   Inspired by Joel Califa's Swarm & Dhvanil Patel's swarm-cursors.
-   Zero external dependencies • Cinema pacing (~3.8s) • Skippable (Esc/click).
+   CCLTCE — Swarm Rebuild (Building the REAL Website Edition)
+   Collaborative Minecraft cursors assembling the actual live DOM elements.
+   Ultra-smooth spring mouse physics • Real DOM element bounding boxes.
    ========================================================================== */
 
+/* While building, progressively reveal real DOM elements as cursors assemble them */
+body.swarm-building .nav-wrap,
+body.swarm-building .hero-logo,
+body.swarm-building .hero-badge,
+body.swarm-building .hero-title,
+body.swarm-building .hero-sub,
+body.swarm-building .hero-cta {
+  opacity: 0;
+  transform: translateY(14px) scale(0.97);
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
+  will-change: opacity, transform;
+}
+
+body.swarm-building .nav-wrap.swarm-built,
+body.swarm-building .hero-logo.swarm-built,
+body.swarm-building .hero-badge.swarm-built,
+body.swarm-building .hero-title.swarm-built,
+body.swarm-building .hero-sub.swarm-built,
+body.swarm-building .hero-cta.swarm-built {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: drop-shadow(0 0 18px rgba(34, 197, 94, 0.45));
+}
+
+/* Semi-transparent blueprint overlay that reveals the real page underneath */
 #swarm-overlay {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 999999;
-  background-color: #080b0f;
+  z-index: 99999;
+  background-color: rgba(6, 10, 14, 0.76);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   background-image:
-    linear-gradient(rgba(34, 197, 94, 0.09) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34, 197, 94, 0.09) 1px, transparent 1px),
-    radial-gradient(circle at 50% 50%, rgba(18, 32, 22, 0.88) 0%, #05070a 100%);
+    linear-gradient(rgba(34, 197, 94, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(20, 35, 25, 0.4) 0%, transparent 80%);
   background-size: 32px 32px, 32px 32px, 100% 100%;
   overflow: hidden;
   user-select: none;
@@ -32,15 +58,15 @@
   filter: brightness(1.25);
 }
 
-/* Subtle CRT scanline overlay */
+/* CRT Scanline Texture */
 #swarm-overlay::before {
   content: "";
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.18) 0px,
-    rgba(0, 0, 0, 0.18) 1px,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
     transparent 1px,
     transparent 3px
   );
@@ -48,26 +74,26 @@
   z-index: 10;
 }
 
-/* Background HUD corner brackets */
+/* HUD Corner Brackets */
 .swarm-hud-corner {
   position: absolute;
-  width: 24px;
-  height: 24px;
-  border-color: rgba(34, 197, 94, 0.55);
+  width: 20px;
+  height: 20px;
+  border-color: rgba(34, 197, 94, 0.5);
   border-style: solid;
   pointer-events: none;
   z-index: 5;
 }
-.swarm-hud-tl { top: 16px; left: 16px; border-width: 3px 0 0 3px; }
-.swarm-hud-tr { top: 16px; right: 16px; border-width: 3px 3px 0 0; }
-.swarm-hud-bl { bottom: 16px; left: 16px; border-width: 0 0 3px 3px; }
-.swarm-hud-br { bottom: 16px; right: 16px; border-width: 0 3px 3px 0; }
+.swarm-hud-tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+.swarm-hud-tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+.swarm-hud-bl { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; }
+.swarm-hud-br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
 
-/* Top status bar */
+/* Status Bar */
 .swarm-status-bar {
   position: absolute;
   top: 14px;
-  left: 36px;
+  left: 28px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -81,14 +107,14 @@
 .swarm-status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   background: rgba(22, 163, 74, 0.2);
   border: 1px solid rgba(34, 197, 94, 0.65);
   box-shadow: 0 0 10px rgba(34, 197, 94, 0.25);
   color: #55ff55;
   padding: 4px 10px;
   font-family: var(--disp, monospace);
-  font-size: 9px;
+  font-size: 8px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -109,14 +135,14 @@
 .swarm-coords {
   color: #a1a1aa;
   font-family: var(--mono, monospace);
-  font-size: 11px;
+  font-size: 10px;
 }
 
-/* Skip Button — authentic Minecraft stone button */
+/* Skip Button — Minecraft Stone Button */
 .swarm-skip-btn {
   position: absolute;
   top: 12px;
-  right: 36px;
+  right: 28px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -152,7 +178,7 @@
   font-size: 8px;
 }
 
-/* Canvas for vectors & particles */
+/* Canvas for Guides & Particles */
 #swarm-canvas {
   position: absolute;
   inset: 0;
@@ -163,189 +189,74 @@
 }
 
 /* ==========================================================================
-   Wireframe Bounding Boxes (Minecraft Blueprint Style)
+   Real DOM Element Bounding Boxes
    ========================================================================== */
-.swarm-box {
+.swarm-target-box {
   position: absolute;
   box-sizing: border-box;
-  max-width: calc(100vw - 24px);
-  border: 1.5px dashed rgba(34, 197, 94, 0.6);
-  background: rgba(34, 197, 94, 0.035);
-  box-shadow: 0 0 24px rgba(34, 197, 94, 0.08);
+  border: 1.5px dashed rgba(34, 197, 94, 0.7);
+  background: rgba(34, 197, 94, 0.04);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);
   opacity: 0;
   transform: scale(0.98);
-  transition: opacity 0.3s ease, transform 0.3s ease, border-color 0.25s ease, background 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease, border-color 0.25s ease, background 0.25s ease;
   pointer-events: none;
   z-index: 12;
 }
 
-.swarm-box.active {
+.swarm-target-box.active {
   opacity: 1;
   transform: scale(1);
 }
 
-.swarm-box.complete {
+.swarm-target-box.complete {
   border-style: solid;
-  border-color: rgba(34, 197, 94, 0.85);
-  background: rgba(34, 197, 94, 0.06);
-  box-shadow: 0 0 30px rgba(34, 197, 94, 0.15), inset 0 0 16px rgba(34, 197, 94, 0.05);
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.08);
+  box-shadow: 0 0 24px rgba(34, 197, 94, 0.25);
 }
 
-/* Corner handles & crosshairs */
-.swarm-box::before,
-.swarm-box::after {
+/* Corner Handles */
+.swarm-target-box::before,
+.swarm-target-box::after {
   content: "";
   position: absolute;
-  width: 9px;
-  height: 9px;
-  border: 2px solid #55ff55;
-  background: #090d12;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid #55ff55;
+  background: #060a0e;
 }
-.swarm-box::before { top: -5px; left: -5px; }
-.swarm-box::after { bottom: -5px; right: -5px; }
+.swarm-target-box::before { top: -4px; left: -4px; }
+.swarm-target-box::after { bottom: -4px; right: -4px; }
 
-/* Box label tag */
-.swarm-box-tag {
+/* Tag Labels showing Real DOM Selector */
+.swarm-target-tag {
   position: absolute;
-  top: -21px;
-  left: -2px;
+  top: -19px;
+  left: -1px;
   background: #15803d;
   color: #f0fdf4;
   border: 1px solid #22c55e;
-  font-family: var(--disp, monospace);
+  font-family: var(--mono, monospace);
   font-size: 8px;
   font-weight: 700;
-  padding: 3px 7px;
-  letter-spacing: 0.06em;
+  padding: 1px 6px;
+  letter-spacing: 0.04em;
   white-space: nowrap;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
 }
 
-.swarm-box-dim {
+.swarm-target-dim {
   position: absolute;
-  bottom: -20px;
-  right: -2px;
+  bottom: -18px;
+  right: -1px;
   color: #86efac;
   font-family: var(--mono, monospace);
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 1px 6px;
-  border: 1px solid rgba(34, 197, 94, 0.4);
-}
-
-/* ==========================================================================
-   Hero Viewport Content Wireframe Assembly
-   ========================================================================== */
-.swarm-hero-content {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 24px;
-  z-index: 14;
-}
-
-.swarm-logo-badge {
-  width: 64px;
-  height: 64px;
-  margin-bottom: 14px;
-  border: 3px solid #22c55e;
-  background: #141416;
-  box-shadow:
-    inset 3px 3px 0 #52525b,
-    inset -3px -3px 0 #18181b,
-    0 0 24px rgba(34, 197, 94, 0.45);
-  display: grid;
-  place-items: center;
-  opacity: 0;
-  transform: translateY(-10px) scale(0.8);
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.swarm-logo-badge.visible {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.swarm-logo-badge svg {
-  width: 40px;
-  height: 40px;
-  fill: #55ff55;
-  filter: drop-shadow(0 0 6px rgba(85, 255, 85, 0.5));
-}
-
-.swarm-term-title {
-  font-family: var(--disp, "Press Start 2P", monospace);
-  font-size: clamp(1.1rem, 2.8vw, 2rem);
-  color: #ededef;
-  text-shadow: 3px 3px 0 #000, 0 0 14px rgba(255, 255, 255, 0.3);
-  letter-spacing: 0.06em;
-  min-height: 1.4em;
-  margin-bottom: 10px;
-}
-
-.swarm-term-sub {
-  font-family: var(--disp, monospace);
-  font-size: clamp(8px, 1.1vw, 11px);
-  color: #eab308;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  text-shadow: 2px 2px 0 #000;
-  margin-bottom: 18px;
-  min-height: 1.2em;
-}
-
-.swarm-cursor-carat {
-  display: inline-block;
-  width: 10px;
-  height: 1.1em;
-  background: #55ff55;
-  vertical-align: middle;
-  margin-left: 5px;
-  box-shadow: 0 0 8px #55ff55;
-  animation: swarm-blink 0.5s steps(2) infinite;
-}
-
-@keyframes swarm-blink {
-  50% { opacity: 0; }
-}
-
-.swarm-buttons-preview {
-  display: flex;
-  gap: 16px;
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.swarm-buttons-preview.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Authentic Minecraft Beveled Buttons */
-.swarm-btn-frame {
-  padding: 10px 18px;
-  font-family: var(--disp, monospace);
   font-size: 9px;
-  color: #ddd;
-  background: #3c3c3c;
-  border: 2px solid #000;
-  box-shadow: inset -2px -2px 0 #1b1b1b, inset 2px 2px 0 #5a5a5a;
-  text-shadow: 1px 1px 0 #000;
-  letter-spacing: 0.05em;
-}
-
-.swarm-btn-frame.primary {
-  background: #1e7039;
-  border: 2px solid #000;
-  box-shadow: inset -2px -2px 0 #0f401f, inset 2px 2px 0 #3cb365, 0 0 14px rgba(34, 197, 94, 0.35);
-  color: #ffffff;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 1px 5px;
+  border: 1px solid rgba(34, 197, 94, 0.4);
 }
 
 /* ==========================================================================
@@ -353,7 +264,7 @@
    ========================================================================== */
 .swarm-xp-bar-wrap {
   position: absolute;
-  bottom: 24px;
+  bottom: 22px;
   left: 50%;
   transform: translateX(-50%);
   width: min(540px, calc(100% - 48px));
@@ -399,7 +310,7 @@
 }
 
 /* ==========================================================================
-   Simulated Minecraft Collaborative Cursors
+   Simulated Minecraft Collaborative Cursors (Smooth Physics)
    ========================================================================== */
 .swarm-cursor-item {
   position: absolute;
@@ -408,8 +319,8 @@
   pointer-events: none;
   z-index: 100;
   will-change: transform;
-  transform-origin: 0 0;
-  transition: none;
+  transform-origin: 4px 4px;
+  transition: transform 0.06s linear;
 }
 
 .swarm-pointer-tool {
@@ -419,6 +330,11 @@
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.9));
+  transition: transform 0.1s ease;
+}
+
+.swarm-cursor-item.clicking .swarm-pointer-tool {
+  transform: scale(0.85) translate(2px, 2px);
 }
 
 /* Minecraft Player Nametag */
@@ -430,7 +346,7 @@
   align-items: center;
   gap: 6px;
   padding: 4px 8px;
-  background: rgba(0, 0, 0, 0.78);
+  background: rgba(0, 0, 0, 0.82);
   border: 1px solid rgba(0, 0, 0, 0.95);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
   font-family: var(--disp, monospace);
@@ -450,13 +366,13 @@
   box-shadow: 0 0 6px currentColor;
 }
 
-/* Cursor click ripple */
+/* Click Ripple */
 .swarm-click-ripple {
   position: absolute;
-  width: 28px;
-  height: 28px;
-  margin-top: -14px;
-  margin-left: -14px;
+  width: 26px;
+  height: 26px;
+  margin-top: -13px;
+  margin-left: -13px;
   border-radius: 0;
   border: 2px solid;
   pointer-events: none;
@@ -466,12 +382,10 @@
 
 @keyframes swarm-ripple-expand {
   0% { transform: scale(0.2) rotate(0deg); opacity: 1; }
-  100% { transform: scale(2.6) rotate(45deg); opacity: 0; }
+  100% { transform: scale(2.8) rotate(45deg); opacity: 0; }
 }
 
-/* ==========================================================================
-   Replay Trigger (Shift+S & Footer link)
-   ========================================================================== */
+/* Replay Button in Footer */
 .swarm-replay-trigger {
   display: inline-flex;
   align-items: center;
@@ -520,28 +434,23 @@
   .swarm-coords {
     display: none;
   }
-  .swarm-term-title {
-    font-size: 1.15rem;
-  }
-  .swarm-term-sub {
-    font-size: 8px;
-  }
-  .swarm-buttons-preview {
-    flex-direction: column;
-    gap: 8px;
-    width: 85%;
-    max-width: 240px;
-  }
-  .swarm-btn-frame {
-    text-align: center;
-  }
   .swarm-xp-bar-wrap {
-    bottom: 16px;
+    bottom: 14px;
     width: calc(100% - 32px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  body.swarm-building .nav-wrap,
+  body.swarm-building .hero-logo,
+  body.swarm-building .hero-badge,
+  body.swarm-building .hero-title,
+  body.swarm-building .hero-sub,
+  body.swarm-building .hero-cta {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
   #swarm-overlay {
     display: none !important;
   }
