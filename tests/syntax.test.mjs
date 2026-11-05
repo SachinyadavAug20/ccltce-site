@@ -24,7 +24,10 @@ test("JavaScript Syntax Verification across codebase", async (t) => {
   for (const file of jsFiles) {
     await t.test(`syntax: ${file}`, () => {
       try {
-        execFileSync(process.execPath, ["--check", file], { stdio: "pipe" });
+        // ES-module sources ship as .js without "type": "module" (zero-build site);
+        // Node <20 parses --check as CJS, so force ESM via stdin + --input-type.
+        const src = fs.readFileSync(file, "utf8");
+        execFileSync(process.execPath, ["--input-type=module", "--check"], { stdio: "pipe", input: src });
       } catch (err) {
         assert.fail(`Syntax error in ${file}:\n${err.stderr?.toString() || err.message}`);
       }
