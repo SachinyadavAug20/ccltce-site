@@ -11,6 +11,14 @@
 (function () {
   "use strict";
 
+  // flag set synchronously BEFORE hero-fx.js runs (script order guarantees it):
+  // hero-fx skips its sky-drop entrance when the swarm will assemble the hero itself.
+  if (window.matchMedia && !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
+      window.location.search.indexOf("intro=0") === -1 &&
+      window.location.search.indexOf("skipintro=1") === -1) {
+    document.documentElement.classList.add("swarm-queued");
+  }
+
   if (window.CCLTCE_SWARM && window.CCLTCE_SWARM._active) return;
 
   var DURATION = 4400; // ~4.4s deliberate cinema pacing

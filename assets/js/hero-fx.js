@@ -7,8 +7,10 @@
   var fine = matchMedia("(pointer: fine)").matches;
 
   // ── sky-drop entrance ─────────────────────────────────────────────
+  // Skipped when the swarm intro plays — it assembles the hero itself;
+  // replaying the drop after it caused the "washed/faded title" look.
   var overlay = document.querySelector(".hero-overlay");
-  if (overlay && !reduce) {
+  if (overlay && !reduce && !document.documentElement.classList.contains("swarm-queued")) {
     var parts = overlay.querySelectorAll(".hero-logo, .hero-badge, .hero-title, .hero-sub, .hero-cta");
     if (parts.length) {
       gsap.from(parts, {

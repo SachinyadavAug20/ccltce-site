@@ -7,14 +7,8 @@
   document.documentElement.classList.add("gsap-ready");
 
   function init() {
-    // hero intro — works with both .hero and .hero-overlay
-    var hero = document.querySelector(".hero, .hero-overlay");
-    if (hero) {
-      var intro = [".hero-logo", ".hero-title", ".hero-sub", ".hero-cta"]
-        .map(function (s) { return hero.querySelector(s); }).filter(Boolean);
-      gsap.fromTo(intro, { opacity: 0, y: 18 },
-        { opacity: 1, y: 0, duration: 0.55, ease: "power2.out", stagger: 0.09, clearProps: "all" });
-    }
+    // NOTE: the hero entrance is owned by hero-fx.js (sky-drop). No second tween here —
+    // two tweens on the same elements fought each other and read as washed-out "blur".
 
     // page-head fade
     var head = document.querySelector(".page-head");

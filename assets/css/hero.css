@@ -6,21 +6,22 @@
   padding: clamp(15rem, 22vh, 17rem) 1.25rem 3rem;
 }
 
-/* floating emblem — round seal set in a chunky MC inventory-slot frame
-   (square bevel fits the site's all-square design language).
+/* floating emblem — seal set in a warm MC item-frame (light wood inner, dark
+   wood edge) so the navy seal art pops instead of sinking into a dark slot.
    Hover motion (pop + bob) is GSAP: hero-fx.js */
 .hero-logo {
   width: clamp(125px, 15vw, 172px); height: clamp(125px, 15vw, 172px);
   object-fit: contain; image-rendering: auto; margin-bottom: 0.6rem;
   padding: 10px;
-  background: linear-gradient(160deg, #3d342a 0%, #241e17 70%, #1b150f 100%);
-  border: 2px solid #574a3c;
+  background: linear-gradient(160deg, #dcb87c 0%, #c39a58 60%, #ad8747 100%);
+  border: 2px solid #6d5730;
   box-shadow:
-    inset 3px 3px 0 #a08a70,
-    inset -3px -3px 0 #1b140e,
-    inset 0 0 0 1px #0e0b08,
+    inset 3px 3px 0 #f4ddae,
+    inset -3px -3px 0 #6b5024,
+    inset 0 0 0 1px #8a6c38,
     0 10px 0 rgba(0, 0, 0, 0.38),
-    0 0 36px rgba(255, 190, 60, 0.32);
+    0 0 40px rgba(255, 200, 70, 0.4);
+  filter: brightness(1.1) saturate(1.12);
   pointer-events: auto;   /* parent overlay is pointer-events:none — needed for :hover */
   will-change: transform;
 }
@@ -180,24 +181,24 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #fff3c8;
+  color: #fff6d8;
   margin: 0;
-  text-shadow: 2px 2px 0 #3a2604,
-    -1px -1px 0 #201604, 1px -1px 0 #201604, -1px 1px 0 #201604, 1px 1px 0 #201604,
-    0 0 18px rgba(255, 210, 80, 0.28);
+  text-shadow: 2px 2px 0 #2a1c04,
+    -1px -1px 0 #1c1202, 1px -1px 0 #1c1202, -1px 1px 0 #1c1202, 1px 1px 0 #1c1202,
+    0 0 20px rgba(255, 220, 110, 0.35);
 }
 .hero-loc {
   font-family: var(--mono);
   font-size: clamp(10px, 1.3vw, 12px);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #9fc8bb;
+  color: #c8f2dd;
   margin: 0;
-  text-shadow: 1px 1px 0 #101a14;
+  text-shadow: 1px 1px 0 #0c1a12,
+    0 0 14px rgba(120, 255, 190, 0.3);
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  opacity: 0.92;
 }
 .loc-gem { color: #ffd76a; }
 

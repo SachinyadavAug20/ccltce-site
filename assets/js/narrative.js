@@ -288,12 +288,12 @@
       if (easter) easter.update(el, camera);
       if (cloudGrps.length) {
         var cd = clamp01((26 - camera.position.x) / 11);   // full at lawn, gone by x = 26
-        if (cd < 1) {
-          for (var cg = 0; cg < cloudGrps.length; cg++) {
-            var gm = cloudGrps[cg].userData.mats;
-            for (var ci = 0; ci < gm.length; ci++) gm[ci].opacity = 0.55 * cd;
-            cloudGrps[cg].visible = cd > 0.02;
-          }
+        // clouds ghost in with the first bit of scroll — the hero title zone stays clean
+        var cr = 0.3 + 0.7 * clamp01(progress.t / 0.10);
+        for (var cg = 0; cg < cloudGrps.length; cg++) {
+          var gm = cloudGrps[cg].userData.mats;
+          for (var ci = 0; ci < gm.length; ci++) gm[ci].opacity = 0.55 * cd * cr;
+          cloudGrps[cg].visible = cd > 0.02;
         }
       }
       if (firstLook) { lookSm.copy(look); firstLook = false; }
