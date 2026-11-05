@@ -87,7 +87,8 @@
       return '<a href="' + s[1] + '" target="_blank" rel="noopener" aria-label="' + s[2] + '" class="' + s[3] + '">' + svg(s[0], 15) + "</a>";
     }).join("") +
     "</span></div>" +
-    '<p class="foot-copy">&copy; ' + new Date().getFullYear() + " CCLTCE &middot; Lokmanya Tilak College of Engineering, Koparkhana, Navi Mumbai</p>";
+    '<p class="foot-copy">&copy; ' + new Date().getFullYear() + " CCLTCE &middot; Lokmanya Tilak College of Engineering, Koparkhana, Navi Mumbai &middot; " +
+    '<button type="button" class="swarm-replay-trigger" onclick="if(window.CCLTCE_SWARM){window.CCLTCE_SWARM.replay()}else{location.href=\'index.html?intro=1\'}" title="Replay Opening (Shift+S)">⚡ Replay Intro <span class="swarm-skip-key">[Shift+S]</span></button></p>';
 
   function markActive() {
     var here = (location.pathname.split("/").pop() || "index").toLowerCase().replace(/\.html$/, "");

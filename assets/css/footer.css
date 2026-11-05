@@ -69,3 +69,19 @@ footer {
   color: #999;
   text-shadow: 1px 1px 0 #000;
 }
+
+.swarm-replay-trigger {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: #71717a;
+  background: none;
+  border: 1px solid transparent;
+  padding: 2px 6px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.swarm-replay-trigger:hover {
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
