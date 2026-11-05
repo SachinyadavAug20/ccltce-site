@@ -1,23 +1,27 @@
 /**
- * CCLTCE — Swarm Rebuild Opening Experience
+ * CCLTCE — Swarm Rebuild Opening Experience (Minecraft Edition)
  * Inspired by Joel Califa's Swarm & Dhvanil Patel's swarm-cursors.
- * Zero-dependency, ultra-fast collaborative pixel builder intro.
+ * Collaborative pixel builder intro with authentic Minecraft sound design,
+ * XP progression, tools, and visual pacing.
+ *
+ * Runs on every refresh • Cinema pacing (~3.8s) • Instant skip (Esc/click).
  */
 (function () {
   "use strict";
 
-  // Prevent multiple initializations
-  if (window.CCLTCE_SWARM) return;
+  // Prevent multiple simultaneous initializations
+  if (window.CCLTCE_SWARM && window.CCLTCE_SWARM._active) return;
 
-  var DURATION = 2200; // Snappy ~2.2s total duration
-  var STORAGE_KEY = "ccltce_swarm_seen";
+  var DURATION = 3800; // ~3.8s cinema pacing for full appreciation
   var isPlaying = false;
   var animFrameId = null;
   var overlayEl = null;
   var audioCtx = null;
   var timeouts = [];
 
-  // Audio synthesis helper (zero-dependency Web Audio API)
+  // =========================================================================
+  // Web Audio Procedural Synthesis (Minecraft Sound Design)
+  // =========================================================================
   function getAudioCtx() {
     if (audioCtx) return audioCtx;
     try {
@@ -40,8 +44,8 @@
       var gain = ctx.createGain();
       osc.type = type || "square";
       osc.frequency.setValueAtTime(freq, t);
-      if (rampFreq) {
-        osc.frequency.exponentialRampToValueAtTime(rampFreq, t + duration);
+      if (rampFreq && rampFreq !== freq) {
+        osc.frequency.exponentialRampToValueAtTime(Math.max(20, rampFreq), t + duration);
       }
       gain.gain.setValueAtTime(0.0001, t);
       gain.gain.exponentialRampToValueAtTime(vol || 0.04, t + 0.005);
@@ -49,79 +53,91 @@
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start(t);
-      osc.stop(t + duration + 0.01);
+      osc.stop(t + duration + 0.015);
     } catch (e) {}
   }
 
   var sfx = {
-    tick: function () { playTone(1200, "square", 0.02, 0.025, 900); },
-    type: function () { playTone(1400 + Math.random() * 200, "triangle", 0.025, 0.03, 1000); },
-    click: function () { playTone(800, "square", 0.04, 0.05, 300); },
-    chord: function () {
-      [523.25, 659.25, 783.99, 1046.5].forEach(function (f, i) {
-        setTimeout(function () { playTone(f, "triangle", 0.12, 0.035); }, i * 45);
-      });
+    // Minecraft block placement pop
+    blockPop: function () {
+      playTone(280, "triangle", 0.04, 0.06, 520);
     },
-    burst: function () {
-      [600, 900, 1200, 1600].forEach(function (f, i) {
-        setTimeout(function () { playTone(f, "sine", 0.18, 0.04, f * 1.5); }, i * 30);
+    // Mechanical typewriter tick
+    typeTick: function () {
+      playTone(1350 + Math.random() * 250, "triangle", 0.02, 0.03, 900);
+    },
+    // Stone button click
+    buttonClick: function () {
+      playTone(750, "square", 0.035, 0.05, 220);
+    },
+    // XP orb twinkle
+    xpOrb: function () {
+      playTone(1100 + Math.random() * 300, "sine", 0.06, 0.035, 1400);
+    },
+    // Minecraft level-up chime fanfare
+    levelUp: function () {
+      var notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+      notes.forEach(function (freq, i) {
+        timeouts.push(setTimeout(function () {
+          playTone(freq, "triangle", 0.16, 0.06);
+          playTone(freq * 0.5, "sine", 0.16, 0.04);
+        }, i * 65));
       });
     }
   };
 
-  // Cursor definitions (Minecraft tools & identities)
+  // =========================================================================
+  // Minecraft Collaborators (Steve, Alex, Miner, Hacker, Builder)
+  // =========================================================================
   var CURSORS = [
     {
       id: "steve",
       name: "Steve",
       role: "DEV",
-      color: "#22c55e",
-      path: "M4 4h8v4h-8zM4 8h4v4h-4zM12 8h4v4h-4zM8 12h4v4h-4zM16 12h4v4h-4zM20 16h4v4h-4zM24 20h4v4h-4z"
+      color: "#55ff55",
+      tool: "assets/cursors/iron-sword.svg"
     },
     {
       id: "alex",
       name: "Alex",
       role: "DESIGN",
-      color: "#38bdf8",
-      path: "M6 2h12v4H6zM4 6h4v4H4zM16 6h4v4h-4zM2 10h4v4H2zM18 10h4v4h-4zM10 10h4v12h-4z"
+      color: "#55ffff",
+      tool: "assets/cursors/gold-pickaxe.svg"
     },
     {
       id: "miner",
       name: "Miner",
       role: "OPS",
-      color: "#f59e0b",
-      path: "M8 4h8v4H8zM6 8h12v4H6zM4 12h16v4H4zM8 16h8v8H8z"
+      color: "#ffaa00",
+      tool: "assets/cursors/netherite-axe.svg"
     },
     {
       id: "hacker",
       name: "Hacker",
       role: "SECURITY",
-      color: "#ef4444",
-      path: "M10 2h4v6h-4zM8 8h8v4H8zM6 12h12v4H6zM10 16h4v8h-4z"
+      color: "#ff5555",
+      tool: "assets/cursors/redstone-torch.svg"
     },
     {
       id: "builder",
       name: "Builder",
       role: "CORE",
-      color: "#c084fc",
-      path: "M4 4h16v4H4zM4 8h4v12H4zM16 8h4v12h-4zM8 16h8v4H8z"
+      color: "#ff55ff",
+      tool: "assets/cursors/shield.svg"
     }
   ];
 
   function shouldPlay() {
-    // Accessibility check: Skip immediately on prefers-reduced-motion
+    // Accessibility check: Skip immediately if prefers-reduced-motion is active
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return false;
     }
-    // URL override (?intro=1 or ?replay=1 forces play)
+    // Allow user to bypass with ?intro=0 or ?skipintro=1
     var search = window.location.search;
-    if (search.indexOf("intro=1") !== -1 || search.indexOf("replay=1") !== -1) {
-      return true;
-    }
-    // Only run on homepage / first session entrance
-    if (sessionStorage.getItem(STORAGE_KEY)) {
+    if (search.indexOf("intro=0") !== -1 || search.indexOf("skipintro=1") !== -1) {
       return false;
     }
+    // Runs on every refresh!
     return true;
   }
 
@@ -136,10 +152,13 @@
       '<div class="swarm-hud-corner swarm-hud-bl"></div>' +
       '<div class="swarm-hud-corner swarm-hud-br"></div>' +
       '<div class="swarm-status-bar">' +
-        '<span class="swarm-status-badge"><span class="swarm-status-dot"></span><span id="swarm-status-txt">BLUEPRINT COMPILING</span></span>' +
-        '<span id="swarm-coord" class="swarm-coords">LOC: X:128 Y:64 Z:256</span>' +
+        '<span class="swarm-status-badge">' +
+          '<span class="swarm-status-dot"></span>' +
+          '<span id="swarm-status-txt">SEARCHING OVERWORLD CHUNKS...</span>' +
+        '</span>' +
+        '<span id="swarm-coord" class="swarm-coords">LOC: X:128 Y:64 Z:256 • BIOME: CAMPUS</span>' +
       '</div>' +
-      '<button type="button" class="swarm-skip-btn" id="swarm-skip-btn" title="Skip Intro">' +
+      '<button type="button" class="swarm-skip-btn" id="swarm-skip-btn" title="Skip Intro (Escape)">' +
         'SKIP <span class="swarm-skip-key">[ESC]</span> ✕' +
       '</button>' +
       '<canvas id="swarm-canvas"></canvas>' +
@@ -149,7 +168,7 @@
       '</div>' +
       '<div id="swarm-box-hero" class="swarm-box">' +
         '<span class="swarm-box-tag">HERO_VIEWPORT</span>' +
-        '<span class="swarm-box-dim" id="swarm-hero-dim">960 × 440</span>' +
+        '<span class="swarm-box-dim" id="swarm-hero-dim">920 × 420</span>' +
         '<div class="swarm-hero-content">' +
           '<div class="swarm-logo-badge" id="swarm-logo">' +
             '<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5L4.5 9.75 3 10.5l9 4.5 9-4.5-1.5-.75L12 13.5zm0 4.5L4.5 14.25 3 15l9 4.5 9-4.5-1.5-.75L12 18z"/></svg>' +
@@ -157,9 +176,15 @@
           '<div class="swarm-term-title" id="swarm-title"></div>' +
           '<div class="swarm-term-sub" id="swarm-sub"></div>' +
           '<div class="swarm-buttons-preview" id="swarm-btns">' +
-            '<span class="swarm-btn-frame primary">BROWSE EVENTS</span>' +
-            '<span class="swarm-btn-frame">TAKE CHALLENGE</span>' +
+            '<span class="swarm-btn-frame primary" id="swarm-btn-events">BROWSE EVENTS</span>' +
+            '<span class="swarm-btn-frame" id="swarm-btn-challenge">TAKE CHALLENGE</span>' +
           '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="swarm-xp-bar-wrap">' +
+        '<div class="swarm-xp-level" id="swarm-xp-lvl">&lt; LEVEL 1 &gt;</div>' +
+        '<div class="swarm-xp-bar-track">' +
+          '<div class="swarm-xp-bar-fill" id="swarm-xp-fill"></div>' +
         '</div>' +
       '</div>';
 
@@ -172,18 +197,31 @@
     rip.className = "swarm-click-ripple";
     rip.style.left = x + "px";
     rip.style.top = y + "px";
-    rip.style.borderColor = color;
+    rip.style.borderColor = color || "#55ff55";
     overlayEl.appendChild(rip);
     setTimeout(function () {
       if (rip.parentNode) rip.parentNode.removeChild(rip);
     }, 450);
   }
 
+  function setXP(percent, level) {
+    var fill = document.getElementById("swarm-xp-fill");
+    var lvl = document.getElementById("swarm-xp-lvl");
+    if (fill) fill.style.width = Math.min(100, Math.max(0, percent)) + "%";
+    if (lvl && level !== undefined) {
+      lvl.textContent = "< LEVEL " + level + " >";
+      if (level >= 42) {
+        lvl.classList.add("leveled-up");
+      }
+    }
+  }
+
   function start() {
     if (isPlaying) return;
     isPlaying = true;
+    if (window.CCLTCE_SWARM) window.CCLTCE_SWARM._active = true;
 
-    // Clear previous elements if any
+    // Clear previous overlay if any
     var existing = document.getElementById("swarm-overlay");
     if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
 
@@ -205,32 +243,35 @@
     var isMobile = W <= 768;
     var activeCursors = isMobile ? CURSORS.slice(0, 3) : CURSORS;
 
-    // Build cursor DOM elements
+    // Build cursor DOM elements using authentic Minecraft pixel tool cursors
     var cursorNodes = [];
-    activeCursors.forEach(function (c) {
+    activeCursors.forEach(function (c, idx) {
       var node = document.createElement("div");
       node.className = "swarm-cursor-item";
       node.id = "cur-" + c.id;
       node.innerHTML =
-        '<svg class="swarm-pointer-svg" viewBox="0 0 24 24" shape-rendering="crispEdges">' +
-          '<polygon points="0,0 0,18 5,14 8,22 11,21 8,13 14,13" fill="' + c.color + '" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/>' +
-        '</svg>' +
-        '<div class="swarm-cursor-badge" style="background: ' + c.color + '; border-color: #000;">' +
-          '<span class="swarm-cursor-dot"></span>' +
-          '<span>' + c.name + '</span>' +
+        '<img class="swarm-pointer-tool" src="' + c.tool + '" alt="" width="32" height="32" />' +
+        '<div class="swarm-cursor-badge" style="color: ' + c.color + ';">' +
+          '<span class="swarm-cursor-dot" style="background: ' + c.color + '; box-shadow: 0 0 6px ' + c.color + ';"></span>' +
+          '<span>' + c.name + ' [' + c.role + ']</span>' +
         '</div>';
       overlayEl.appendChild(node);
+
+      // Distribute starting positions off-screen
+      var startX = (idx % 2 === 0) ? -60 : W + 60;
+      var startY = (idx * (H / activeCursors.length)) + 40;
+
       cursorNodes.push({
         def: c,
         el: node,
-        x: W / 2 + (Math.random() - 0.5) * W * 0.8,
-        y: H + 80 + Math.random() * 100,
-        tx: W / 2,
-        ty: H / 2
+        x: startX,
+        y: startY,
+        tx: W / 2 + (Math.random() - 0.5) * 200,
+        ty: H / 2 + (Math.random() - 0.5) * 200
       });
     });
 
-    // Boxes & elements
+    // Box and UI elements
     var boxNav = document.getElementById("swarm-box-nav");
     var boxHero = document.getElementById("swarm-box-hero");
     var navDim = document.getElementById("swarm-nav-dim");
@@ -258,7 +299,7 @@
     var heroW = Math.max(280, Math.min(W - (isMobile ? 24 : 48), isMobile ? (W - 24) : 920));
     var heroH = Math.min(H - (isMobile ? 160 : 180), isMobile ? 380 : 420);
     var heroX = Math.max(isMobile ? 12 : 24, (W - heroW) / 2);
-    var heroY = isMobile ? 104 : ((H - heroH) / 2 + 20);
+    var heroY = isMobile ? 104 : ((H - heroH) / 2 + 10);
     if (boxHero) {
       boxHero.style.left = heroX + "px";
       boxHero.style.top = heroY + "px";
@@ -270,19 +311,19 @@
     // Particle system for the XP burst climax
     var particles = [];
     function spawnParticles(originX, originY, count) {
-      var colors = ["#22c55e", "#facc15", "#4ade80", "#ffffff", "#38bdf8"];
+      var colors = ["#55ff55", "#facc15", "#22c55e", "#55ffff", "#ffffff", "#eab308"];
       for (var i = 0; i < count; i++) {
         var angle = Math.random() * Math.PI * 2;
-        var speed = 4 + Math.random() * 12;
+        var speed = 3 + Math.random() * 14;
         particles.push({
           x: originX,
           y: originY,
           vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          size: 3 + Math.floor(Math.random() * 5),
+          vy: Math.sin(angle) * speed - 1.5,
+          size: 3 + Math.floor(Math.random() * 6),
           color: colors[Math.floor(Math.random() * colors.length)],
           alpha: 1,
-          decay: 0.02 + Math.random() * 0.03
+          decay: 0.015 + Math.random() * 0.025
         });
       }
     }
@@ -296,8 +337,8 @@
       // Update cursor positions with smooth lerping
       for (var i = 0; i < cursorNodes.length; i++) {
         var c = cursorNodes[i];
-        c.x += (c.tx - c.x) * 0.18;
-        c.y += (c.ty - c.y) * 0.18;
+        c.x += (c.tx - c.x) * 0.14;
+        c.y += (c.ty - c.y) * 0.14;
         c.el.style.transform = "translate3d(" + Math.round(c.x) + "px, " + Math.round(c.y) + "px, 0)";
       }
 
@@ -306,16 +347,16 @@
         ctx.clearRect(0, 0, W, H);
 
         // Draw dynamic connecting guide lines between cursors during build phase
-        if (elapsed > 300 && elapsed < 1650) {
+        if (elapsed > 400 && elapsed < 3100) {
           ctx.beginPath();
-          ctx.strokeStyle = "rgba(34, 197, 94, 0.15)";
-          ctx.setLineDash([4, 4]);
+          ctx.strokeStyle = "rgba(85, 255, 85, 0.16)";
+          ctx.setLineDash([5, 5]);
           ctx.lineWidth = 1;
           for (var j = 0; j < cursorNodes.length; j++) {
             var curA = cursorNodes[j];
             var curB = cursorNodes[(j + 1) % cursorNodes.length];
-            ctx.moveTo(curA.x, curA.y);
-            ctx.lineTo(curB.x, curB.y);
+            ctx.moveTo(curA.x + 12, curA.y + 12);
+            ctx.lineTo(curB.x + 12, curB.y + 12);
           }
           ctx.stroke();
           ctx.setLineDash([]);
@@ -326,8 +367,9 @@
           var pt = particles[p];
           pt.x += pt.vx;
           pt.y += pt.vy;
-          pt.vx *= 0.96;
-          pt.vy *= 0.96;
+          pt.vy += 0.22; // Minecraft gravity effect on XP orbs
+          pt.vx *= 0.97;
+          pt.vy *= 0.97;
           pt.alpha -= pt.decay;
 
           if (pt.alpha <= 0) {
@@ -347,21 +389,22 @@
     animFrameId = requestAnimationFrame(renderLoop);
 
     // =========================================================================
-    // Choreographed Timeline
+    // Choreographed Timeline (~3.8s cinema pacing)
     // =========================================================================
 
-    // Phase 1 (100ms - 400ms): Cursors converge to wireframe anchors
+    // Phase 1 (100ms - 450ms): Cursors enter realm & converge to wireframe anchors
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
-      if (statusTxt) statusTxt.textContent = "SYNCHRONIZING REPOSITORY";
-      sfx.tick();
+      if (statusTxt) statusTxt.textContent = "SYNCHRONIZING VOXEL CHUNKS";
+      sfx.blockPop();
+      setXP(15, 5);
 
-      // Steve draws Nav
+      // Steve heads to Nav
       if (cursorNodes[0]) {
-        cursorNodes[0].tx = navX + 20;
+        cursorNodes[0].tx = navX + 30;
         cursorNodes[0].ty = navY + navH / 2;
       }
-      // Alex and Miner frame Hero
+      // Alex & Miner frame Hero
       if (cursorNodes[1]) {
         cursorNodes[1].tx = heroX + 40;
         cursorNodes[1].ty = heroY + 40;
@@ -370,19 +413,25 @@
         cursorNodes[2].tx = heroX + heroW - 40;
         cursorNodes[2].ty = heroY + heroH - 40;
       }
+      // Hacker & Builder
       if (cursorNodes[3]) {
         cursorNodes[3].tx = heroX + heroW / 2;
-        cursorNodes[3].ty = heroY + 120;
+        cursorNodes[3].ty = heroY + 90;
       }
-    }, 150));
+      if (cursorNodes[4]) {
+        cursorNodes[4].tx = heroX + heroW / 2;
+        cursorNodes[4].ty = heroY + heroH - 60;
+      }
+    }, 200));
 
-    // Phase 2 (400ms - 800ms): Draw Wireframes
+    // Phase 2 (500ms - 1100ms): Drawing Nav & Hero Wireframes
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
-      if (statusTxt) statusTxt.textContent = "BUILDING UI BLUEPRINT";
+      if (statusTxt) statusTxt.textContent = "GENERATING BLUEPRINT MESH";
       if (boxNav) boxNav.classList.add("active");
       if (boxHero) boxHero.classList.add("active");
-      sfx.tick();
+      sfx.blockPop();
+      setXP(30, 12);
 
       if (cursorNodes[0]) {
         cursorNodes[0].tx = navX + navW - 60;
@@ -393,25 +442,39 @@
         cursorNodes[1].tx = heroX + heroW / 2;
         cursorNodes[1].ty = heroY + 60;
       }
-    }, 450));
+    }, 600));
 
-    // Phase 3 (750ms): Solidify wireframe & reveal logo
+    // Phase 3 (1100ms - 1500ms): Wireframe solidifies & core emblem appears
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (boxNav) boxNav.classList.add("complete");
       if (boxHero) boxHero.classList.add("complete");
       if (logoBadge) logoBadge.classList.add("visible");
-      if (statusTxt) statusTxt.textContent = "MOUNTING CORE EMBLEM";
-      sfx.click();
-      spawnRipple(heroX + heroW / 2, heroY + 60, "#22c55e");
-    }, 750));
+      if (statusTxt) statusTxt.textContent = "MOUNTING CORE DIAMOND CREST";
+      sfx.xpOrb();
+      setXP(48, 20);
+      spawnRipple(heroX + heroW / 2, heroY + 60, "#55ff55");
 
-    // Phase 4 (900ms - 1300ms): Fast Typewriter effect
+      if (cursorNodes[0]) {
+        cursorNodes[0].tx = navX + navW / 2;
+        cursorNodes[0].ty = navY + navH / 2;
+      }
+      if (cursorNodes[1]) {
+        cursorNodes[1].tx = heroX + heroW / 2 - 120;
+        cursorNodes[1].ty = heroY + 140;
+      }
+      if (cursorNodes[2]) {
+        cursorNodes[2].tx = heroX + heroW / 2 + 120;
+        cursorNodes[2].ty = heroY + 140;
+      }
+    }, 1150));
+
+    // Phase 4 (1500ms - 2500ms): Rhythmic Typewriter text assembly
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
-      if (statusTxt) statusTxt.textContent = "COMPILING ASSETS";
+      if (statusTxt) statusTxt.textContent = "COMPILING OVERWORLD TITLE";
       var fullTitle = "CODING CLUB";
-      var fullSub = "BUILD • SHIP • BREAK";
+      var fullSub = "BUILD • SHIP • BREAK THINGS";
       var curIdx = 0;
 
       function typeNext() {
@@ -420,97 +483,106 @@
           if (termTitle) {
             termTitle.innerHTML = fullTitle.slice(0, curIdx + 1) + '<span class="swarm-cursor-carat"></span>';
           }
-          sfx.type();
+          sfx.typeTick();
           curIdx++;
-          timeouts.push(setTimeout(typeNext, 40));
+          timeouts.push(setTimeout(typeNext, 55));
         } else {
           if (termSub) {
             termSub.innerHTML = fullSub;
-            sfx.tick();
+            sfx.blockPop();
           }
           if (termTitle) {
             termTitle.textContent = fullTitle;
           }
+          setXP(72, 30);
         }
       }
       typeNext();
 
       if (cursorNodes[3]) {
-        cursorNodes[3].tx = heroX + heroW / 2 + 100;
+        cursorNodes[3].tx = heroX + heroW / 2 + 80;
         cursorNodes[3].ty = heroY + heroH / 2;
       }
-    }, 900));
+    }, 1550));
 
-    // Phase 5 (1350ms): Place Action Buttons
+    // Phase 5 (2500ms - 3100ms): Place Minecraft Action Buttons
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (buttonsPreview) buttonsPreview.classList.add("visible");
-      if (statusTxt) statusTxt.textContent = "READY // INITIATING RUNTIME";
-      sfx.click();
+      if (statusTxt) statusTxt.textContent = "BINDING ACTION TRIGGERS";
+      sfx.buttonClick();
+      setXP(88, 38);
+
+      var btnEv = document.getElementById("swarm-btn-events");
+      var btnCh = document.getElementById("swarm-btn-challenge");
+
       if (cursorNodes[1]) {
         cursorNodes[1].tx = heroX + heroW / 2 - 80;
-        cursorNodes[1].ty = heroY + heroH - 50;
+        cursorNodes[1].ty = heroY + heroH - 55;
         spawnRipple(cursorNodes[1].tx, cursorNodes[1].ty, cursorNodes[1].def.color);
       }
       if (cursorNodes[2]) {
         cursorNodes[2].tx = heroX + heroW / 2 + 80;
-        cursorNodes[2].ty = heroY + heroH - 50;
+        cursorNodes[2].ty = heroY + heroH - 55;
         spawnRipple(cursorNodes[2].tx, cursorNodes[2].ty, cursorNodes[2].def.color);
       }
-    }, 1350));
+    }, 2550));
 
-    // Phase 6 (1650ms): Swarm convergence & chime
+    // Phase 6 (3100ms - 3400ms): Swarm Convergence & XP 100%
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
-      if (statusTxt) statusTxt.textContent = "WORLD RENDER: READY";
-      sfx.chord();
+      if (statusTxt) statusTxt.textContent = "REALM ONLINE // ALL SYSTEMS READY";
+      setXP(100, 42);
 
-      // Cursors converge to center
+      // Cursors orbit and converge into center
       var cx = heroX + heroW / 2;
       var cy = heroY + heroH / 2;
       for (var k = 0; k < cursorNodes.length; k++) {
         var angle = (k / cursorNodes.length) * Math.PI * 2;
-        cursorNodes[k].tx = cx + Math.cos(angle) * 70;
-        cursorNodes[k].ty = cy + Math.sin(angle) * 70;
+        cursorNodes[k].tx = cx + Math.cos(angle) * 75;
+        cursorNodes[k].ty = cy + Math.sin(angle) * 75;
       }
-    }, 1650));
+    }, 3100));
 
-    // Phase 7 (1850ms): Climax explosion & XP burst
+    // Phase 7 (3400ms - 3800ms): Climax XP Fanfare & Radiant Explosion
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       var cx = heroX + heroW / 2;
       var cy = heroY + heroH / 2;
-      spawnParticles(cx, cy, 55);
-      sfx.burst();
+      spawnParticles(cx, cy, 75);
+      sfx.levelUp();
 
-      // Cursors scatter outward
+      // Cursors scatter outward in all directions
       for (var m = 0; m < cursorNodes.length; m++) {
-        var angle = (m / cursorNodes.length) * Math.PI * 2 + 0.3;
-        cursorNodes[m].tx = cx + Math.cos(angle) * (W * 0.7);
-        cursorNodes[m].ty = cy + Math.sin(angle) * (H * 0.7);
+        var angle = (m / cursorNodes.length) * Math.PI * 2 + 0.35;
+        cursorNodes[m].tx = cx + Math.cos(angle) * (W * 0.75);
+        cursorNodes[m].ty = cy + Math.sin(angle) * (H * 0.75);
       }
-    }, 1850));
+    }, 3400));
 
-    // Phase 8 (2100ms): Seamless completion & fade out
+    // Phase 8 (3800ms): Seamless Dissolve into the interactive 3D voxel website
     timeouts.push(setTimeout(function () {
       finish(false);
     }, DURATION));
 
-    // Listeners for skip
+    // Skip Button Handler
     var skipBtn = document.getElementById("swarm-skip-btn");
     if (skipBtn) {
-      skipBtn.addEventListener("click", function (e) {
+      function onSkip(e) {
         e.stopPropagation();
         finish(true);
-      });
+      }
+      skipBtn.addEventListener("click", onSkip);
+      skipBtn.addEventListener("pointerdown", onSkip);
     }
 
+    // Click anywhere on overlay skips immediately
     function onOverlayClick(e) {
-      // Any click on overlay skips
       finish(true);
     }
     overlayEl.addEventListener("click", onOverlayClick);
 
+    // Keyboard shortcuts (Escape or Space skips)
     function onKey(e) {
       if (e.key === "Escape" || e.key === " " || e.code === "Space") {
         finish(true);
@@ -528,6 +600,7 @@
   function finish(isSkipped) {
     if (!isPlaying) return;
     isPlaying = false;
+    if (window.CCLTCE_SWARM) window.CCLTCE_SWARM._active = false;
 
     // Clear all scheduled timeouts
     timeouts.forEach(function (tid) { clearTimeout(tid); });
@@ -539,11 +612,6 @@
       animFrameId = null;
     }
 
-    // Mark as seen in session
-    try {
-      sessionStorage.setItem(STORAGE_KEY, "1");
-    } catch (e) {}
-
     if (overlayEl) {
       if (overlayEl._cleanup) overlayEl._cleanup();
       overlayEl.classList.add("swarm-done");
@@ -552,11 +620,11 @@
           overlayEl.parentNode.removeChild(overlayEl);
         }
         overlayEl = null;
-      }, 400);
+      }, 450);
     }
   }
 
-  // Replay method
+  // Manual replay method
   function replay() {
     finish(true);
     setTimeout(function () {
@@ -567,7 +635,6 @@
   // Global key listener for Shift+S (Replay Intro)
   window.addEventListener("keydown", function (e) {
     if (e.shiftKey && (e.key === "S" || e.key === "s")) {
-      // Don't trigger if user is typing in an input or textarea
       var tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : "";
       if (tag === "input" || tag === "textarea") return;
       e.preventDefault();
@@ -577,12 +644,13 @@
 
   // Expose API
   window.CCLTCE_SWARM = {
+    _active: false,
     start: start,
     finish: finish,
     replay: replay
   };
 
-  // Auto-run if conditions match
+  // Auto-run on every refresh
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () {
       if (shouldPlay()) start();
