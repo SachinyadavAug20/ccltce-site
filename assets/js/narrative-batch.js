@@ -37,12 +37,13 @@ export function batchStatic(scene) {
     if (hex === undefined) return;
     var ehex = m.emissive && m.emissiveIntensity > 0 ? m.emissive.getHex() : 0;
     var key = hex + "_" + ehex + "_" + (m.emissiveIntensity || 0);
-    if (!boxes.has(key)) boxes.set(key, { color: m.color.clone(), emissive: m.emissive ? m.emissive.clone() : null, ei: m.emissiveIntensity || 0, xforms: [] });
+    if (!boxes.has(key)) boxes.set(key, { color: m.color.clone(), emissive: m.emissive ? m.emissive.clone() : null, ei: m.emissiveIntensity || 0, xforms: [], geoms: [] });
     boxes.get(key).xforms.push(n.matrixWorld.clone());
+    boxes.get(key).geoms.push(n.geometry);
   });
 
   var proto = new THREE.BoxGeometry(1, 1, 1);
-  var pa = proto.attributes.position.array, na = proto.attributes.normal.array, ia = proto.index.array;
+  var ia = proto.index.array;   // every THREE BoxGeometry shares this 36-index pattern
   var V = 24, T = 36;
   var merged = 0, skipped = 0, groupsMade = 0;
   var v3 = new THREE.Vector3(), n3 = new THREE.Vector3(), nm3 = new THREE.Matrix3();
@@ -55,6 +56,9 @@ export function batchStatic(scene) {
     var idx = count * V > 65536 ? new Uint32Array(count * T) : new Uint16Array(count * T);
     for (var r = 0; r < count; r++) {
       var x = rec.xforms[r], e = x.elements;
+      // bake the box's OWN sized vertices (builders use BoxGeometry(w,h,d), scale=1 —
+      // a unit proto would collapse every block to a 1×1×1 cube at the right center).
+      var pa = rec.geoms[r].attributes.position.array, na = rec.geoms[r].attributes.normal.array;
       // voxel boxes are rotated but axis-aligned-scaled; normals need the ROTATION only
       // (a full inverse-transpose via getNormalMatrix flips winding on identity-scale boxes).
       var nrm = new THREE.Matrix4().extractRotation(x);

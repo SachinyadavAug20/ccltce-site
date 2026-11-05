@@ -114,8 +114,9 @@
     var curve = createCameraPath(), stations = built.stations;
     var viewport = wrapper.querySelector(".narrative-viewport");
     var perf = createPerf({ renderer: renderer, scene: scene, section: wrapper, camera: camera });
-    var batch = batchStatic(scene);
-    window.CCLTCE_BATCH = { groups: batch.count, merged: cullMergedStatic(scene).removed };
+    var nobatch = /[?&]nobatch=1/.test(location.search);
+    var batch = nobatch ? { count: 0, saved: 0 } : batchStatic(scene);
+    window.CCLTCE_BATCH = { groups: batch.count, merged: nobatch ? 0 : cullMergedStatic(scene).removed };
     perf.rescan();   // anim registry must exclude meshes removed by the merge
     window.CCLTCE_PERF = perf.profile();
     window.CCLTCE_PERF_LIVE = perf.profile;   // live re-read: budget must stay a constant count
