@@ -10,12 +10,16 @@ var BUDGET = [40, 24, 14];
 export function createPerf(o) {
   var renderer = o.renderer, scene = o.scene, section = o.section, camera = o.camera;
   var anim = [], items = [];
-  scene.traverse(function (n) {
-    var u = n.userData;
-    if (u.float !== undefined || u.blink !== undefined || u.pulse !== undefined ||
-        u.orbit !== undefined || u.cart || u.cloud !== undefined) anim.push(n);
-    if (n.isPointLight) items.push({ l: n, s: 0 });
-  });
+  function rescan() {
+    anim.length = 0; items.length = 0;
+    scene.traverse(function (n) {
+      var u = n.userData;
+      if (u.float !== undefined || u.blink !== undefined || u.pulse !== undefined ||
+          u.orbit !== undefined || u.cart || u.cloud !== undefined) anim.push(n);
+      if (n.isPointLight) items.push({ l: n, s: 0 });
+    });
+  }
+  rescan();
 
   var tier = 0, dpr = 0, slow = 0, rest = 0, good = 0, acc = 0, frames = 0, need = 0, beat = 0;
   try {
@@ -66,6 +70,7 @@ export function createPerf(o) {
       return r.bottom > 0 && r.top < innerHeight;
     },
     resize: function () { size(); lights(); },
+    rescan: rescan,
     profile: function () {
       var on = 0;
       for (var i = 0; i < items.length; i++) if (items[i].l.visible) on++;

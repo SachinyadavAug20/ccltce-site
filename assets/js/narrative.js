@@ -89,7 +89,7 @@
 
   async function start() {
     var THREE = await import("../vendor/three.module.js");
-    var [{ buildScene }, { createCameraPath, phaseAt, dimAt }, { initDragon }, { createLighting }, { createPerf }, { initCrystals }, { buildEaster }] =
+    var [{ buildScene }, { createCameraPath, phaseAt, dimAt }, { initDragon }, { createLighting }, { createPerf }, { initCrystals }, { buildEaster }, { batchStatic, cullMergedStatic }] =
       await Promise.all([
         import("./narrative-scene.js"),
         import("./narrative-camera.js"),
@@ -98,6 +98,7 @@
         import("./narrative-perf.js"),
         import("./narrative-crystals.js"),
         import("./narrative-easter.js"),
+        import("./narrative-batch.js"),
       ]);
     var canvas = document.getElementById("narrative-webgl");
     if (!canvas) {
@@ -113,6 +114,9 @@
     var curve = createCameraPath(), stations = built.stations;
     var viewport = wrapper.querySelector(".narrative-viewport");
     var perf = createPerf({ renderer: renderer, scene: scene, section: wrapper, camera: camera });
+    var batch = batchStatic(scene);
+    window.CCLTCE_BATCH = { groups: batch.count, merged: cullMergedStatic(scene).removed };
+    perf.rescan();   // anim registry must exclude meshes removed by the merge
     window.CCLTCE_PERF = perf.profile();
     window.CCLTCE_PERF_LIVE = perf.profile;   // live re-read: budget must stay a constant count
     var dragon = initDragon(scene, camera, viewport);
@@ -215,8 +219,9 @@
       var el = clock.getElapsedTime(), dt = Math.min(0.1, Math.max(0.001, el - lastEl));
       lastEl = el;
       // slow single-stage cinematic glide: one fixed-rate exponential follow, no cascaded damping
-      // (the old raw→t→s double lag rang the camera into little useless wiggles on stop)
-      var k = 1.5;
+      // (the old raw→t→s double lag rang the camera into little useless wiggles on stop).
+      // k=0.9: long floaty settle — eases into stops like a camera dolly on a crane arm
+      var k = 0.9;
       progress.t += (progress.raw - progress.t) * (1 - Math.exp(-k * dt));
       progress.s = progress.t;
     syncHud(progress.t);
@@ -297,7 +302,7 @@
         }
       }
       if (firstLook) { lookSm.copy(look); firstLook = false; }
-      else lookSm.lerp(look, 1 - Math.exp(-1.8 * dt));   // slow steady gaze — no snap, no swing
+      else lookSm.lerp(look, 1 - Math.exp(-1.1 * dt));   // slow steady gaze — no snap, no swing
       camera.lookAt(lookSm);
       if (shake > 0) {
         camera.position.x += (Math.random() - 0.5) * shake;
@@ -316,7 +321,7 @@
           "XYZ: " + bx.x.toFixed(3) + " / " + bx.y.toFixed(3) + " / " + bx.z.toFixed(3) + "\n" +
           "Dim: " + progress.dim + "   Biome: " + biome + "\n" +
           "Facing: " + heading + "\u00b0\n" +
-          "Scroll: u = " + u.toFixed(3) + "   Glide: k = 1.5\n" +
+          "Scroll: u = " + u.toFixed(3) + "   Glide: k = 0.9\n" +
           "Sneak: no   Sprint: no   Fly: spline\n" +
           "Easter eggs: creeper \u263a ghast TNT mossy & more \u2014 keep looking";
       }

@@ -1,6 +1,6 @@
 /* ---------- narrative scroll — 3D journey overlays ---------- */
-/* 1750vh: cinema-length journey — the overworld and the nether both get real runway */
-#narrative-scroll { position: relative; height: 1750vh; width: 100%; }
+/* 2800vh: full cinema-length journey — slower, smoother glide for overworld+nether+end */
+#narrative-scroll { position: relative; height: 2800vh; width: 100%; }
 
 body.narrative-page main,
 body:has(#narrative-scroll) main {

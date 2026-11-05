@@ -2,7 +2,7 @@
 import * as THREE from "../vendor/three.module.js";
 
 export function createCameraPath() {
-  return new THREE.CatmullRomCurve3([
+  var curve = new THREE.CatmullRomCurve3([
     new THREE.Vector3(0, 115, 140),   // high sky start — long vanilla-flavored descent
     new THREE.Vector3(0, 80, 112),
     new THREE.Vector3(0, 46, 84),
@@ -25,6 +25,8 @@ export function createCameraPath() {
     new THREE.Vector3(246, -84, 58),  // long fall outside the pillar ring
     new THREE.Vector3(214, -80, 50),  // finale — close enough to the dragon to click its head
   ], false, "catmullrom", 0.5);
+  curve.arcLengthDivisions = 3000;   // high-res arc map: getPointAt(u) stays frame-rate accurate, no scroll dead zones
+  return curve;
 }
 
 export function updateCamera(camera, curve, t, look) {

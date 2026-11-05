@@ -20,7 +20,7 @@ function buildTrack(g) {
     P(g, box(2, 2, 12, STONE2), ax, 15, 0); P(g, box(1, 1, 1, GOLD, GOLD, 0.9), ax, 13, 0);
     g.add(glowLight(GOLD, 1, 15, ax, 13, 0));
   }
-  var s1 = new THREE.Group(); s1.position.set(40, 10, 0);
+  var s1 = new THREE.Group(); s1.position.set(40, 10, 0); s1.userData.spin = 1;
   for (var u = 0; u < 4; u++) {
     var unit = box(5, 2.5, 4, DARK); unit.position.y = u * 3; s1.add(unit);
     var led1 = box(0.6, 0.6, 0.3, RED, RED, 1); led1.position.set(1.8, u * 3 + 0.5, 2.1); led1.userData.blink = u; s1.add(led1);
@@ -32,7 +32,7 @@ function buildTrack(g) {
     code.position.set(-3 + cb * 2.5, 8 + (cb % 3) * 1.5, 2); code.userData.float = cb * 1.2; s1.add(code);
   }
   g.add(s1); g.add(glowLight(RED, 1.5, 30, 40, 12, 5)); g.add(glowLight(EMER, 1, 25, 50, 12, 5));
-  var s2 = new THREE.Group(); s2.position.set(120, 10, 0);
+  var s2 = new THREE.Group(); s2.position.set(120, 10, 0); s2.userData.spin = 1;
   s2.add(box(2, 10, 2, DARKOAK));
   [[-5, 4, 2], [5, 4, -2], [-3, 7, -1], [3, 7, 1], [0, 10, 0], [-1, 5, 3], [1, 5, -3]].forEach(function (np, ni) {
     var n = box(2.2, 2.2, 2.2, GOLD, GOLD, 0.3); n.position.set(np[0], np[1], np[2]); n.userData.pulse = ni * 0.8; s2.add(n);
@@ -42,7 +42,7 @@ function buildTrack(g) {
     paper.rotation.y = 0.3; paper.userData.float = note * 1.5; s2.add(paper);
   }
   g.add(s2); g.add(glowLight(GOLD, 2, 35, 120, 14, 5));
-  var s3 = new THREE.Group(); s3.position.set(200, 10, 0);
+  var s3 = new THREE.Group(); s3.position.set(200, 10, 0); s3.userData.spin = 1;
   s3.add(box(4, 8, 3, 0x3d8c3d).translateY(2)); s3.add(box(5, 5, 4, 0x4caf50).translateY(9));
   s3.add(box(1, 1, 0.3, 0x0a0a0a).translateX(-1).translateY(10).translateZ(2.1));
   s3.add(box(1, 1, 0.3, 0x0a0a0a).translateX(1).translateY(10).translateZ(2.1));
