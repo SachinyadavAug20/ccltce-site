@@ -198,8 +198,9 @@
       var phase = phaseAt(t);
       for (var key in overlays) { var el = overlays[key]; if (el) el.classList.toggle("on", key === phase); }
       if (heroOverlay) {
-        // normalized to scroll length: gone by t≈0.16 (~2 screens) at 1500vh
-        var hf = clamp01((t - 0.04) / 0.12);
+        // hold hero text at FULL opacity through the first ~scroll-screens;
+        // only begin the lift after t=0.10, gone by t≈0.22
+        var hf = clamp01((t - 0.10) / 0.12);
         heroOverlay.style.opacity = 1 - hf;
         heroOverlay.style.transform = "translateY(" + (-50 * hf) + "px)";
         heroOverlay.style.display = hf >= 1 ? "none" : "";

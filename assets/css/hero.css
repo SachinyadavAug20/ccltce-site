@@ -6,15 +6,22 @@
   padding: clamp(15rem, 22vh, 17rem) 1.25rem 3rem;
 }
 
-/* floating emblem — flat badge with a hard block shadow, no glow.
-   Hover motion (pop + Minecraft-item bob) is GSAP: assets/js/hero-fx.js */
+/* floating emblem — round seal set in a chunky MC inventory-slot frame
+   (square bevel fits the site's all-square design language).
+   Hover motion (pop + bob) is GSAP: hero-fx.js */
 .hero-logo {
-  width: clamp(115px, 14vw, 160px); height: clamp(115px, 14vw, 160px);
-  object-fit: contain; image-rendering: auto; margin-bottom: 0.5rem;
-  padding: 0;
+  width: clamp(125px, 15vw, 172px); height: clamp(125px, 15vw, 172px);
+  object-fit: contain; image-rendering: auto; margin-bottom: 0.6rem;
+  padding: 10px;
+  background: linear-gradient(160deg, #3d342a 0%, #241e17 70%, #1b150f 100%);
+  border: 2px solid #574a3c;
+  box-shadow:
+    inset 3px 3px 0 #a08a70,
+    inset -3px -3px 0 #1b140e,
+    inset 0 0 0 1px #0e0b08,
+    0 10px 0 rgba(0, 0, 0, 0.38),
+    0 0 36px rgba(255, 190, 60, 0.32);
   pointer-events: auto;   /* parent overlay is pointer-events:none — needed for :hover */
-  border: none;
-  filter: drop-shadow(0 5px 0 rgba(0, 0, 0, 0.45));
   will-change: transform;
 }
 
@@ -38,24 +45,61 @@
 
 /* no dark veil over the scene — the hero text carries its own contact shadows */
 
-/* block lettering — gold + emerald (never white: white dies on the cloud bank),
-   hard pixel contact shadow + 1px outline so it reads over clouds AND sky */
+/* block lettering — Minecraft-logo style: saturated fill, chunky extruded
+   block depth and a hard near-black outline so it always pops over the
+   cloud bank (no veil needed), with a slight lean like the MC key art */
 .hero-title {
   font-family: var(--disp); font-weight: 400;
-  font-size: clamp(2rem, 7.6vw, 5rem); line-height: 1.22;
-  text-transform: uppercase; color: #ffd21f;
-  text-shadow: 3px 3px 0 #3a2604,
-    -1px -1px 0 #2b1d04, 1px -1px 0 #2b1d04, -1px 1px 0 #2b1d04, 1px 1px 0 #2b1d04,
-    0 0 26px rgba(255, 190, 40, 0.45), 0 0 60px rgba(255, 170, 30, 0.22);
+  font-size: clamp(2.1rem, 7.8vw, 5.2rem); line-height: 1.24;
+  text-transform: uppercase; color: #ffcd14;
+  transform: rotate(-1.4deg);
+  text-shadow:
+    /* extrusion — solid block depth, darkening downward */
+    0 1px 0 #e0a312, 0 2px 0 #d3980f, 0 3px 0 #c48c0e,
+    0 4px 0 #b5800d, 0 5px 0 #a6730b, 0 6px 0 #97670a,
+    0 7px 0 #895b09, 0 8px 0 #7a5008, 0 9px 0 #6b4507,
+    0 10px 0 #5c3b06, 0 11px 0 #4e3105, 0 12px 0 #402704,
+    /* hard outline — wraps fill + edges of the extrusion */
+    -2px 0 0 #140d03, 2px 0 0 #140d03, 0 -2px 0 #140d03,
+    -2px -2px 0 #140d03, 2px -2px 0 #140d03, 2px 2px 0 #140d03,
+    -2px 12px 0 #140d03, 2px 12px 0 #140d03,
+    -2px 13px 0 #140d03, 2px 13px 0 #140d03, 0 14px 0 #140d03,
+    /* far rim + soft ground shadow */
+    -2px 15px 0 rgba(0, 0, 0, 0.32), 2px 15px 0 rgba(0, 0, 0, 0.32),
+    0 15px 0 rgba(0, 0, 0, 0.32), 0 26px 30px rgba(0, 0, 0, 0.4),
+    /* warm bloom so it feels sunlit */
+    0 0 30px rgba(255, 165, 25, 0.35);
   margin: 0.2rem 0 0.6rem;
   position: relative;
   pointer-events: auto;   /* parent overlay is pointer-events:none — needed for :hover */
+  animation: hero-vibe 0.68s steps(2, jump-none) infinite;
+}
+
+/* constant micro-quake — the letters buzz like an active redstone lamp */
+@keyframes hero-vibe {
+  0%   { transform: rotate(-1.4deg) translate(0, 0) scale(1); }
+  25%  { transform: rotate(-1.4deg) translate(0.6px, -0.4px) scale(1.006); }
+  50%  { transform: rotate(-1.4deg) translate(-0.5px, 0.4px) scale(0.998); }
+  75%  { transform: rotate(-1.4deg) translate(0.5px, 0.3px) scale(1.008); }
+  100% { transform: rotate(-1.4deg) translate(0, 0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-title { animation: none; }
 }
 .hero-title em {
-  font-style: normal; color: #2dff70;
-  text-shadow: 3px 3px 0 #052312,
-    -1px -1px 0 #04180c, 1px -1px 0 #04180c, -1px 1px 0 #04180c, 1px 1px 0 #04180c,
-    0 0 22px rgba(45, 255, 112, 0.4);
+  font-style: normal; color: #25f26b;
+  text-shadow:
+    0 1px 0 #1ec853, 0 2px 0 #1bb54c, 0 3px 0 #19a344,
+    0 4px 0 #16913d, 0 5px 0 #147f36, 0 6px 0 #126d2e,
+    0 7px 0 #105b27, 0 8px 0 #0e4c21, 0 9px 0 #0b3d1a,
+    0 10px 0 #092f14, 0 11px 0 #07230f, 0 12px 0 #05180a,
+    -2px 0 0 #031105, 2px 0 0 #031105, 0 -2px 0 #031105,
+    -2px -2px 0 #031105, 2px -2px 0 #031105, 2px 2px 0 #031105,
+    -2px 12px 0 #031105, 2px 12px 0 #031105,
+    -2px 13px 0 #031105, 2px 13px 0 #031105, 0 14px 0 #031105,
+    -2px 15px 0 rgba(0, 0, 0, 0.32), 2px 15px 0 rgba(0, 0, 0, 0.32),
+    0 15px 0 rgba(0, 0, 0, 0.32), 0 26px 30px rgba(0, 0, 0, 0.4),
+    0 0 28px rgba(30, 224, 94, 0.35);
 }
 
 /* vanilla splash text — yellow, tilted, pulsing 2 Hz exactly like the title screen.
@@ -90,16 +134,17 @@
 .hero-clouds { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
 .cloud { position: absolute; will-change: transform, opacity; }
 
-/* soft mist layer directly behind the hero text: mutes the busy 3D scene so the
-   hard-shadowed type stays crisp, while clouds drift around it */
+/* dark smoke backdrop directly behind the hero text: a warm DARK veil so the
+   saturated type pops over the bright cloud bank instead of washing out.
+   (used to be white mist — that's what made the gold go buttery pale) */
 .hero-haze {
   position: absolute; left: 50%; top: 48%;
-  width: min(1160px, 98vw); height: min(580px, 66vh);
+  width: min(1200px, 98vw); height: min(640px, 70vh);
   transform: translate(-50%, -50%);
   background: radial-gradient(ellipse at center,
-    rgba(255, 255, 255, 0.34) 0%,
-    rgba(255, 253, 246, 0.22) 40%,
-    rgba(255, 253, 246, 0.07) 68%,
+    rgba(22, 14, 3, 0.62) 0%,
+    rgba(22, 14, 3, 0.42) 45%,
+    rgba(22, 14, 3, 0.16) 68%,
     transparent 85%);
   pointer-events: none;
   z-index: 2;
@@ -107,10 +152,10 @@
 }
 
 /* mid-band clouds ride lower — behind the type, framing it left/right */
-.cloud-mid { opacity: 0.82; }
-.cloud-sky { opacity: 0.9; }
+.cloud-mid { opacity: 0.6; }
+.cloud-sky { opacity: 0.82; }
 /* near band: big, low, closest to camera — sweeps the hardest on part */
-.cloud-near { opacity: 0.78; }
+.cloud-near { opacity: 0.55; }
 
 /* adventure quest subtext & college location — three tiers: kicker, headline, meta */
 .hero-sub {
