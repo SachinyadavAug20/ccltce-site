@@ -43,17 +43,19 @@
 .hero-title {
   font-family: var(--disp); font-weight: 400;
   font-size: clamp(2rem, 7.6vw, 5rem); line-height: 1.22;
-  text-transform: uppercase; color: #ffd76a;
+  text-transform: uppercase; color: #ffd21f;
   text-shadow: 3px 3px 0 #3a2604,
-    -1px -1px 0 #2b1d04, 1px -1px 0 #2b1d04, -1px 1px 0 #2b1d04, 1px 1px 0 #2b1d04;
+    -1px -1px 0 #2b1d04, 1px -1px 0 #2b1d04, -1px 1px 0 #2b1d04, 1px 1px 0 #2b1d04,
+    0 0 26px rgba(255, 190, 40, 0.45), 0 0 60px rgba(255, 170, 30, 0.22);
   margin: 0.2rem 0 0.6rem;
   position: relative;
   pointer-events: auto;   /* parent overlay is pointer-events:none — needed for :hover */
 }
 .hero-title em {
-  font-style: normal; color: #17dd62;
+  font-style: normal; color: #2dff70;
   text-shadow: 3px 3px 0 #052312,
-    -1px -1px 0 #04180c, 1px -1px 0 #04180c, -1px 1px 0 #04180c, 1px 1px 0 #04180c;
+    -1px -1px 0 #04180c, 1px -1px 0 #04180c, -1px 1px 0 #04180c, 1px 1px 0 #04180c,
+    0 0 22px rgba(45, 255, 112, 0.4);
 }
 
 /* vanilla splash text — yellow, tilted, pulsing 2 Hz exactly like the title screen.
@@ -95,9 +97,9 @@
   width: min(1160px, 98vw); height: min(580px, 66vh);
   transform: translate(-50%, -50%);
   background: radial-gradient(ellipse at center,
-    rgba(255, 255, 255, 0.46) 0%,
-    rgba(255, 253, 246, 0.3) 40%,
-    rgba(255, 253, 246, 0.1) 68%,
+    rgba(255, 255, 255, 0.34) 0%,
+    rgba(255, 253, 246, 0.22) 40%,
+    rgba(255, 253, 246, 0.07) 68%,
     transparent 85%);
   pointer-events: none;
   z-index: 2;
@@ -121,22 +123,23 @@
   font-family: var(--disp);
   font-size: clamp(0.55rem, 1.05vw, 0.72rem);
   letter-spacing: 0.3em;
-  color: #e8c34e;
+  color: #ffce3d;
   margin: 0;
   text-shadow: 1px 1px 0 #2b1d04;
   display: inline-flex; align-items: center; gap: 0.7rem;
 }
-.hero-motto::before, .hero-motto::after { content: "\25C6"; font-size: 0.6em; color: #b98a1e; }
+.hero-motto::before, .hero-motto::after { content: "\25C6"; font-size: 0.6em; color: #ffd76a; }
 .hero-college {
   font-family: var(--mono);
   font-size: clamp(15px, 2.35vw, 19px);
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #ffe9a8;
+  color: #fff3c8;
   margin: 0;
   text-shadow: 2px 2px 0 #3a2604,
-    -1px -1px 0 #201604, 1px -1px 0 #201604, -1px 1px 0 #201604, 1px 1px 0 #201604;
+    -1px -1px 0 #201604, 1px -1px 0 #201604, -1px 1px 0 #201604, 1px 1px 0 #201604,
+    0 0 18px rgba(255, 210, 80, 0.28);
 }
 .hero-loc {
   font-family: var(--mono);
