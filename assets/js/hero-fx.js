@@ -14,8 +14,8 @@
       gsap.from(parts, {
         y: -110,            // drop from the sky, through where the clouds part
         opacity: 0,
-        duration: 1.05,
-        stagger: 0.11,      // logo → badge → title → sub → cta cascade
+        duration: 0.75,
+        stagger: 0.08,      // logo → badge → title → sub → cta cascade
         ease: "power3.out",
         clearProps: "transform",   // leave opacity to the scroll fade, clear motion residue
         delay: 0.15,

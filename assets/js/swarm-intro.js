@@ -88,35 +88,35 @@
   var CURSORS = [
     {
       id: "steve",
-      name: "Steve",
+      name: "Sachin Yadav",
       role: "DEV",
       color: "#55ff55",
       tool: "assets/cursors/iron-sword.svg"
     },
     {
       id: "alex",
-      name: "Alex",
+      name: "Rashi Kasotiya",
       role: "DESIGN",
       color: "#55ffff",
       tool: "assets/cursors/gold-pickaxe.svg"
     },
     {
       id: "miner",
-      name: "Miner",
+      name: "Adarsh Mishra",
       role: "OPS",
       color: "#ffaa00",
       tool: "assets/cursors/netherite-axe.svg"
     },
     {
       id: "hacker",
-      name: "Hacker",
+      name: "Ayush Vishwakarma",
       role: "SECURITY",
       color: "#ff5555",
       tool: "assets/cursors/redstone-torch.svg"
     },
     {
       id: "builder",
-      name: "Builder",
+      name: "Aakash Gupta",
       role: "CORE",
       color: "#ff55ff",
       tool: "assets/cursors/shield.svg"
@@ -433,7 +433,7 @@
       }
     }, 250));
 
-    // Phase 2 (750ms): Steve builds real .nav-wrap
+    // Phase 2 (650ms): Steve builds real .nav-wrap
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (statusTxt) statusTxt.textContent = "ASSEMBLING <NAV.NAV-WRAP>";
@@ -445,9 +445,9 @@
         cursorNodes[0].tx = rNav.left + rNav.width - 40;
         cursorNodes[0].ty = rNav.top + rNav.height / 2;
       }
-    }, 750));
+    }, 650));
 
-    // Phase 3 (1350ms): Real Nav reveals; Alex mounts real .hero-logo
+    // Phase 3 (1200ms): Real Nav reveals; Alex mounts real .hero-logo
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (boxNav) boxNav.classList.add("complete");
@@ -463,9 +463,9 @@
         cursorNodes[1].tx = rLogo.left + rLogo.width / 2;
         cursorNodes[1].ty = rLogo.top + rLogo.height / 2;
       }
-    }, 1350));
+    }, 1200));
 
-    // Phase 4 (2050ms): Real Logo reveals; Steve & Hacker construct Title & Motto
+    // Phase 4 (1750ms): Real Logo reveals; Steve & Hacker construct Title & Motto
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (boxLogo) boxLogo.classList.add("complete");
@@ -485,9 +485,9 @@
         cursorNodes[0].tx = rTitle.left + rTitle.width - 60;
         cursorNodes[0].ty = rTitle.top + rTitle.height / 2;
       }
-    }, 2050));
+    }, 1750));
 
-    // Phase 5 (2750ms): Title reveals; Miner & Builder assemble Action Buttons
+    // Phase 5 (2300ms): Title reveals; Miner & Builder assemble Action Buttons
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (boxTitle) boxTitle.classList.add("complete");
@@ -508,9 +508,9 @@
         cursorNodes[4].tx = rCta.left + rCta.width - 80;
         cursorNodes[4].ty = rCta.top + rCta.height / 2;
       }
-    }, 2750));
+    }, 2300));
 
-    // Phase 6 (3300ms): Real Buttons snap in; Cursors click them
+    // Phase 6 (2800ms): Real Buttons snap in; Cursors click them
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (boxCta) boxCta.classList.add("complete");
@@ -518,7 +518,7 @@
       triggerClick(cursorNodes[2], sfx.buttonClick);
       triggerClick(cursorNodes[4], sfx.buttonClick);
       setXP(95, 41);
-    }, 3300));
+    }, 2800));
 
     // Phase 7 (3650ms): Swarm orbits and converges on real .hero-logo
     timeouts.push(setTimeout(function () {
@@ -534,7 +534,7 @@
         cursorNodes[k].tx = cx + Math.cos(angle) * 80;
         cursorNodes[k].ty = cy + Math.sin(angle) * 80;
       }
-    }, 3650));
+    }, 3150));
 
     // Phase 8 (3950ms): Climax Fanfare! Radiant XP Orbs burst from real logo
     timeouts.push(setTimeout(function () {

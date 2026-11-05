@@ -28,7 +28,8 @@ body:has(#narrative-scroll) footer {
 .sky-veil {
   position: absolute; inset: 0; z-index: 9;
   background: #f0f4f8; pointer-events: none;
-  animation: veil-lift 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+  opacity: 0.7;
+  animation: veil-lift 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.05s forwards;
 }
 @keyframes veil-lift {
   to { opacity: 0; }

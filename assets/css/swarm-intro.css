@@ -13,7 +13,7 @@ body.swarm-building .hero-sub,
 body.swarm-building .hero-cta {
   opacity: 0;
   transform: translateY(14px) scale(0.97);
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
   will-change: opacity, transform;
 }
 
