@@ -603,6 +603,14 @@
     var built = document.querySelectorAll(".swarm-built");
     built.forEach(function (el) { el.classList.remove("swarm-built"); });
 
+    // Decay the build glow smoothly instead of popping it off (skips get no fanfare)
+    if (!isSkipped) {
+      document.body.classList.add("swarm-settled");
+      setTimeout(function () {
+        document.body.classList.remove("swarm-settled");
+      }, 1400);
+    }
+
     timeouts.forEach(function (tid) { clearTimeout(tid); });
     timeouts = [];
 
@@ -619,7 +627,7 @@
           overlayEl.parentNode.removeChild(overlayEl);
         }
         overlayEl = null;
-      }, 450);
+      }, 700);
     }
   }
 

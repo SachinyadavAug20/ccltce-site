@@ -48,14 +48,69 @@ body.swarm-building .hero-cta.swarm-built {
   -webkit-user-select: none;
   pointer-events: auto;
   opacity: 1;
-  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), filter 0.45s ease;
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), filter 0.65s ease, transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
   font-family: var(--disp, "Press Start 2P", monospace);
 }
 
+/* Camera-lift exit: overlay zooms past the viewer while the blueprint grid slides away */
 #swarm-overlay.swarm-done {
   opacity: 0;
   pointer-events: none;
-  filter: brightness(1.25);
+  filter: brightness(1.3);
+  transform: scale(1.07);
+  animation: swarmGridLift 0.65s ease-in forwards;
+}
+
+@keyframes swarmGridLift {
+  from {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  to {
+    background-position: 0 -72px, -72px 0, 0 0;
+  }
+}
+
+/* Staggered teardown: HUD pieces and blueprint boxes dematerialize after the flash */
+.swarm-done .swarm-target-box {
+  opacity: 0 !important;
+  transform: scale(1.14) !important;
+  transition-delay: 0.08s;
+}
+
+.swarm-done .swarm-cursor-item {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.swarm-done .swarm-status-bar,
+.swarm-done .swarm-skip-btn {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.swarm-done .swarm-xp-bar-wrap {
+  opacity: 0;
+  transform: translate(-50%, 10px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+/* Glow handoff: build glow decays smoothly instead of popping off */
+body.swarm-settled .hero-logo,
+body.swarm-settled .hero-badge,
+body.swarm-settled .hero-sub,
+body.swarm-settled .hero-cta {
+  animation: swarmSettle 1.3s ease-out;
+}
+
+@keyframes swarmSettle {
+  0% {
+    filter: drop-shadow(0 0 18px rgba(34, 197, 94, 0.45));
+  }
+  100% {
+    filter: drop-shadow(0 0 0 rgba(34, 197, 94, 0));
+  }
 }
 
 /* CRT Scanline Texture */
