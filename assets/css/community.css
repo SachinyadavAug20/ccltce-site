@@ -1221,6 +1221,27 @@
   box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.15), 1px 1px 0 #000;
   background: #0b0f14;
 }
+/* live presence dot (real Supabase Realtime presence) */
+.wa-online-dot {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  width: 11px;
+  height: 11px;
+  background: var(--emerald, #17dd62);
+  border: 2px solid #000;
+  box-shadow: 0 0 6px rgba(23, 221, 98, 0.8);
+  z-index: 2;
+}
+.wa-thread-status.typing,
+#thread-status.typing {
+  color: var(--emerald, #17dd62);
+  animation: typingPulse 1.1s steps(2) infinite;
+}
+@keyframes typingPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
 .wa-contact-avatar img {
   width: 100%;
   height: 100%;

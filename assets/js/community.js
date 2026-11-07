@@ -99,7 +99,6 @@ const DEFAULT_CHANNELS = [
     purpose: "Everyday club chatter, announcements & banter",
     icon: "gen",
     unread: 0,
-    online: 8,
     lastTime: "10:41 AM",
     lastMsg: "Everyday club chatter — say hi!"
   },
@@ -110,7 +109,6 @@ const DEFAULT_CHANNELS = [
     purpose: "Hackathons, workshops, dates & deadlines",
     icon: "ev",
     unread: 0,
-    online: 5,
     lastTime: "09:15 AM",
     lastMsg: "Aakash: hopefully"
   },
@@ -121,7 +119,6 @@ const DEFAULT_CHANNELS = [
     purpose: "Debug code, DSA roadblocks & project blockers",
     icon: "help",
     unread: 0,
-    online: 4,
     lastTime: "Yesterday",
     lastMsg: "Stuck on code, homework or setup?"
   },
@@ -132,7 +129,6 @@ const DEFAULT_CHANNELS = [
     purpose: "Show off what you built this weekend",
     icon: "show",
     unread: 0,
-    online: 5,
     lastTime: "2 days ago",
     lastMsg: "Aakash: See my github..."
   },
@@ -143,7 +139,6 @@ const DEFAULT_CHANNELS = [
     purpose: "Memes, battle stations & tech hot takes",
     icon: "rand",
     unread: 0,
-    online: 7,
     lastTime: "Yesterday",
     lastMsg: "Off-topic, memes, music, life"
   }
@@ -157,6 +152,116 @@ let channels = [];
 let activeChannel = null; // { id, slug, name, purpose }
 let chanSub = null;
 let chanSeen = {}; // slug -> ISO ts of last read
+
+// ── real presence + typing (Supabase Realtime) ──
+let presenceSub = null;
+let typingTimer = null;
+let lastTypingSent = 0;
+let guestKey = null;
+const onlinePeers = new Map(); // presence key -> { user_id, name, role }
+
+function myPresenceKey() {
+  if (!guestKey) {
+    try {
+      guestKey = localStorage.getItem("ccltce-guest-key");
+      if (!guestKey) {
+        guestKey = "guest-" + Math.random().toString(36).slice(2, 10);
+        localStorage.setItem("ccltce-guest-key", guestKey);
+      }
+    } catch (e) {
+      guestKey = "guest-anon";
+    }
+  }
+  return me ? "u-" + me.id : guestKey;
+}
+
+function myDisplayName() {
+  return me ? (me.full_name || me.email || "Member") : "Guest";
+}
+
+function startPresence() {
+  if (!supabase || presenceSub) return;
+  presenceSub = supabase.channel("ccltce-presence", {
+    config: { presence: { key: myPresenceKey() } },
+  });
+  presenceSub
+    .on("presence", { event: "sync" }, () => {
+      onlinePeers.clear();
+      const state = presenceSub.presenceState() || {};
+      Object.values(state).forEach((metas) => {
+        (metas || []).forEach((s) => onlinePeers.set(s.presence_ref, s));
+      });
+      paintPresence();
+    })
+    .on("broadcast", { event: "typing" }, ({ payload }) => {
+      if (!payload || (me && payload.uid === me.id)) return;
+      if (activeChannel && payload.ch !== (activeChannel.slug || activeChannel.id)) return;
+      showTyping(payload.name || "Someone");
+    })
+    .subscribe((status) => {
+      if (status === "SUBSCRIBED" && presenceSub) {
+        presenceSub.track({
+          user_id: me ? me.id : null,
+          name: myDisplayName(),
+          role: me ? me.role || "student" : "guest",
+        });
+      }
+    });
+}
+
+function paintPresence() {
+  const status = $("#thread-status");
+  const n = onlinePeers.size;
+  if (status && !status.classList.contains("typing")) {
+    const purpose = activeChannel ? activeChannel.purpose || "Everyday club chatter" : "";
+    status.textContent = `🟢 ${n} online${n === 1 ? "" : "s"}` + (purpose ? ` • ${purpose}` : "");
+  }
+  // live dots in the member directory
+  const ids = new Set(Array.from(onlinePeers.values()).map((s) => s.user_id).filter(Boolean));
+  $$("#comm-grid .wa-contact-card").forEach((card) => {
+    const av = card.querySelector(".wa-contact-avatar");
+    if (!av) return;
+    const dot = av.querySelector(".wa-online-dot");
+    const isOn = ids.has(card.dataset.id);
+    if (isOn && !dot) {
+      const d = document.createElement("span");
+      d.className = "wa-online-dot";
+      d.title = "Online now";
+      av.appendChild(d);
+    } else if (!isOn && dot) {
+      dot.remove();
+    }
+  });
+}
+
+function showTyping(name) {
+  const status = $("#thread-status");
+  if (!status) return;
+  status.textContent = `✍ ${name} is typing…`;
+  status.classList.add("typing");
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => {
+    status.classList.remove("typing");
+    paintPresence();
+  }, 2800);
+}
+
+function wireTyping() {
+  const input = $("#thread-input");
+  if (!input || input.dataset.typingWired) return;
+  input.dataset.typingWired = "1";
+  input.addEventListener("input", () => {
+    if (!supabase || !presenceSub || !activeChannel) return;
+    const now = Date.now();
+    if (now - lastTypingSent < 1200) return;
+    lastTypingSent = now;
+    presenceSub.send({
+      type: "broadcast",
+      event: "typing",
+      payload: { ch: activeChannel.slug || activeChannel.id, name: myDisplayName(), uid: me ? me.id : null },
+    }).catch?.(() => {});
+  });
+}
 let lastMsgAt = null; // newest rendered message ts (incremental polling)
 const msgIds = new Set(); // rendered message ids — dedupe realtime vs own send
 
@@ -478,6 +583,7 @@ function renderDirectory(list) {
       );
     })
     .join("");
+  paintPresence();
 }
 
 function switchTab(id) {
@@ -676,9 +782,9 @@ async function openChannel(c, isUserClick = false) {
     avatar.textContent = "#";
     avatar.className = `wa-thread-avatar wa-chan-icon ${c.icon || "gen"}`;
   }
-  const onlineCount = c.online || 5;
+  const onlineCount = onlinePeers.size;
   if (status) {
-    status.textContent = `🟢 ${onlineCount} online • ${c.purpose || "Everyday club chatter"}`;
+    status.textContent = `🟢 ${onlineCount} online${onlineCount === 1 ? "" : "s"} • ${c.purpose || "Everyday club chatter"}`;
   }
   if (input) input.placeholder = `Message #${c.name}...`;
   if (form) form.hidden = false;
@@ -1348,11 +1454,14 @@ async function init() {
       const { data: events } = await supabase.from("events").select("id, title").order("created_at");
       allEvents = events || [];
     } catch (e) {}
+    startPresence();
   }
 
   // Pre-load channels & directory
   await loadChannelsPanel();
   await loadDirectory();
+  wireTyping();
+  paintPresence();
 
   const hash = (location.hash || "").replace("#", "");
   if (hash === "board") switchTab("board");

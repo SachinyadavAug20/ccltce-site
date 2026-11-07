@@ -127,33 +127,6 @@
     toast.className = "xp-toast";
     toast.hidden = true;
     document.body.appendChild(toast);
-    var hot = document.createElement("div");
-    hot.className = "hotbar";
-    hot.setAttribute("role", "toolbar");
-    hot.setAttribute("aria-label", "Quick slots");
-    hot.innerHTML = "<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>";
-    document.body.appendChild(hot);
-    slots = [].slice.call(hot.querySelectorAll("i"));
-    paintSlots();
-    hot.addEventListener("click", function (e) {
-      var s = e.target.closest("i"), i = slots.indexOf(s);
-      if (i < 0 || relics[i]) return;
-      var q = QUICK[i];
-      if (!q) return;
-      if (window.CCLTCE_SFX) CCLTCE_SFX.click();
-      addXP(2);
-      if (q[2]) location.href = q[2];
-      else if (window.CCLTCE_TERM) CCLTCE_TERM.toggle();
-    });
-    document.addEventListener("keydown", function (e) {
-      if (/INPUT|TEXTAREA/.test((document.activeElement || {}).tagName || "")) return;
-      var n = parseInt(e.key, 10);
-      if (n >= 1 && n <= 9) {
-        slots.forEach(function (s, i) { s.classList.toggle("sel", i === n - 1); });
-        if (window.CCLTCE_SFX) CCLTCE_SFX.click();
-      }
-    });
-    slots[0].classList.add("sel");
   }
   window.CCLTCE_HUD = { mount: mount, addXP: addXP, achievement: achievement, relic: relic, level: level, rank: rank, need: need, xp: function () { return xp; }, flush: flush };
 })();
