@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="assets/css/gamify.css" />
   <link rel="stylesheet" href="assets/css/mobile.css" />
   <link rel="stylesheet" href="assets/css/auth.css" />
+  <link rel="stylesheet" href="assets/css/challenges.css?v=1" />
 </head>
 <body>
 
@@ -47,6 +48,85 @@
     </section>
 
     <section class="challenges" data-render="challenges"></section>
+
+    <section class="ch-howto" aria-label="How challenges work">
+      <h2 class="section-title">How it works</h2>
+      <div class="ch-howto-grid">
+        <div class="ch-step"><span class="ch-step-num">1</span><h3>Pick a quest</h3><p>Choose any weekly prompt above — or invent your own. Beginner tracks welcome.</p></div>
+        <div class="ch-step"><span class="ch-step-num">2</span><h3>Build &amp; push</h3><p>Create a repo, commit as you go, write a short README. Ugly-but-shipped beats perfect-but-private.</p></div>
+        <div class="ch-step"><span class="ch-step-num">3</span><h3>Share the repo</h3><p>Drop your repo link in <a href="community.html">#showcase</a> on the Community page for XP and feedback.</p></div>
+        <div class="ch-step"><span class="ch-step-num">4</span><h3>Explain it</h3><p>Present at the next meetup — what broke, what you learned. Shipping it is half; explaining it is the XP.</p></div>
+      </div>
+    </section>
+
+    <section class="ch-vault" aria-label="Reference vault">
+      <h2 class="section-title">Reference Vault</h2>
+      <p class="ch-sub">Stash of proven maps. Learn from these before you mine your own path.</p>
+      <div class="ref-grid">
+        <a class="ref-card" href="https://github.com/codecrafters-io/build-your-own-x" target="_blank" rel="noopener">
+          <h3>Build Your Own X</h3><p>Build your own browser, database, git, React, bot — step-by-step deep-dive tutorials.</p><span class="ref-tag">projects</span>
+        </a>
+        <a class="ref-card" href="https://github.com/practical-tutorials/project-based-learning" target="_blank" rel="noopener">
+          <h3>Project-Based Learning</h3><p>Tons of guided project ideas by language: C++, Go, JS, Python and more.</p><span class="ref-tag">projects</span>
+        </a>
+        <a class="ref-card" href="https://github.com/kamranahmedse/developer-roadmap" target="_blank" rel="noopener">
+          <h3>Developer Roadmaps</h3><p>Community-driven roadmaps for frontend, backend, DevOps, AI and beyond.</p><span class="ref-tag">paths</span>
+        </a>
+        <a class="ref-card" href="https://developer.mozilla.org" target="_blank" rel="noopener">
+          <h3>MDN Web Docs</h3><p>The official reference for HTML, CSS and JavaScript. When in doubt, MDN it.</p><span class="ref-tag">docs</span>
+        </a>
+        <a class="ref-card" href="https://www.freecodecamp.org" target="_blank" rel="noopener">
+          <h3>freeCodeCamp</h3><p>Free full curricula with certifications — responsive web, JS, data viz, APIs.</p><span class="ref-tag">course</span>
+        </a>
+        <a class="ref-card" href="https://www.theodinproject.com" target="_blank" rel="noopener">
+          <h3>The Odin Project</h3><p>Open-source full-stack curriculum that forces you to build real projects.</p><span class="ref-tag">course</span>
+        </a>
+        <a class="ref-card" href="https://cssbattle.dev" target="_blank" rel="noopener">
+          <h3>CSSBattle</h3><p>Golf your CSS: replicate targets in the fewest characters possible.</p><span class="ref-tag">playground</span>
+        </a>
+        <a class="ref-card" href="https://github.com/sindresorhus/awesome" target="_blank" rel="noopener">
+          <h3>Awesome Lists</h3><p>Curated lists of everything — frameworks, libs, books, tutorials per topic.</p><span class="ref-tag">index</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="ch-arena" aria-label="Competitive arena">
+      <h2 class="section-title">Competitive Arena</h2>
+      <p class="ch-sub">Grind ladders between club challenges. Post your ratings and streaks in #showcase.</p>
+      <div class="ref-grid">
+        <a class="ref-card" href="https://leetcode.com" target="_blank" rel="noopener">
+          <h3>LeetCode</h3><p>The interview grind — arrays to graphs. Start with the Top Interview 150 set.</p><span class="ref-tag">DSA</span>
+        </a>
+        <a class="ref-card" href="https://codeforces.com" target="_blank" rel="noopener">
+          <h3>Codeforces</h3><p>Weekly rated rounds and Div. 2/3 contests. The classic CP ladder.</p><span class="ref-tag">contests</span>
+        </a>
+        <a class="ref-card" href="https://atcoder.jp" target="_blank" rel="noopener">
+          <h3>AtCoder</h3><p>Clean weekly ABC/ARC contests — great problems, friendly difficulty curve.</p><span class="ref-tag">contests</span>
+        </a>
+        <a class="ref-card" href="https://code.golf" target="_blank" rel="noopener">
+          <h3>Code Golf</h3><p>Solve holes in the fewest bytes — 60+ languages, instant leaderboards.</p><span class="ref-tag">golf</span>
+        </a>
+        <a class="ref-card" href="https://adventofcode.com" target="_blank" rel="noopener">
+          <h3>Advent of Code</h3><p>December story-driven puzzles every year. Perfect winter-break grind.</p><span class="ref-tag">puzzles</span>
+        </a>
+        <a class="ref-card" href="https://www.codewars.com" target="_blank" rel="noopener">
+          <h3>Codewars</h3><p>Kata ranked by difficulty — level up your rank community-style.</p><span class="ref-tag">kata</span>
+        </a>
+        <a class="ref-card" href="https://picoctf.org" target="_blank" rel="noopener">
+          <h3>picoCTF</h3><p>Beginner-friendly capture-the-flag: web, crypto, forensics, reversing.</p><span class="ref-tag">security</span>
+        </a>
+        <a class="ref-card" href="https://projecteuler.net" target="_blank" rel="noopener">
+          <h3>Project Euler</h3><p>Math+code puzzles that get brutally hard fast. Bring your number theory.</p><span class="ref-tag">math</span>
+        </a>
+        <a class="ref-card" href="https://www.kaggle.com/competitions" target="_blank" rel="noopener">
+          <h3>Kaggle</h3><p>ML competitions with real datasets and prize ladders — tabular to vision.</p><span class="ref-tag">AI/ML</span>
+        </a>
+        <a class="ref-card" href="https://ctftime.org" target="_blank" rel="noopener">
+          <h3>CTFtime</h3><p>Calendar + rankings for every CTF worldwide. Form a squad, get rated.</p><span class="ref-tag">security</span>
+        </a>
+      </div>
+    </section>
+
     <section class="math-mount" data-math-canvas aria-hidden="true"></section>
 
     <section class="golf-mount" data-golf></section>

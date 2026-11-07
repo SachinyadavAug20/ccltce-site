@@ -193,9 +193,45 @@
     { "date": "Sep 30, 2026", "tag": "won", "title": "Regional round cleared", "body": "CCLTCE qualified for the inter-college round with two teams in the top 12." }
   ],
   "challenges": [
-    { "id": "w1", "prompt": "Build a responsive navbar with vanilla HTML/CSS that collapses into a hamburger menu on mobile.", "due": "Oct 8, 2026", "badge": "Beginner" },
-    { "id": "w2", "prompt": "Create a Three.js particle system that reacts to cursor position.", "due": "Oct 15, 2026", "badge": "Advanced" },
-    { "id": "w3", "prompt": "Write a CLI that renames a folder of images and writes a Markdown index.", "due": "Oct 18, 2026", "badge": "Beginner" },
-    { "id": "w4", "prompt": "Implement a rate limiter backed by Redis and benchmark it under load.", "due": "Oct 22, 2026", "badge": "Advanced" }
+    {
+      "id": "w1",
+      "prompt": "Build a responsive navbar with vanilla HTML/CSS that collapses into a hamburger menu on mobile.",
+      "due": "Oct 8, 2026",
+      "badge": "Beginner",
+      "links": [
+        { "label": "MDN: Responsive design", "url": "https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Responsive_Design" },
+        { "label": "Frontend Mentor", "url": "https://www.frontendmentor.io" }
+      ]
+    },
+    {
+      "id": "w2",
+      "prompt": "Create a Three.js particle system that reacts to cursor position.",
+      "due": "Oct 15, 2026",
+      "badge": "Advanced",
+      "links": [
+        { "label": "Three.js docs", "url": "https://threejs.org/docs" },
+        { "label": "Live examples", "url": "https://threejs.org/examples" }
+      ]
+    },
+    {
+      "id": "w3",
+      "prompt": "Write a CLI that renames a folder of images and writes a Markdown index.",
+      "due": "Oct 18, 2026",
+      "badge": "Beginner",
+      "links": [
+        { "label": "Node.js fs API", "url": "https://nodejs.org/api/fs.html" },
+        { "label": "Commander.js guide", "url": "https://github.com/tj/commander.js" }
+      ]
+    },
+    {
+      "id": "w4",
+      "prompt": "Implement a rate limiter backed by Redis and benchmark it under load.",
+      "due": "Oct 22, 2026",
+      "badge": "Advanced",
+      "links": [
+        { "label": "Redis: rate limiting", "url": "https://redis.io/guide/docs/about/rate-limiting" },
+        { "label": "System Design Primer", "url": "https://github.com/donnemartin/system-design-primer" }
+      ]
+    }
   ]
 }

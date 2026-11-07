@@ -77,14 +77,25 @@ const TEMPLATES = {
     </div>`;
   },
 
-  challenges: (c) => `
+  challenges: (c) => {
+    const refs = (c.links || []).map((l) =>
+      `<a class="ch-ref" href="${escape(l.url)}" target="_blank" rel="noopener">${escape(l.label)} ↗</a>`).join("");
+    return `
     <article class="challenge">
       <div class="ch-top">
         <h3>${escape(c.prompt)}</h3>
         <span class="badge ${escape((c.badge || "").toLowerCase())}">${escape(c.badge)}</span>
       </div>
       <p>Due ${escape(c.due)}</p>
-    </article>`,
+      ${refs ? `<div class="ch-refs"><span class="ch-refs-h"> intel:</span>${refs}</div>` : ""}
+      <div class="ch-ship">
+        <span class="ch-ship-h">Your turn:</span>
+        <a href="https://github.com/new" target="_blank" rel="noopener">1. create a repo</a>
+        <a href="https://git-scm.com/docs/gittutorial" target="_blank" rel="noopener">2. push your build</a>
+        <a href="community.html">3. drop it in #showcase</a>
+      </div>
+    </article>`;
+  },
 };
 
 const STATS = [
