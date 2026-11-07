@@ -224,16 +224,37 @@
   }
 }
 
-/* one-time connector draw-in on build */
+/* one-time build-in: connectors draw tier-by-tier, cards pop like placed blocks */
 .tree-svg.draw-in .tree-edge {
   stroke-dasharray: 1 1;
   stroke-dashoffset: 1;
-  animation: treeDraw 0.85s ease-out forwards;
+  animation: treeDraw 0.5s ease-out both;
+  animation-delay: var(--edge-delay, 0s);
 }
 
 @keyframes treeDraw {
   to {
     stroke-dashoffset: 0;
+  }
+}
+
+.tree-canvas.build-in .tree-node {
+  animation: nodeBuild 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.35) both;
+  animation-delay: var(--build-delay, 0s);
+}
+
+@keyframes nodeBuild {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.82);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -463,6 +484,9 @@ body.team-mode-grid #team-grid {
     animation: none;
     stroke-dasharray: none;
     stroke-dashoffset: 0;
+  }
+  .tree-canvas.build-in .tree-node {
+    animation: none;
   }
   .tree-node,
   .tn-avatar,

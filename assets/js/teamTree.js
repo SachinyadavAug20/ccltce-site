@@ -242,8 +242,14 @@
     html += '</filter>';
     html += '</defs>';
 
+    var tierOf = {};
+    TIERS.forEach(function (t) {
+      t.members.forEach(function (n) { tierOf[n] = t.tier; });
+    });
+
     CONNECTIONS.forEach(function (c, idx) {
-      html += '<path class="tree-edge ' + c.grad + '" pathLength="1" data-from="' + escapeAttr(c.from) + '" data-to="' + escapeAttr(c.to) + '" data-index="' + idx + '" stroke="url(#' + c.grad + ')"></path>';
+      var edgeDelay = (((tierOf[c.to] !== undefined ? tierOf[c.to] : 1) - 1) * 0.32).toFixed(2);
+      html += '<path class="tree-edge ' + c.grad + '" pathLength="1" style="--edge-delay: ' + edgeDelay + 's;" data-from="' + escapeAttr(c.from) + '" data-to="' + escapeAttr(c.to) + '" data-index="' + idx + '" stroke="url(#' + c.grad + ')"></path>';
     });
     html += '</svg>';
 
@@ -251,16 +257,19 @@
       html += '<section class="tree-tier" data-tier="' + t.tier + '">';
       html += '<div class="tree-tier-nodes">';
 
+      var col = 0;
       t.members.forEach(function (name) {
         var m = memberMap[name];
         if (!m) return;
+        var buildDelay = (t.tier * 0.32 + 0.1 + col * 0.06).toFixed(2);
+        col++;
         var progress = PROGRESS_MAP[name] || 90;
         var accent = m.accent || "#17dd62";
         var yearClass = (m.area || "").split("•")[0].trim() || "MEMBER";
         var roleLabel = cleanRole(m.role);
 
         html += '<article class="tree-node" tabindex="0" role="button" aria-haspopup="dialog"';
-        html += ' style="--accent: ' + accent + '; --accent-glow: ' + hexToRgba(accent, 0.45) + ';"';
+        html += ' style="--accent: ' + accent + '; --accent-glow: ' + hexToRgba(accent, 0.45) + '; --build-delay: ' + buildDelay + 's;"';
         html += ' data-name="' + escapeAttr(m.name) + '"';
         html += ' data-role="' + escapeAttr(m.role) + '"';
         html += ' data-area="' + escapeAttr(m.area) + '"';
@@ -305,7 +314,11 @@
       }
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
         svg.classList.add("draw-in");
-        setTimeout(function () { svg.classList.remove("draw-in"); }, 1100);
+        canvas.classList.add("build-in");
+        setTimeout(function () {
+          svg.classList.remove("draw-in");
+          canvas.classList.remove("build-in");
+        }, 1900);
       }
     });
 
