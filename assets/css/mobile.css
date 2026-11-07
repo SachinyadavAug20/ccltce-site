@@ -55,7 +55,7 @@
   html, body { overflow-x: hidden; }
   .tabbar { display: grid; }
   /* no desktop game HUD on phones — the tab bar is the chrome */
-  .hotbar, .xp-rail, .xp-tip, .xp-toast, .hud-fx { display: none !important; }
+  .xp-rail, .xp-tip, .xp-toast, .hud-fx { display: none !important; }
   .term-hud { bottom: 0; }
   .vox-panel { max-width: calc(100vw - 1.5rem); }
   main { padding-bottom: calc(72px + env(safe-area-inset-bottom, 16px)) !important; }
@@ -128,7 +128,7 @@
 a, button, [role="button"], summary { -webkit-tap-highlight-color: rgba(234, 179, 8, 0.3); }
 @media (hover: none) {
   .btn:hover, .t-btn:hover, .foot-links a:hover, .foot-social a:hover,
-  .golf-lang-btn:hover, .hotbar i.quick:hover, .nav-auth > a:hover { transform: none; }
+  .golf-lang-btn:hover, .nav-auth > a:hover { transform: none; }
 }
 
 @media (pointer: coarse) {

@@ -1,13 +1,10 @@
-// XP rail (right edge) + 9-slot quick/relic hotbar — subtle progression HUD.
+// XP rail (right edge) — subtle progression HUD.
 (function () {
   var gsap = window.gsap;
   var xp = parseInt(localStorage.getItem("ccltce-xp") || "0", 10), relics = [];
   try { relics = JSON.parse(localStorage.getItem("ccltce-relics") || "[]"); } catch (e) {}
   var RELIC = { "Sudo Pickaxe": "#pick", "Redstone Dust": "#dust", "Golden Apple": "#apple", "Void Feather": "#feather", "Mending Book": "#book" };
-  var QUICK = [["⌂", "Home", "index.html"], ["E", "Events", "events.html"], ["T", "Team", "team.html"],
-    ["⚔", "Challenges", "challenges.html"], ["R", "Resources", "resources.html"], ["N", "Notices", "notices.html"],
-    ["★", "Achievements", "achievements.html"], ["$", "Open shell (Ctrl+`)", null], ["W", "CCLTCE Week", "challenges.html"]];
-  var fill, tip, slots, rail, toast, toastT, seen = {};
+  var fill, tip, rail, toast, toastT, seen = {};
   // batch localStorage writes — clicks earn XP constantly; don't hit storage every time
   var xpDirty = false, relicsDirty = false, saveT = 0;
   function flush() {
@@ -73,7 +70,7 @@
   }
   function tipText() {
     return "Lv " + level() + " · " + rank() + "\n" + (xp % 100) + "% to next · " + need() + " XP left\n" +
-      "Earn XP by clicking, shell (Ctrl+`), events,\nchallenges. Relics fill the hotbar below.";
+      "Earn XP by clicking, shell (Ctrl+`),\nevents, and challenges.";
   }
   // vanilla-style advancement toast — "Achievement Get! <Name>" (used by the narrative dims + boss)
   function achievement(name) {
@@ -84,16 +81,6 @@
   }
   function showTip() { if (!tip) return; tip.textContent = tipText(); tip.hidden = false; }
   function hideTip() { if (tip) tip.hidden = true; }
-  function paintSlots() {
-    if (!slots) return;
-    slots.forEach(function (s, i) {
-      var r = relics[i], q = QUICK[i] || ["", "", null];
-      s.textContent = r ? (RELIC[r] || "★") : q[0];
-      s.title = r || q[1];
-      s.classList.toggle("filled", !!r);
-      s.classList.toggle("quick", !r);
-    });
-  }
   function addXP(n) {
     var before = level();
     xp += n;
@@ -114,7 +101,7 @@
     relics.push(name);
     relicsDirty = true;
     scheduleSave();
-    if (slots) paintSlots();
+    showToast("★ Relic: " + name);
   }
   function mount() {
     // Skip desktop game HUD on mobile/touch screens (< 900px or touch) — concentrated mobile app shell

@@ -121,9 +121,9 @@ body:has(#narrative-scroll) footer {
 .narrative-overlay.slain #dragon-hp { color: #17dd62; border-color: #17dd62; background: rgba(23, 221, 98, 0.14); }
 @keyframes afterRise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-/* scroll hint — floats comfortably above the bottom hotbar */
+/* scroll hint */
 .narrative-hint {
-  position: absolute; bottom: 5rem; left: 50%;
+  position: absolute; bottom: 2.5rem; left: 50%;
   transform: translateX(-50%);
   font-family: var(--disp); font-size: 0.5rem;
   color: #ffd76a; letter-spacing: 0.12em;

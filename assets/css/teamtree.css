@@ -131,7 +131,7 @@
   position: relative;
   width: 100%;
   max-width: 1300px;
-  margin: 0 auto 9rem; /* generous bottom clearance above hotbar */
+  margin: 0 auto 6rem;
   background: transparent;
   border: none;
   box-shadow: none;
