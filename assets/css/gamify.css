@@ -26,7 +26,31 @@
 
 /* code golf */
 .golf-card { border: 4px solid #000; background: #262626; box-shadow: inset 3px 3px 0 #404040, inset -3px -3px 0 #151515; padding: 1.1rem; font-family: var(--disp); }
-.golf-title { font-size: 0.62rem; color: var(--gold); line-height: 1.6; margin-bottom: 0.7rem; }
+.golf-title { font-size: 0.62rem; color: var(--gold); line-height: 1.6; margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+.golf-meta { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--mono); font-size: 0.68rem; font-weight: 400; }
+.golf-rate { padding: 2px 7px; border: 1px solid; letter-spacing: 0.05em; }
+.golf-rate-800 { color: #55ff55; border-color: #2f9e44; background: rgba(34, 197, 94, 0.08); }
+.golf-rate-900 { color: #fbbf24; border-color: #a16207; background: rgba(251, 191, 36, 0.08); }
+.golf-rate-1000 { color: #ff6666; border-color: #b91c1c; background: rgba(239, 68, 68, 0.1); }
+.golf-pid { color: var(--muted); }
+
+/* math canvas HUD */
+.math-hud {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  pointer-events: none;
+  font-family: var(--disp);
+  z-index: 2;
+}
+.math-hud-title { font-size: 0.55rem; color: var(--gold); text-shadow: 2px 2px 0 #000; }
+.math-hud-note { font-family: var(--mono); font-size: 11px; color: var(--muted); text-shadow: 1px 1px 0 #000; }
+.math-hud-coords { position: absolute; bottom: 10px; right: 12px; font-family: var(--mono); font-size: 11px; color: rgba(85, 255, 85, 0.75); text-shadow: 1px 1px 0 #000; pointer-events: none; z-index: 2; }
 .golf-prompt { font-family: var(--mono); font-size: 1.1rem; color: #e0e0e0; margin-bottom: 0.7rem; }
 .golf-tests { font-family: var(--mono); font-size: 1rem; color: var(--emerald); background: #121212; border: 2px solid #000; padding: 0.5rem 0.7rem; margin-bottom: 0.7rem; overflow-x: auto; }
 .golf-code { width: 100%; box-sizing: border-box; background: #121212; border: 3px solid #000; color: #ffff55; font-family: var(--mono); font-size: 1.05rem; padding: 0.6rem; resize: vertical; outline: 0; tab-size: 2; user-select: text; -webkit-user-select: text; }
