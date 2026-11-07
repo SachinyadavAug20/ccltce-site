@@ -243,7 +243,7 @@
     html += '</defs>';
 
     CONNECTIONS.forEach(function (c, idx) {
-      html += '<path class="tree-edge ' + c.grad + '" data-from="' + escapeAttr(c.from) + '" data-to="' + escapeAttr(c.to) + '" data-index="' + idx + '" stroke="url(#' + c.grad + ')"></path>';
+      html += '<path class="tree-edge ' + c.grad + '" pathLength="1" data-from="' + escapeAttr(c.from) + '" data-to="' + escapeAttr(c.to) + '" data-index="' + idx + '" stroke="url(#' + c.grad + ')"></path>';
     });
     html += '</svg>';
 
@@ -303,6 +303,10 @@
         centerTree();
         updateLines();
       }
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        svg.classList.add("draw-in");
+        setTimeout(function () { svg.classList.remove("draw-in"); }, 1100);
+      }
     });
 
     // Resize handling
@@ -348,13 +352,23 @@
       var y1 = (pr.bottom - canvasRect.top) / s;
       var x2 = (chr.left + chr.width / 2 - canvasRect.left) / s;
       var y2 = (chr.top - canvasRect.top) / s;
-      var dy = Math.max(20, y2 - y1);
 
-      // Smooth S-curve (Cubic Bezier)
-      var d = "M " + x1.toFixed(1) + " " + y1.toFixed(1) +
-              " C " + x1.toFixed(1) + " " + (y1 + dy * 0.52).toFixed(1) +
-              ", " + x2.toFixed(1) + " " + (y2 - dy * 0.52).toFixed(1) +
-              ", " + x2.toFixed(1) + " " + y2.toFixed(1);
+      // Orthogonal org-chart routing: parent drops to a horizontal bus, then into the
+      // child — rounded elbows keep it readable instead of overlapping S-curves.
+      var midY = y1 + (y2 - y1) * 0.5;
+      var r = 9;
+      var d;
+      if (Math.abs(x2 - x1) < r * 2) {
+        d = "M " + x1.toFixed(1) + " " + y1.toFixed(1) + " L " + x2.toFixed(1) + " " + y2.toFixed(1);
+      } else {
+        var dir = x2 > x1 ? 1 : -1;
+        d = "M " + x1.toFixed(1) + " " + y1.toFixed(1) +
+            " L " + x1.toFixed(1) + " " + (midY - r).toFixed(1) +
+            " Q " + x1.toFixed(1) + " " + midY.toFixed(1) + " " + (x1 + r * dir).toFixed(1) + " " + midY.toFixed(1) +
+            " L " + (x2 - r * dir).toFixed(1) + " " + midY.toFixed(1) +
+            " Q " + x2.toFixed(1) + " " + midY.toFixed(1) + " " + x2.toFixed(1) + " " + (midY + r).toFixed(1) +
+            " L " + x2.toFixed(1) + " " + y2.toFixed(1);
+      }
       path.setAttribute("d", d);
     });
   }
@@ -395,12 +409,37 @@
     });
   }
 
+  // lineages — adjacency so hover lights the full chain (ancestors + descendants)
+  var ADJ = {};
+  CONNECTIONS.forEach(function (c) {
+    if (!ADJ[c.from]) ADJ[c.from] = { up: [], down: [] };
+    if (!ADJ[c.to]) ADJ[c.to] = { up: [], down: [] };
+    ADJ[c.from].down.push(c.to);
+    ADJ[c.to].up.push(c.from);
+  });
+
+  function relatedSet(name) {
+    var set = {};
+    set[name] = true;
+    var walk = function (n, key) {
+      var list = (ADJ[n] && ADJ[n][key]) || [];
+      list.forEach(function (x) {
+        if (!set[x]) { set[x] = true; walk(x, key); }
+      });
+    };
+    walk(name, "up");
+    walk(name, "down");
+    return set;
+  }
+
   function highlightGraph(name, accent) {
     var edges = svg.querySelectorAll(".tree-edge");
     var nodes = canvas.querySelectorAll(".tree-node");
+    var related = relatedSet(name);
 
     edges.forEach(function (e) {
-      if (e.dataset.from === name || e.dataset.to === name) {
+      var onPath = related[e.dataset.from] && related[e.dataset.to];
+      if (onPath) {
         e.classList.add("edge-highlight");
         e.classList.remove("edge-dim");
         e.style.setProperty("--edge-color", accent);
@@ -412,19 +451,12 @@
     });
 
     nodes.forEach(function (n) {
-      if (n.dataset.name === name) {
-        n.classList.add("node-active");
+      if (related[n.dataset.name]) {
+        n.classList.add(related[n.dataset.name] && n.dataset.name === name ? "node-active" : "node-linked");
         n.classList.remove("node-dim");
       } else {
-        var isLinked = CONNECTIONS.some(function (c) {
-          return (c.from === name && c.to === n.dataset.name) ||
-                 (c.to === name && c.from === n.dataset.name);
-        });
-        if (isLinked) {
-          n.classList.remove("node-dim");
-        } else {
-          n.classList.add("node-dim");
-        }
+        n.classList.remove("node-active", "node-linked");
+        n.classList.add("node-dim");
       }
     });
   }
@@ -434,7 +466,7 @@
       e.classList.remove("edge-highlight", "edge-dim");
     });
     canvas.querySelectorAll(".tree-node").forEach(function (n) {
-      n.classList.remove("node-active", "node-dim");
+      n.classList.remove("node-active", "node-linked", "node-dim");
     });
   }
 
