@@ -34,7 +34,15 @@
 .golf-rate-1000 { color: #ff6666; border-color: #b91c1c; background: rgba(239, 68, 68, 0.1); }
 .golf-pid { color: var(--muted); }
 
-/* math canvas HUD */
+/* math canvas HUD — minimal: one label, one fading hint, faint live coords */
+[data-math-canvas]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(90% 70% at 50% 60%, transparent 55%, rgba(0, 0, 0, 0.55));
+  pointer-events: none;
+  z-index: 1;
+}
 .math-hud {
   position: absolute;
   top: 10px;
@@ -42,15 +50,37 @@
   right: 12px;
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: 1rem;
   pointer-events: none;
   font-family: var(--disp);
   z-index: 2;
 }
-.math-hud-title { font-size: 0.55rem; color: var(--gold); text-shadow: 2px 2px 0 #000; }
-.math-hud-note { font-family: var(--mono); font-size: 11px; color: var(--muted); text-shadow: 1px 1px 0 #000; }
-.math-hud-coords { position: absolute; bottom: 10px; right: 12px; font-family: var(--mono); font-size: 11px; color: rgba(85, 255, 85, 0.75); text-shadow: 1px 1px 0 #000; pointer-events: none; z-index: 2; }
+.math-hud-title { font-size: 0.55rem; color: var(--gold); text-shadow: 2px 2px 0 #000; letter-spacing: 0.08em; }
+.math-hud-title::after { content: ""; display: block; width: 14px; height: 2px; margin-top: 4px; background: var(--gold); box-shadow: 1px 1px 0 #000; }
+.math-hud-orbit {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 170, 0, 0.35);
+  padding: 2px 8px;
+  opacity: 0.9;
+  transition: opacity 0.5s steps(5);
+  text-shadow: 1px 1px 0 #000;
+}
+.math-hud-orbit.off { opacity: 0; }
+.math-hud-coords {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: rgba(85, 255, 85, 0.45);
+  text-shadow: 1px 1px 0 #000;
+  pointer-events: none;
+  z-index: 2;
+}
 .golf-prompt { font-family: var(--mono); font-size: 1.1rem; color: #e0e0e0; margin-bottom: 0.7rem; }
 .golf-tests { font-family: var(--mono); font-size: 1rem; color: var(--emerald); background: #121212; border: 2px solid #000; padding: 0.5rem 0.7rem; margin-bottom: 0.7rem; overflow-x: auto; }
 .golf-code { width: 100%; box-sizing: border-box; background: #121212; border: 3px solid #000; color: #ffff55; font-family: var(--mono); font-size: 1.05rem; padding: 0.6rem; resize: vertical; outline: 0; tab-size: 2; user-select: text; -webkit-user-select: text; }

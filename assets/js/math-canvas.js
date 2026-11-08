@@ -6,12 +6,15 @@
 
   var hud = document.createElement("div");
   hud.className = "math-hud";
-  hud.innerHTML = '<span class="math-hud-title">CHAOS ENGINE // LORENZ ATTRACTOR</span>' +
-    '<span class="math-hud-note">σ=10 ρ=28 β=8/3 — move to orbit</span>';
+  hud.innerHTML = '<span class="math-hud-title">CHAOS ENGINE</span>' +
+    '<span class="math-hud-orbit">drag to orbit</span>';
   mount.appendChild(hud);
   var coords = document.createElement("div");
   coords.className = "math-hud-coords";
   mount.appendChild(coords);
+  mount.addEventListener("pointermove", function () {
+    hud.querySelector(".math-hud-orbit").classList.add("off");
+  }, { once: true, passive: true });
 
   var cv = document.createElement("canvas");
   cv.className = "math-canvas";
