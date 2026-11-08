@@ -16,9 +16,42 @@ export function initDragon(scene, camera, host) {
     if (o.userData.gatewayBeam) jets.push(o);
   });
   if (!root || !hitbox) return null;
-  var wings = [];
-  root.traverse(function (o) { if (o.userData.wingL || o.userData.wingR) wings.push(o); });
-  var hp = 3, state = "alive", tHit = -9, tDie = -9, tBoom = -9, tOrb = -9, prev = 0, lastFw = 0;
+  var wings = [], jaw = null, eyes = [], tails = [];
+  root.traverse(function (o) {
+    if (o.userData.wingL || o.userData.wingR) wings.push(o);
+    if (o.userData.dragonJaw) jaw = o;
+    if (o.userData.dragonEye) { o.material.emissive = new THREE.Color(0xe879f9); o.material.emissiveIntensity = 0.5; eyes.push(o); }
+    if (o.userData.dragonTail) tails.push(o);
+  });
+  var hp = 3, state = "alive", tHit = -9, tDie = -9, tBoom = -9, tOrb = -9, prev = 0, lastFw = 0, nextRoar = 0, roarT = -9;
+  // dragon fire — pooled breath particles that stream from the jaws on roars
+  var br = [], brPool = [];
+  for (var bp = 0; bp < 12; bp++) {
+    var bm = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.55, 0.55),
+      new THREE.MeshBasicMaterial({ color: 0xc026d3, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }));
+    bm.visible = false; scene.add(bm); brPool.push(bm);
+  }
+  function breath() {
+    var o = new THREE.Vector3(), f = new THREE.Vector3(0, 0, 1).applyQuaternion(root.quaternion);
+    head.getWorldPosition(o);
+    for (var n = 0; n < 7 && brPool.length; n++) {
+      var m = brPool.pop();
+      m.material.color.setHex(n % 2 ? 0xe879f9 : 0xc026d3); m.material.opacity = 0.9;
+      m.position.copy(o).addScaledVector(f, 2.5 + n * 0.4); m.scale.setScalar(0.8 + (n % 3) * 0.3);
+      m.visible = true;
+      var v = f.clone().multiplyScalar(10 + Math.random() * 6);
+      v.x += (Math.random() - 0.5) * 2.4; v.y += (Math.random() - 0.5) * 2.4 - 1.2; v.z += (Math.random() - 0.5) * 2.4;
+      br.push({ m: m, v: v, life: 1.0 + Math.random() * 0.4 });
+    }
+  }
+  function stepBr(dt) {
+    for (var i = br.length - 1; i >= 0; i--) {
+      var p = br[i]; p.life -= dt;
+      if (p.life <= 0) { p.m.visible = false; brPool.push(p.m); br.splice(i, 1); continue; }
+      p.m.position.addScaledVector(p.v, dt); p.v.y -= 2.5 * dt;
+      p.m.material.opacity = Math.min(0.9, p.life * 1.3);
+    }
+  }
   var beams = new THREE.Group(), orbs = [];
   for (var i = 0; i < 8; i++) {          // beam = bright core + additive halo (no pink monolith)
     var bg = new THREE.Group();
@@ -143,16 +176,31 @@ export function initDragon(scene, camera, host) {
     update: function (el) {
       var dt = Math.min(0.05, Math.max(0, el - prev)), a = el * 0.16; prev = el;
       if (state === "alive") {
-        root.position.set(C.x + Math.cos(a) * 22, C.y + Math.sin(el * 0.5) * 3, C.z + Math.sin(a) * 22);
-        root.rotation.set(0, -a, Math.sin(el * 0.9) * 0.07);
+        // flown, not fired: the patrol radius drifts (banking into the tighter turn),
+        // the body double-bobs and nods, the jaw roars fire every few seconds
+        var r = 22 + Math.sin(el * 0.19) * 2.6;
+        root.position.set(C.x + Math.cos(a) * r, C.y + Math.sin(el * 0.5) * 3 + Math.sin(el * 1.15) * 0.8, C.z + Math.sin(a) * r);
+        root.rotation.set(Math.sin(el * 0.62) * 0.05, -a, -Math.cos(el * 0.19) * 0.14 + Math.sin(el * 0.9) * 0.05);
+        head.rotation.y = Math.sin(el * 0.8) * 0.12;
+        head.rotation.x = Math.sin(el * 0.62) * 0.07;
+        for (var t2 = 0; t2 < tails.length; t2++) tails[t2].rotation.y = Math.sin(el * 1.6 + t2 * 0.55) * 0.14;
+        var eg = 0.35 + Math.abs(Math.sin(el * 2.1)) * 0.9;
+        for (var e2 = 0; e2 < eyes.length; e2++) eyes[e2].material.emissiveIntensity = eg;
+        if (el >= nextRoar) { roarT = el; nextRoar = el + 5.5 + Math.random() * 3.5; breath(); }
+        var roarOp = Math.max(0, Math.min(1, (el - roarT) / 1.2));
+        jaw.rotation.x = -0.55 * Math.sin(roarOp * Math.PI);
         if (el - tHit < 0.35) {
           root.position.x += (Math.random() - 0.5) * 1.4; root.position.y += (Math.random() - 0.5);
           root.rotation.z += (Math.random() - 0.5) * 0.25;
         }
         var f = Math.sin(el * 4.5) * 0.5;
         for (var w = 0; w < wings.length; w++) wings[w].rotation.z = wings[w].userData.wingL ? -f : f;
+        stepBr(dt);
       } else if (state === "dying") {
         var d = el - tDie;
+        jaw.rotation.x = 0;                                            // clean posture for the death scene
+        for (var t3 = 0; t3 < tails.length; t3++) tails[t3].rotation.y = 0;
+        stepBr(dt);
         if (d < 0.6) {
           root.position.set(C.x + (Math.random() - 0.5) * 1.8, C.y + (Math.random() - 0.5) * 1.4, C.z + (Math.random() - 0.5) * 1.8);
           root.rotation.z = (Math.random() - 0.5) * 0.5; beams.visible = true;

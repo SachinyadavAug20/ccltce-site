@@ -42,17 +42,17 @@ export function enderDragon(g, x, y, z) {
   add(grp, M(0.95, 0.9, 1.2, D), 0, 2.0, 5.1);
   var head = add(grp, M(1.5, 1.15, 1.9, D), 0, 2.5, 6.3);       // head (look target)
   head.userData.dragonHead = true;
-  add(grp, M(1.15, 0.35, 1.5, D2), 0, 1.85, 6.6);               // jaw
-  add(grp, M(0.3, 0.22, 0.16, EYE), -0.45, 2.6, 7.25);          // purple eyes
-  add(grp, M(0.3, 0.22, 0.16, EYE), 0.45, 2.6, 7.25);
+  add(grp, M(1.15, 0.35, 1.5, D2), 0, 1.85, 6.6).userData.dragonJaw = true;
+  add(grp, M(0.3, 0.22, 0.16, EYE), -0.45, 2.6, 7.25).userData.dragonEye = true;
+  add(grp, M(0.3, 0.22, 0.16, EYE), 0.45, 2.6, 7.25).userData.dragonEye = true;
   [[-1.0, 1.9], [1.0, 1.9], [-1.0, -1.9], [1.0, -1.9]].forEach(function (p) {
     add(grp, M(0.55, 1.5, 0.55, D), p[0], -1.4, p[1]);          // legs
     add(grp, M(0.7, 0.4, 1.0, D2), p[0], -2.25, p[1] + 0.15);   // feet
   });
-  add(grp, M(1.7, 1.5, 1.8, D), 0, -0.2, -3.5);                 // tail
-  add(grp, M(1.3, 1.1, 1.6, D), 0, -0.45, -5.0);
-  add(grp, M(1.0, 0.85, 1.4, D), 0, -0.7, -6.3);
-  add(grp, M(0.7, 0.6, 1.2, D2), 0, -0.95, -7.4);
+  [[1.7, 1.5, 1.8, 0, -0.2, -3.5], [1.3, 1.1, 1.6, 0, -0.45, -5.0],    // tail — snake-wave in dragon.js
+   [1.0, 0.85, 1.4, 0, -0.7, -6.3], [0.7, 0.6, 1.2, D2, 0, -0.95, -7.4]].forEach(function (tg, ti) {
+     add(grp, M(tg[0], tg[1], tg[2], tg[3]), 0, tg[4], tg[5]).userData.dragonTail = true;
+   });
   [-1, 1].forEach(function (s) {                                // wings — flap via group
     var w = new THREE.Group(); w.position.set(1.3 * s, 0.7, 0.4);
     add(w, M(5.2, 0.25, 3.6, D2), 2.7 * s, 0, 0);
