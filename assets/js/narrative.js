@@ -89,7 +89,7 @@
 
   async function start() {
     var THREE = await import("../vendor/three.module.js");
-    var [{ buildScene }, { createCameraPath, phaseAt, dimAt }, { initDragon }, { createLighting }, { createPerf }, { initCrystals }, { buildEaster }, { batchStatic, cullMergedStatic }] =
+    var [{ buildScene }, { createCameraPath, phaseAt, dimAt }, { initDragon }, { createLighting }, { createPerf }, { initCrystals }, { buildEaster }, { batchStatic, cullMergedStatic }, { createGazeDirector }] =
       await Promise.all([
         import("./narrative-scene.js"),
         import("./narrative-camera.js"),
@@ -99,6 +99,7 @@
         import("./narrative-crystals.js"),
         import("./narrative-easter.js"),
         import("./narrative-batch.js"),
+        import("./narrative-gaze.js"),
       ]);
     var canvas = document.getElementById("narrative-webgl");
     if (!canvas) {
@@ -126,7 +127,8 @@
     window.CCLTCE_CRYSTALS = crystals;
     var easter = buildEaster(scene);
     var hint = wrapper.querySelector(".narrative-hint");
-    var lookV = new THREE.Vector3(), lookA = new THREE.Vector3();
+    var gazePt = new THREE.Vector3(), beatV = new THREE.Vector3();
+    var gaze = createGazeDirector(curve);
     // campus cloud fade — they thin out as the camera nears the portal so the punch
     // into the nether reads clean (no flat white slab crowding the obsidian frame)
     var cloudGrps = [];
@@ -213,8 +215,7 @@
       if (hint) hint.style.opacity = t > 0.04 ? "0" : "1";
     }
     // simple stable cinematic: fixed 45° lens, level horizon, damped scroll follow + damped look
-    var clock = new THREE.Clock(), lastEl = 0, firstLook = true;
-    var lookSm = new THREE.Vector3();
+    var clock = new THREE.Clock(), lastEl = 0;
     function animate() {
       requestAnimationFrame(animate);
       var el = clock.getElapsedTime(), dt = Math.min(0.1, Math.max(0.001, el - lastEl));
@@ -278,16 +279,10 @@
       // damped scroll follow — the frame loop owns the camera so nothing drifts off-screen
       var u = Math.min(Math.max(progress.s, 0), 1);
       camera.position.copy(curve.getPointAt(u));
-      var look = lookA.copy(curve.getPointAt(Math.min(u + 0.012, 1))), shake = 0;
-      if (u > 0.7432 && u < 0.9225) {
-        // dive: the spline looks east into the void — hold the island (and its beams) in frame
-        var iw = clamp01((u - 0.7432) / 0.06) * (1 - clamp01((u - 0.8825) / 0.04));
-        look.lerp(lookV.set(200, -118, 20), iw * 0.9);
-      }
+      var shake = 0;
       if (dragon) {
         dragon.update(el);
-        var w = u > 0.7733 ? clamp01((u - 0.7733) / 0.1) : 0;   // dive → finale: keep the boss framed
-        if (w > 0) look.lerp(dragon.look(lookV), w);
+        var w = u > 0.93 ? clamp01((u - 0.93) / 0.05) : 0;   // banking arc → boss gaze (fades itself out if the dragon slips behind)
         shake = Math.max(dragon.shake(), crystals.shake());
       }
       crystals.update(dt);
@@ -302,9 +297,9 @@
           cloudGrps[cg].visible = cd > 0.02;
         }
       }
-      if (firstLook) { lookSm.copy(look); firstLook = false; }
-      else lookSm.lerp(look, 1 - Math.exp(-1.1 * dt));   // slow steady gaze — no snap, no swing
-      camera.lookAt(lookSm);
+      // forward-only gaze — the director smooths heading in direction space; no snap, no swing, never looks back
+      var look = gaze.update(u, camera.position, dt, dragon && w > 0 ? dragon.look(beatV) : null, dragon ? w : 0, gazePt);
+      camera.lookAt(look);
       if (shake > 0) {
         camera.position.x += (Math.random() - 0.5) * shake;
         camera.position.y += (Math.random() - 0.5) * shake;
