@@ -49,5 +49,47 @@
   catch (e) { console.log("%c[VAULT] token: " + token + ":soon", "color: #ffaa00; font-size: 12px;"); }
   console.log("%c[RIDDLE] I speak without a mouth and hear without ears. Type my answer in the shell: sudo unlock ...", "color: #aaaaaa; font-size: 12px;");
 
-  window.CCLTCE_EGG = { matrix: matrix, token: token };
+  // icon-secret — pixel burst on every ref-icon click; awards hidden in click combos
+  function pixelBurst(x, y) {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var COLORS = ["#ffaa00", "#17dd62", "#00e5ff", "#ff5555", "#a78bfa"];
+    for (var i = 0; i < 12; i++) {
+      var p = document.createElement("span");
+      p.className = "egg-pix";
+      var a = Math.random() * Math.PI * 2, d = 26 + Math.random() * 42;
+      p.style.left = x + "px";
+      p.style.top = y + "px";
+      p.style.background = COLORS[i % COLORS.length];
+      p.style.setProperty("--dx", Math.cos(a) * d + "px");
+      p.style.setProperty("--dy", Math.sin(a) * d + "px");
+      document.body.appendChild(p);
+      setTimeout(function (el) { return function () { el.remove(); }; }(p), 750);
+    }
+  }
+
+  var iconLog = [], inspectorDone = false, masterDone = false;
+  document.addEventListener("click", function (e) {
+    var ico = e.target.closest(".ref-ico");
+    if (!ico) return;
+    pixelBurst(e.clientX, e.clientY);
+    var now = Date.now();
+    iconLog.push({ el: ico, t: now });
+    iconLog = iconLog.filter(function (h) { return now - h.t < 4000; });
+    if (!window.CCLTCE_HUD) return;
+    var same = iconLog.filter(function (h) { return h.el === ico; }).length;
+    if (!masterDone && same >= 5) {
+      masterDone = true;
+      CCLTCE_HUD.addXP(75);
+      CCLTCE_HUD.relic("Pixel Master Pickaxe");
+      CCLTCE_HUD.achievement("Blade Master — 5 rapid strikes on one icon");
+    } else if (!inspectorDone && iconLog.filter(function (h, i) {
+      return iconLog.findIndex(function (o) { return o.el === h.el; }) === i;
+    }).length >= 3) {
+      inspectorDone = true;
+      CCLTCE_HUD.addXP(40);
+      CCLTCE_HUD.achievement("Icon Inspector — clicked 3 different icons in 4s");
+    }
+  });
+
+  window.CCLTCE_EGG = { matrix: matrix, token: token, pixelBurst: pixelBurst };
 })();
