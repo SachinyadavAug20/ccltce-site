@@ -7,7 +7,10 @@
 //   - end-of-path guard: sampling "a bit ahead" collapses onto the camera position
 //     as u → 1, which makes lookAt spin wildly — hold a minimum gaze distance instead
 //   - gaze beats (e.g. the dragon) are layered on top but fade out as their subject
-//     slips behind the forward hemisphere, so nothing can drag the view backwards
+//     slips behind the forward hemisphere, so nothing can drag the view backwards.
+//     ONE exception: during the End freefall the camera starts falling away from the
+//     arena, so the boss beat is allowed to whip the heading around mid-fall (bypass)
+//     — the whip IS the shot: it reads as a mid-air spin to spot the dragon.
 import * as THREE from "../vendor/three.module.js";
 
 var LOOK_ARC = 0.012;  // fraction of the path sampled ahead for the flight direction
@@ -21,7 +24,7 @@ export function createGazeDirector(curve) {
   var beatDir = new THREE.Vector3();          // direction to the current gaze subject
   var seeded = false;
 
-  function update(u, cameraPos, dt, subjectPos, subjectWeight, out) {
+  function update(u, cameraPos, dt, subjectPos, subjectWeight, out, bypass) {
     // flight direction: the bit of path just ahead of the lens
     curve.getPointAt(Math.min(u + LOOK_ARC, 1), dir);
     dir.sub(cameraPos);
@@ -34,12 +37,13 @@ export function createGazeDirector(curve) {
     heading.lerp(dir, 1 - Math.exp(-GAZE_SPEED * dt)).normalize();
 
     // gaze beat — eases toward the subject only while it stays ahead of the lens
+    // (bypass waives the hemisphere for the End freefall whip)
     if (subjectPos && subjectWeight > 0) {
       beatDir.copy(subjectPos).sub(cameraPos);
       if (beatDir.lengthSq() > 1e-6) {
         beatDir.normalize();
-        var forwardness = Math.max(0, Math.min(1, beatDir.dot(heading)));
-        var w = subjectWeight * forwardness * forwardness * (1 - Math.exp(-GAZE_SPEED * dt));
+        var forwardness = bypass ? 1 : Math.max(0, Math.min(1, beatDir.dot(heading)));
+        var w = Math.min(1, subjectWeight * forwardness * forwardness * (1 - Math.exp(-GAZE_SPEED * dt)));
         heading.lerp(beatDir, w).normalize();
       }
     }

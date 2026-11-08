@@ -1,7 +1,7 @@
 // Day/night presets, dimension light damping, camera follow-light, fog/sky lerp.
 import * as THREE from "../vendor/three.module.js";
 
-export var DIM_L = { overworld: 1, nether: 0.5, end: 0.66, bedrock: 0.42 };
+export var DIM_L = { overworld: 1, nether: 0.5, stronghold: 0.3, end: 0.66, bedrock: 0.42 };
 
 var TOD = {
   night:   { sky: 0x0a0e1a, fog: 0x0a0e1a, d: 0.0035, sun: 0x8899cc, sunI: 0.5,  amb: 0x2c3a52, ambI: 0.52, hemiS: 0x334466, hemiG: 0x141422, pos: [-40, 50, 20] },
@@ -51,16 +51,16 @@ export function createLighting(scene, L) {
     if (L.amb) { L.amb.color.setHex(tod.amb); L.amb.intensity = tod.ambI * (0.6 + 0.4 * k); }
     if (L.fill) { L.fill.color.setHex(tod.sun); L.fill.intensity = 0.3 * k; L.fill.position.set(-tod.pos[0] * 0.5, 25, -40); }
     if (L.hemi) { L.hemi.color.setHex(tod.hemiS); L.hemi.groundColor.setHex(tod.hemiG); L.hemi.intensity = 0.5 * (0.4 + 0.6 * k); }
-    follow.intensity = dim === "overworld" ? 0 : 55;
+    follow.intensity = dim === "overworld" ? 0 : dim === "stronghold" ? 8 : 55;
     follow.color.setHex(dim === "end" ? 0xd8c0ff : 0xffd9a8);
   }
   function tick(dim, cam) {
-    follow.position.copy(cam.position);
+    follow.position.set(cam.position.x, cam.position.y + (dim === "stronghold" ? 2.4 : 0.6), cam.position.z);
     if (scene.fog) {
       scene.fog.color.lerp(t.fog, 0.09);
       scene.fog.density += (t.d - scene.fog.density) * 0.09;
     }
     if (scene.background && scene.background.isColor) scene.background.lerp(t.sky, 0.09);
   }
-  return { sky: sky, lights: lights, tick: tick };
+  return { sky: sky, lights: lights, tick: tick, state: function () { return { fog: t.fog.getHex(), sky: t.sky.getHex(), d: t.d }; } };
 }

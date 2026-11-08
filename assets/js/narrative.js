@@ -145,6 +145,7 @@
       station1: wrapper.querySelector(".narrative-overlay.station-1"),
       station2: wrapper.querySelector(".narrative-overlay.station-2"),
       station3: wrapper.querySelector(".narrative-overlay.station-3"),
+      stronghold: wrapper.querySelector(".narrative-overlay.stronghold"),
       bedrock: wrapper.querySelector(".narrative-overlay.bedrock"),
     };
     // F3 easter egg — vanilla debug screen (toggle with the F3 key, camera coords + biome)
@@ -282,7 +283,7 @@
       var shake = 0;
       if (dragon) {
         dragon.update(el);
-        var w = u > 0.93 ? clamp01((u - 0.93) / 0.05) : 0;   // banking arc → boss gaze (fades itself out if the dragon slips behind)
+        var w = u > 0.845 ? clamp01((u - 0.845) / 0.05) * 2.4 : 0;   // post-punch boss gaze — gain overpowers the dive heading so the freefall whip completes (the beat still fades itself out if the dragon slips behind)
         shake = Math.max(dragon.shake(), crystals.shake());
       }
       crystals.update(dt);
@@ -297,8 +298,9 @@
           cloudGrps[cg].visible = cd > 0.02;
         }
       }
-      // forward-only gaze — the director smooths heading in direction space; no snap, no swing, never looks back
-      var look = gaze.update(u, camera.position, dt, dragon && w > 0 ? dragon.look(beatV) : null, dragon ? w : 0, gazePt);
+      // forward-only gaze — the director smooths heading in direction space; the End freefall
+      // waives the hemisphere (bypass) so the mid-fall spin to the dragon reads as the shot
+      var look = gaze.update(u, camera.position, dt, dragon && w > 0 ? dragon.look(beatV) : null, dragon ? w : 0, gazePt, u > 0.865);
       camera.lookAt(look);
       if (shake > 0) {
         camera.position.x += (Math.random() - 0.5) * shake;
@@ -369,6 +371,8 @@
     updateOverlays(0); animate(); onScroll();
     window.CCLTCE_PROGRESS = progress;   // live scroll glide { raw, t, s } — tests + debug console
     window.CCLTCE_CAM = camera;          // camera handle — debug views for the frame-loop-owned camera
+    window.CCLTCE_LIGHT = light;         // fog/sky preset chaser — debug reads of scene.fog state
+    window.CCLTCE_SCENE = scene;         // scene handle — tests traverse world groups
   }
   start().catch(function (err) {
     console.warn("Narrative WebGL path unavailable —", err);

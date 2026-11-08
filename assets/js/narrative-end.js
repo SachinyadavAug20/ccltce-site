@@ -150,7 +150,11 @@ export function buildEnd(g) {
   var D = 100;   // the End sits far below the nether — the dive drops the full height
   island(g, D);
   var pillars = [[-22, -22], [22, -22], [-22, 22], [22, 22], [0, -28], [0, 28], [-28, 0], [28, 0]];
-  pillars.forEach(function (p, i) { pillar(g, 200 + p[0], 20 + p[1], 18 + i * 2, i, D); });
+  pillars.forEach(function (p, i) {
+    // i=3 (222,42) sits dead on the rest-camera sight line to the dragon — shattered stub
+    // by height so the ending frame reads wide instead of pillar-wall
+    pillar(g, 200 + p[0], 20 + p[1], i === 3 ? 10 : 18 + i * 2, i, D);
+  });
   city(g, D); gateway(g, D);
   enderman(g, 190, -26 - D, 32); enderman(g, 210, -26 - D, 32);
   enderman(g, 195, -26 - D, 8); enderman(g, 215, -26 - D, 25);

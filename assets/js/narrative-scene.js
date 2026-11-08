@@ -2,6 +2,7 @@
 import * as THREE from "../vendor/three.module.js";
 import { GOLD, EMER, RED, AMETH, STONE, STONE2, DEEP, DARK, DARKOAK, QUARTZ, box, glowLight, torch } from "./narrative-blocks.js";
 import { buildNether, buildEnd } from "./narrative-zones.js";
+import { buildStronghold } from "./narrative-stronghold.js";
 import { buildCampus } from "./narrative-campus.js";
 import { buildOverworld } from "./narrative-overworld.js";
 import { buildGlow } from "./narrative-glow.js";
@@ -82,11 +83,12 @@ export function buildScene() {
   var world = new THREE.Group(); scene.add(world);
   buildCampus(world); buildOverworld(world);
   var stations = buildTrack(world);
-  buildNether(world); buildEnd(world); buildBedrock(world); buildGlow(world);
+  buildNether(world); buildStronghold(world); buildEnd(world); buildBedrock(world); buildGlow(world);
   initMobAnim(world);
   scene.userData.skyPresets = {
     overworld: { sky: 0x78a7ff, fog: 0xbdd5ff, d: 0.0028 },
     nether: { sky: 0x4a1010, fog: 0x5e1e1e, d: 0.0085 },
+    stronghold: { sky: 0x0d0d13, fog: 0x14141b, d: 0.011 },
     end: { sky: 0x2a1c4e, fog: 0x3a2866, d: 0.0032 },
     bedrock: { sky: 0x0a0a12, fog: 0x12121c, d: 0.010 },
   };
