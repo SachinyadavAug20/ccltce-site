@@ -59,15 +59,27 @@ const TEMPLATES = {
       <p>${escape(a.detail)}</p>
     </article>`,
 
-  events: (e) => `
+  events: (e) => {
+    const t = e.title.toLowerCase();
+    const tag = /jam/.test(t) ? ["48h Jam", "t-jam"]
+      : /bootcamp/.test(t) ? ["Bootcamp", "t-boot"]
+      : /session|orientation/.test(t) ? ["Hands-on", "t-work"]
+      : ["Club Event", "t-ev"];
+    const [mon, day, year] = String(e.date || "").replace(",", "").split(" ");
+    return `
     <details class="event">
       <summary>
+        <span class="ev-when" aria-hidden="true"><b>${escape(day)}</b><i>${escape(mon)}</i><em>${escape(year)}</em></span>
+        <span class="ev-main">
+          <span class="ev-title">${escape(e.title)}</span>
+          <span class="ev-meta"><span class="ev-tag ${tag[1]}">${escape(tag[0])}</span><span class="ev-date">${escape(e.date)}</span></span>
+        </span>
         <img src="assets/img/${escape(e.image)}.svg" alt="${escape(e.title)} poster" width="56" height="38" loading="lazy" decoding="async" />
-        <span class="ev-title">${escape(e.title)}<span class="ev-date">${escape(e.date)}</span></span>
         <span class="ev-toggle" aria-hidden="true">+</span>
       </summary>
       <p class="ev-body">${escape(e.desc)}</p>
-    </details>`,
+    </details>`;
+  },
 
   notices: (n) => {
     const cls = /urgent|important|deadline/i.test(n.tag) ? "urgent" : /new|fresh|latest/i.test(n.tag) ? "new" : "info";

@@ -51,21 +51,67 @@
 .ach p { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
 /* events (chest slots) */
-.event { background: var(--panel); border: 2px solid var(--stone-lo); box-shadow: inset 2px 2px 0 #2a2a2e, inset -2px -2px 0 #101012; transition: border-color 0.15s ease-out; }
-.event:hover { border-color: var(--stone-hi); }
+.event {
+  background: var(--panel); border: 2px solid var(--stone-lo);
+  box-shadow: inset 2px 2px 0 #2a2a2e, inset -2px -2px 0 #101012;
+  transition: border-color 0.15s ease-out, transform 0.15s ease-out, box-shadow 0.2s ease-out;
+}
+.event:hover { border-color: var(--stone-hi); transform: translateY(-2px); }
 .event summary {
-  display: flex; align-items: center; gap: 0.9rem; padding: 1rem 1.3rem;
+  display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.2rem;
   cursor: pointer; list-style: none;
 }
 .event summary::-webkit-details-marker { display: none; }
-.event summary img { width: 44px; height: 32px; image-rendering: pixelated; border: 2px solid #09090b; flex: none; }
-.ev-title { flex: 1; display: flex; flex-direction: column; gap: 0.15rem; }
+/* pixel date plaque */
+.ev-when {
+  flex: none; width: 3.4rem; padding: 0.4rem 0; text-align: center; line-height: 1;
+  background: #17171a; border: 2px solid #09090b;
+  box-shadow: inset 2px 2px 0 #232327, inset -2px -2px 0 #0c0c0e;
+  align-self: center;
+}
+.ev-when b { display: block; font-family: var(--disp); font-size: 0.78rem; color: var(--gold); text-shadow: 1px 1px 0 #09090b; }
+.ev-when i { display: block; font-family: var(--disp); font-style: normal; font-size: 0.4rem; color: #d4d4d8; margin-top: 0.25rem; }
+.ev-when em { display: block; font-family: var(--mono); font-style: normal; font-size: 10px; color: #71717a; margin-top: 0.2rem; }
+.ev-main { flex: 1; display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
 .ev-title { font-family: var(--disp); font-size: 0.58rem; color: #f4f4f5; text-shadow: 1px 1px 0 #09090b; }
-.ev-date { font-family: var(--mono); font-size: 12px; color: var(--muted); text-shadow: none; }
-.ev-toggle { font-family: var(--disp); font-size: 0.75rem; color: var(--gold); flex: none; transition: transform 0.2s ease-out; }
-.event[open] .ev-toggle { transform: rotate(45deg); color: #fff; }
-.event[open] { border-color: var(--emerald-lo); }
-.ev-body { padding: 0 1.3rem 1.1rem; font-family: var(--mono); font-size: 13px; color: #d4d4d8; line-height: 1.65; border-top: 2px solid #09090b; padding-top: 0.9rem; }
+.ev-meta { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.ev-tag {
+  font-family: var(--disp); font-size: 0.4rem; padding: 3px 7px;
+  border: 2px solid #09090b; text-transform: uppercase; line-height: 1.4; color: #fff;
+}
+.ev-tag.t-work { background: #166534; }
+.ev-tag.t-boot { background: #854d0e; }
+.ev-tag.t-jam { background: #991b1b; }
+.ev-tag.t-ev { background: #0369a1; }
+.ev-date { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.event summary img {
+  width: 52px; height: 36px; image-rendering: pixelated; border: 2px solid #09090b; flex: none;
+  transition: box-shadow 0.15s ease-out, transform 0.15s ease-out;
+}
+.event summary:hover img { box-shadow: 0 0 0 2px var(--gold), 0 0 10px rgba(250, 204, 21, 0.25); }
+.ev-toggle {
+  flex: none; width: 1.6rem; height: 1.6rem; display: grid; place-items: center;
+  font-family: var(--disp); font-size: 0.7rem; color: var(--gold);
+  background: #1c1c20; border: 2px solid #09090b;
+  box-shadow: inset 2px 2px 0 #2a2a2e, inset -2px -2px 0 #101012;
+  transition: transform 0.2s ease-out, color 0.2s ease-out, background 0.2s ease-out;
+}
+.event summary:hover .ev-toggle { color: #fff; background: #2a2a2f; }
+.event[open] .ev-toggle { transform: rotate(45deg); color: var(--emerald-hi); background: #102a1a; }
+.event[open] { border-color: var(--emerald-lo); box-shadow: inset 2px 2px 0 #2a2a2e, inset -2px -2px 0 #101012, 0 0 14px rgba(23, 221, 98, 0.12); }
+.ev-body {
+  padding: 0.9rem 1.3rem 1.1rem; font-family: var(--mono); font-size: 13px;
+  color: #d4d4d8; line-height: 1.65; border-top: 2px solid #09090b;
+  animation: ev-open 0.18s ease-out;
+}
+@keyframes ev-open {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ev-body { animation: none; }
+  .event, .event summary img, .ev-toggle { transition: none; }
+}
 
 /* notices (sign boards) */
 .notice-item {
