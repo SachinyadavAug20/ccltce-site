@@ -45,8 +45,8 @@ export function enderDragon(g, x, y, z) {
   add(grp, M(2.9, 0.75, 4.5, D2), 0, 1.0, 0);                   // wither plate
   add(grp, M(2.4, 0.9, 4.2, D3), 0, -0.95, 0);                  // belly shadow
   add(grp, M(2.0, 2.0, 1.3, D), 0, 0.1, -2.2);                  // hip saddle
-  [[-2.0, 2.1, 1.05, -0.55], [-0.7, 2.25, 0.95, 0.6], [0.7, 2.25, 0.95, -0.6], [2.0, 2.1, 1.05, 0.55]].forEach(function (sk) {
-    var sp = add(grp, M(0.42, 0.62, 0.5, SPK), 0, sk[1], sk[0]); sp.rotation.x = sk[3];
+  [[-2.0, 1.75, -0.5], [-0.7, 1.85, 0.65], [0.7, 1.85, -0.65], [2.0, 1.75, 0.5]].forEach(function (sk) {
+    var sp = add(grp, M(0.4, 0.6, 0.5, SPK), 0, sk[1], sk[0]); sp.rotation.x = sk[2];   // grounded on the plate
   });
   // neck: 3 arch links rising to the look head (userlist guarded by dragonHead)
   add(grp, M(1.34, 1.25, 1.15, D), 0, 1.05, 2.9);
@@ -70,12 +70,12 @@ export function enderDragon(g, x, y, z) {
     horn.rotation.x = -0.95;                                     // swept-back horns
     add(grp, M(0.2, 0.2, 0.6, SPK), 0.62 * s, 3.2, 4.4).rotation.x = -0.8; // nub pair
   });
-  // jointed legs: thigh + shin + cloned claw feet
+  // jointed legs: thigh + shin + spread claw-tipped feet
   [[-1.05, 1.75], [1.05, 1.75], [-1.05, -1.8], [1.05, -1.8]].forEach(function (p) {
     add(grp, M(0.6, 1.15, 0.6, D2), p[0], -1.15, p[1]);
     add(grp, M(0.5, 1.05, 0.5, D), p[0], -2.05, p[1] + 0.1);
-    [-0.16, 0.02, 0.2].forEach(function (tt) {
-      add(grp, M(0.3, 0.22, 0.34, SPK), p[0] + 0, -2.62, p[1] + 0.55 + tt * 1.1);
+    [-0.2, 0, 0.2].forEach(function (tt) {
+      add(grp, M(0.26, 0.24, 0.42, SPK), p[0] + tt, -2.58, p[1] + 0.62);
     });
   });
   // tail: 5-taper snake with spike studs each segment
@@ -84,23 +84,23 @@ export function enderDragon(g, x, y, z) {
    [0.5, 0.5, 1.0, D2, -1.18, -8.3]].forEach(function (tg) {
     var seg = add(grp, M(tg[0], tg[1], tg[2], tg[3]), 0, tg[4], tg[5]);
     seg.userData.dragonTail = true;
-    add(seg, M(0.2, tg[1] * 1.25, 0.42, SPK), 0, tg[1] * 0.55, 0); // kite ridge stud per segment
+    add(seg, M(0.2, 0.42, 0.5, SPK), 0, tg[1] * 0.65, 0);          // small kite ridge stud per segment
   });
-  // wings: bone struts + two swept membrane panels + claw knuckle (flap via group)
+  // wings: ONE swept assembly per side — shoulder, straight leading-edge bone,
+  // two back-swept ribs, two overlapping membranes, knuckle claw on the bone tip.
+  // Set up in a sub-group so every piece lines up along the same local +x axis
+  // (mirror via scale.x, so the sweep mirrors for free).
   [-1, 1].forEach(function (s) {
-    var w = new THREE.Group(); w.position.set(1.35 * s, 0.9, 0.35);
-    add(w, M(0.32, 0.32, 1.6, D), -0.15 * s, 0.1, -0.15);         // arm bone
-    var bone1 = add(w, M(3.9, 0.24, 0.36, D2), 2.2 * s, 0.05, -0.25);
-    bone1.rotation.y = -0.42 * s;                                // first strut sweeps back
-    var bone2 = add(w, M(3.1, 0.2, 0.3, D2), 5.9 * s, -0.25, -1.35);
-    bone2.rotation.y = -0.55 * s;
-    add(w, M(0.35, 0.35, 0.35, SPK), 7.4 * s, -0.4, -1.7);        // claw knuckle
-    var mem1 = add(w, M(3.6, 0.13, 2.3, D2), 2.35 * s, -0.45, -1.15);
-    mem1.rotation.y = -0.45 * s;
-    var mem2 = add(w, M(2.7, 0.1, 1.7, D), 5.6 * s, -0.55, -1.75);
-    mem2.rotation.y = -0.6 * s;
-    w.userData[s < 0 ? "wingL" : "wingR"] = true;
-    grp.add(w);
+    var w = new THREE.Group(); w.position.set(1.35 * s, 0.9, 0.35); w.scale.x = s;
+    var sweep = new THREE.Group(); sweep.rotation.y = 0.62; w.add(sweep);
+    add(sweep, M(0.4, 0.42, 1.4, D), 0.1, 0.05, 0);              // shoulder joint
+    add(sweep, M(7.4, 0.28, 0.42, D2), 3.7, 0.1, 0);             // leading-edge bone
+    add(sweep, M(2.6, 0.24, 0.3, D2), 1.6, -0.15, -1.2);         // inner rib
+    add(sweep, M(2.2, 0.2, 0.28, D2), 4.3, -0.25, -1.5);         // outer rib
+    add(sweep, M(3.5, 0.12, 2.2, D2), 2.3, -0.34, -0.85);        // inner membrane
+    add(sweep, M(3.1, 0.1, 1.8, D2), 5.0, -0.44, -1.0);          // outer membrane
+    add(sweep, M(0.34, 0.34, 0.34, SPK), 7.4, -0.18, 0);         // claw knuckle on the tip
+    grp.add(w); w.userData[s < 0 ? "wingL" : "wingR"] = true;
   });
   var hit = new THREE.Mesh(new THREE.BoxGeometry(5, 4.5, 6),   // click target (forgiving on low-end)
     new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide }));
