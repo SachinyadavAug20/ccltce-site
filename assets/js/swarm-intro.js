@@ -289,14 +289,33 @@
         el: node,
         x: startX,
         y: startY,
+        fx: startX,                  // flight-plan coordinates (tremor rides on top)
+        fy: startY,
         vx: 0,
         vy: 0,
-        tx: W / 2,
-        ty: H / 2,
         tilt: 0,
-        clicking: false
+        clicking: false,
+        mv: null,                    // active flight segment {x0,y0,x1,y1,t0,t1}
+        trail: [],                   // last positions for the canvas streak
+        seed: idx * 9.7 + 3,         // per-cursor hand-tremor phase
+        lastFx: startX, lastFy: startY
       });
     });
+
+    // -----------------------------------------------------------------------
+    // Flight-plan cursor engine: staged eased flicks that snap into a deadzone
+    // on arrival (precise, no spring wobble), idle hand-tremor while holding,
+    // velocity-driven tilt, and a fading trail streak on the canvas.
+    // -----------------------------------------------------------------------
+    function setTarget(c, x, y, dur) {
+      if (!c) return;
+      var t = performance.now() - startTime;
+      c.mv = { x0: c.fx, y0: c.fy, x1: Math.round(x), y1: Math.round(y), t0: t, t1: t + (dur || 480) };
+    }
+    function easeFlick(k) {          // fast launch, tiny arc-out, zero overshoot at k=1
+      if (k >= 1) return 1;
+      return (1 - Math.pow(1 - k, 3.1)) + Math.sin(k * Math.PI) * 0.03 * (1 - k);
+    }
 
     var statusTxt = document.getElementById("swarm-status-txt");
 
@@ -328,29 +347,54 @@
       if (!isPlaying) return;
       var elapsed = now - startTime;
 
-      var spring = 0.052;
-      var damping = 0.76;
-
       for (var i = 0; i < cursorNodes.length; i++) {
         var c = cursorNodes[i];
-        var dx = c.tx - c.x;
-        var dy = c.ty - c.y;
+        var px = c.x, py = c.y;
 
-        c.vx = (c.vx + dx * spring) * damping;
-        c.vy = (c.vy + dy * spring) * damping;
+        if (c.mv) {
+          var k = (elapsed - c.mv.t0) / (c.mv.t1 - c.mv.t0);
+          if (k >= 1) {                          // deadzone snap — cursor IS the pixel
+            c.fx = c.mv.x1; c.fy = c.mv.y1; c.mv = null;
+          } else {
+            var e = easeFlick(Math.max(0, k));
+            c.fx = c.mv.x0 + (c.mv.x1 - c.mv.x0) * e;
+            c.fy = c.mv.y0 + (c.mv.y1 - c.mv.y0) * e;
+          }
+        }
 
-        c.x += c.vx;
-        c.y += c.vy;
+        // idle hand-tremor while holding a spot (fast flicks kill it to zero)
+        var speed = Math.abs(c.fx - c.lastFx || 0) + Math.abs(c.fy - c.lastFy || 0);
+        var amp = c.mv ? 0 : Math.max(0, 1.2 - speed * 0.4);
+        c.lastFx = c.fx; c.lastFy = c.fy;
+        var trX = Math.sin(now * 0.011 + c.seed) * amp + Math.sin(now * 0.023 + c.seed * 2.3) * amp * 0.45;
+        var trY = Math.cos(now * 0.009 + c.seed * 1.7) * amp + Math.cos(now * 0.019 + c.seed) * amp * 0.45;
+        c.x = c.fx + trX; c.y = c.fy + trY;
 
-        var targetTilt = Math.max(-14, Math.min(14, c.vx * 0.85));
-        c.tilt += (targetTilt - c.tilt) * 0.18;
+        c.vx = (c.x - px) * 2.4; c.vy = (c.y - py) * 2.4;   // frame-velocity for tilt
+        var targetTilt = Math.max(-13, Math.min(13, c.vx * 0.9));
+        c.tilt += (targetTilt - c.tilt) * 0.22;
+
+        c.trail.push([c.x, c.y]);
+        if (c.trail.length > 9) c.trail.shift();
 
         c.el.style.transform = "translate3d(" + Math.round(c.x) + "px, " + Math.round(c.y) + "px, 0) rotate(" + c.tilt.toFixed(1) + "deg)";
       }
 
-      // Draw dynamic connecting guide lines and XP particles on Canvas
+      // Draw cursor trails, connecting guide lines and XP particles on Canvas
       if (ctx) {
         ctx.clearRect(0, 0, W, H);
+
+        for (var t9 = 0; t9 < cursorNodes.length; t9++) {
+          var cn = cursorNodes[t9], tr = cn.trail;
+          for (var tp = 0; tp < tr.length; tp++) {
+            var ta = (tp / tr.length) * 0.3;                // head bright, tail fades
+            ctx.fillStyle = cn.def.color;
+            ctx.globalAlpha = ta;
+            var ts = 1 + (tp / tr.length) * 1.6;
+            ctx.fillRect(Math.round(tr[tp][0] + 12 - ts / 2), Math.round(tr[tp][1] + 12 - ts / 2), ts, ts);
+          }
+        }
+        ctx.globalAlpha = 1;
 
         if (elapsed > 350 && elapsed < 3700) {
           ctx.beginPath();
@@ -409,39 +453,22 @@
     // Choreographed Timeline (Building the REAL DOM Elements ~4.4s)
     // =========================================================================
 
-    // Phase 1 (250ms): Cursors glide onto screen
+    // Phase 1 (250ms): Staggered glide-ons — each collaborator enters on its own beat
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (statusTxt) statusTxt.textContent = "SYNCHRONIZING REPOSITORY MESH";
       sfx.blockPop();
       setXP(15, 6);
 
-      // Steve targets real navigation bar
-      if (cursorNodes[0]) {
-        cursorNodes[0].tx = rNav.left + 24;
-        cursorNodes[0].ty = rNav.top + rNav.height / 2;
-      }
-      // Alex heads towards real emblem
-      if (cursorNodes[1]) {
-        cursorNodes[1].tx = rLogo.left + rLogo.width / 2;
-        cursorNodes[1].ty = rLogo.top - 40;
-      }
-      // Miner frames hero title
-      if (cursorNodes[2]) {
-        cursorNodes[2].tx = rTitle.left + 40;
-        cursorNodes[2].ty = rTitle.top + rTitle.height / 2;
-      }
-      if (cursorNodes[3]) {
-        cursorNodes[3].tx = rCta.left + 40;
-        cursorNodes[3].ty = rCta.top + rCta.height / 2;
-      }
-      if (cursorNodes[4]) {
-        cursorNodes[4].tx = rCta.left + rCta.width - 40;
-        cursorNodes[4].ty = rCta.top + rCta.height / 2;
-      }
+      // Sideslip entries with slightly different flight times so the swarm feels hand-run
+      if (cursorNodes[0]) setTarget(cursorNodes[0], rNav.left + 24, rNav.top + rNav.height / 2, 950);
+      if (cursorNodes[1]) setTarget(cursorNodes[1], rLogo.left + rLogo.width / 2, rLogo.top - 40, 820);
+      if (cursorNodes[2]) setTarget(cursorNodes[2], rTitle.left + 40, rTitle.top + rTitle.height / 2, 1010);
+      if (cursorNodes[3]) setTarget(cursorNodes[3], rCta.left + 40, rCta.top + rCta.height / 2, 870);
+      if (cursorNodes[4]) setTarget(cursorNodes[4], rCta.left + rCta.width - 40, rCta.top + rCta.height / 2, 1040);
     }, 250));
 
-    // Phase 2 (650ms): Steve builds real .nav-wrap
+    // Phase 2 (650ms): Steve sweeps the nav bar left→right; Miner scans the title edge
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (statusTxt) statusTxt.textContent = "ASSEMBLING <NAV.NAV-WRAP>";
@@ -449,13 +476,11 @@
       sfx.blockPop();
       setXP(30, 14);
 
-      if (cursorNodes[0]) {
-        cursorNodes[0].tx = rNav.left + rNav.width - 40;
-        cursorNodes[0].ty = rNav.top + rNav.height / 2;
-      }
+      if (cursorNodes[0]) setTarget(cursorNodes[0], rNav.left + rNav.width - 40, rNav.top + rNav.height / 2, 340);
+      if (cursorNodes[2]) setTarget(cursorNodes[2], rTitle.left + rTitle.width - 30, rTitle.top + 10, 300);
     }, 650));
 
-    // Phase 3 (1200ms): Real Nav reveals; Alex mounts real .hero-logo
+    // Phase 3 (1200ms): Real Nav reveals; Alex mounts real .hero-logo; Steve re-checks the seam
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (boxNav) boxNav.classList.add("complete");
@@ -467,35 +492,28 @@
       sfx.xpOrb();
       setXP(48, 22);
 
-      if (cursorNodes[1]) {
-        cursorNodes[1].tx = rLogo.left + rLogo.width / 2;
-        cursorNodes[1].ty = rLogo.top + rLogo.height / 2;
-      }
+      if (cursorNodes[0]) setTarget(cursorNodes[0], rNav.left + 24, rNav.top + rNav.height / 2, 260);
+      if (cursorNodes[1]) setTarget(cursorNodes[1], rLogo.left + rLogo.width / 2, rLogo.top + rLogo.height / 2, 340);
     }, 1200));
 
-    // Phase 4 (1750ms): Real Logo reveals; Steve & Hacker construct Title & Motto
+    // Phase 4 (1750ms): Real Logo reveals; Hacker & Steve converge to engrave the Title
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (boxLogo) boxLogo.classList.add("complete");
       if (realLogo) realLogo.classList.add("swarm-built");
       if (realBadge) realBadge.classList.add("swarm-built");
       triggerClick(cursorNodes[1], sfx.blockPop);
+      if (cursorNodes[1]) setTarget(cursorNodes[1], rLogo.left + rLogo.width - 20, rLogo.top + 20, 220);
 
       if (statusTxt) statusTxt.textContent = "ENGRAVING <H1.HERO-TITLE>";
       if (boxTitle) boxTitle.classList.add("active");
       setXP(68, 30);
 
-      if (cursorNodes[3]) {
-        cursorNodes[3].tx = rTitle.left + 40;
-        cursorNodes[3].ty = rTitle.top + rTitle.height / 2;
-      }
-      if (cursorNodes[0]) {
-        cursorNodes[0].tx = rTitle.left + rTitle.width - 60;
-        cursorNodes[0].ty = rTitle.top + rTitle.height / 2;
-      }
+      if (cursorNodes[3]) setTarget(cursorNodes[3], rTitle.left + 40, rTitle.top + rTitle.height / 2, 520);
+      if (cursorNodes[0]) setTarget(cursorNodes[0], rTitle.left + rTitle.width - 60, rTitle.top + rTitle.height / 2, 500);
     }, 1750));
 
-    // Phase 5 (2300ms): Title reveals; Miner & Builder assemble Action Buttons
+    // Phase 5 (2300ms): Title reveals; Miner & Builder travel to the CTA rail
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (boxTitle) boxTitle.classList.add("complete");
@@ -508,17 +526,13 @@
       if (boxCta) boxCta.classList.add("active");
       setXP(85, 37);
 
-      if (cursorNodes[2]) {
-        cursorNodes[2].tx = rCta.left + 80;
-        cursorNodes[2].ty = rCta.top + rCta.height / 2;
-      }
-      if (cursorNodes[4]) {
-        cursorNodes[4].tx = rCta.left + rCta.width - 80;
-        cursorNodes[4].ty = rCta.top + rCta.height / 2;
-      }
+      if (cursorNodes[2]) setTarget(cursorNodes[2], rCta.left + 80, rCta.top + rCta.height / 2, 620);
+      if (cursorNodes[4]) setTarget(cursorNodes[4], rCta.left + rCta.width - 80, rCta.top + rCta.height / 2, 640);
+      if (cursorNodes[0]) setTarget(cursorNodes[0], rSub.left + rSub.width - 70, rSub.top + rSub.height / 2, 560);
+      if (cursorNodes[3]) setTarget(cursorNodes[3], rSub.left + 60, rSub.top + rSub.height / 2, 560);
     }, 2300));
 
-    // Phase 6 (2800ms): Real Buttons snap in; Cursors click them
+    // Phase 6 (2800ms): Real Buttons snap in; Cursors click them with a tiny recoil hop
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (boxCta) boxCta.classList.add("complete");
@@ -526,9 +540,11 @@
       triggerClick(cursorNodes[2], sfx.buttonClick);
       triggerClick(cursorNodes[4], sfx.buttonClick);
       setXP(95, 41);
+      if (cursorNodes[2]) setTarget(cursorNodes[2], rCta.left + 80 - 6, rCta.top + rCta.height / 2 + 4, 130);
+      if (cursorNodes[4]) setTarget(cursorNodes[4], rCta.left + rCta.width - 80 + 6, rCta.top + rCta.height / 2 + 4, 130);
     }, 2800));
 
-    // Phase 7 (3650ms): Swarm orbits and converges on real .hero-logo
+    // Phase 7 (3150ms): Swarm orbits and converges on real .hero-logo
     timeouts.push(setTimeout(function () {
       if (!isPlaying) return;
       if (statusTxt) statusTxt.textContent = "REALM ONLINE // ALL SYSTEMS NOMINAL";
@@ -539,8 +555,7 @@
 
       for (var k = 0; k < cursorNodes.length; k++) {
         var angle = (k / cursorNodes.length) * Math.PI * 2;
-        cursorNodes[k].tx = cx + Math.cos(angle) * 80;
-        cursorNodes[k].ty = cy + Math.sin(angle) * 80;
+        setTarget(cursorNodes[k], cx + Math.cos(angle) * 84, cy + Math.sin(angle) * 84, 560);
       }
     }, 3150));
 
@@ -554,8 +569,7 @@
 
       for (var m = 0; m < cursorNodes.length; m++) {
         var angle = (m / cursorNodes.length) * Math.PI * 2 + 0.3;
-        cursorNodes[m].tx = cx + Math.cos(angle) * (W * 0.85);
-        cursorNodes[m].ty = cy + Math.sin(angle) * (H * 0.85);
+        setTarget(cursorNodes[m], cx + Math.cos(angle) * (W * 0.85), cy + Math.sin(angle) * (H * 0.85), 640);
       }
     }, 3950));
 
