@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" shape-rendering="crispEdges">
+  <rect width="120" height="80" fill="#0b0f12"/>
+  <rect x="10" y="10" width="3" height="3" fill="#3f3f46"/>
+  <rect x="96" y="8" width="3" height="3" fill="#52525b"/>
+  <rect x="24" y="6" width="3" height="3" fill="#52525b"/>
+  <!-- netherite sword diag ghost -->
+  <rect x="18" y="18" width="52" height="8" fill="#a16207"/>
+  <rect x="18" y="18" width="52" height="2" fill="#facc15"/>
+  <rect x="22" y="21" width="24" height="2" fill="#171717"/>
+  <rect x="50" y="21" width="16" height="2" fill="#171717"/>
+  <rect x="58" y="30" width="54" height="10" fill="#111827"/>
+  <rect x="60" y="31" width="8" height="8" fill="#22d3ee"/>
+  <rect x="70" y="33" width="38" height="2" fill="#4b5563"/>
+  <rect x="70" y="37" width="26" height="2" fill="#4b5563"/>
+  <rect x="88" y="31" width="4" height="2" fill="#17dd62"/>
+  <rect x="100" y="31" width="4" height="2" fill="#17dd62"/>
+  <!-- stacked books -->
+  <rect x="20" y="54" width="30" height="7" fill="#7c2d12"/>
+  <rect x="20" y="54" width="30" height="2" fill="#dc2626"/>
+  <rect x="24" y="48" width="26" height="7" fill="#1e3a8a"/>
+  <rect x="24" y="48" width="26" height="2" fill="#3b82f6"/>
+  <rect x="28" y="42" width="22" height="7" fill="#14532d"/>
+  <rect x="28" y="42" width="22" height="2" fill="#22c55e"/>
+  <!-- trophy -->
+  <rect x="68" y="52" width="18" height="12" fill="#78350f"/>
+  <rect x="70" y="54" width="14" height="4" fill="#facc15"/>
+  <rect x="74" y="48" width="6" height="4" fill="#fbbf24"/>
+  <rect x="0" y="70" width="120" height="10" fill="#171717"/>
+  <rect x="0" y="70" width="120" height="2" fill="#262626"/>
+</svg>

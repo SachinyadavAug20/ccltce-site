@@ -6,8 +6,25 @@
       "iconColor": "#60a5fa",
       "title": "Web Development Track",
       "author": "CCLTCE Core",
-      "bullets": ["HTML, CSS & modern layout", "JavaScript fundamentals", "React + TypeScript", "Node, Express & REST APIs", "Auth, sessions & databases"],
-      "tags": ["HTML", "CSS", "JavaScript", "React", "TypeScript", "Node.js", "Express", "MongoDB", "REST", "Auth"],
+      "bullets": [
+        "HTML, CSS & modern layout",
+        "JavaScript fundamentals",
+        "React + TypeScript",
+        "Node, Express & REST APIs",
+        "Auth, sessions & databases"
+      ],
+      "tags": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "React",
+        "TypeScript",
+        "Node.js",
+        "Express",
+        "MongoDB",
+        "REST",
+        "Auth"
+      ],
       "link": "challenges.html"
     },
     {
@@ -16,8 +33,23 @@
       "iconColor": "#fb7185",
       "title": "Systems & CP Track",
       "author": "CCLTCE Core",
-      "bullets": ["C++ & the STL", "Data structures & graphs", "Dynamic programming", "Linux, Git & open source", "System design & contests"],
-      "tags": ["Git", "Linux", "C++", "STL", "Graphs", "DP", "System Design", "Open Source"],
+      "bullets": [
+        "C++ & the STL",
+        "Data structures & graphs",
+        "Dynamic programming",
+        "Linux, Git & open source",
+        "System design & contests"
+      ],
+      "tags": [
+        "Git",
+        "Linux",
+        "C++",
+        "STL",
+        "Graphs",
+        "DP",
+        "System Design",
+        "Open Source"
+      ],
       "link": "challenges.html"
     },
     {
@@ -26,8 +58,22 @@
       "iconColor": "#2dd4bf",
       "title": "AI & Automation Track",
       "author": "CCLTCE Core",
-      "bullets": ["Python from scratch", "Data wrangling & pandas", "Prompting & LLM tooling", "Small models & evaluation", "Automation scripts & bots"],
-      "tags": ["Python", "NumPy", "pandas", "PyTorch", "LLMs", "Agents", "Automation"],
+      "bullets": [
+        "Python from scratch",
+        "Data wrangling & pandas",
+        "Prompting & LLM tooling",
+        "Small models & evaluation",
+        "Automation scripts & bots"
+      ],
+      "tags": [
+        "Python",
+        "NumPy",
+        "pandas",
+        "PyTorch",
+        "LLMs",
+        "Agents",
+        "Automation"
+      ],
       "link": "challenges.html"
     }
   ],
@@ -177,20 +223,67 @@
     }
   ],
   "achievements": [
-    { "year": "2026", "title": "First campus-wide CP contest", "detail": "120 participants across three divisions, with live problem discussions." },
-    { "year": "2026", "title": "Git workshop series", "detail": "4 sessions, 200+ student registrations, zero-to-first-commit in 90 minutes." },
-    { "year": "2026", "title": "Open source starter pack", "detail": "Curated repos and templates so every member lands their first merged PR." }
+    {
+      "year": "2026",
+      "title": "First campus-wide CP contest",
+      "detail": "120 participants across three divisions, with live problem discussions."
+    },
+    {
+      "year": "2026",
+      "title": "Git workshop series",
+      "detail": "4 sessions, 200+ student registrations, zero-to-first-commit in 90 minutes."
+    },
+    {
+      "year": "2026",
+      "title": "Open source starter pack",
+      "detail": "Curated repos and templates so every member lands their first merged PR."
+    }
   ],
   "events": [
-    { "title": "Orientation 2026", "date": "Sep 18, 2026", "desc": "Welcome event for the new batch — club roadmap, track selection, mentor pairing and a live demo of the Web and Systems tracks.", "image": "event-orientation" },
-    { "title": "GitHub Session", "date": "Sep 25, 2026", "desc": "Hands-on Git basics, branching workflow, and how to open your first pull request. Laptops required, no prior experience needed.", "image": "event-github" },
-    { "title": "DSA Bootcamp", "date": "Oct 09, 2026", "desc": "Six-week competitive programming bootcamp covering arrays, graphs, DP and weekly rated contests on Codeforces.", "image": "event-orientation" },
-    { "title": "AI Build Jam", "date": "Oct 23, 2026", "desc": "48-hour jam to ship a small agent or automation using Python and LLM APIs. Teams of three, mentors on site.", "image": "event-github" }
+    {
+      "title": "Orientation 2026",
+      "date": "Sep 18, 2026",
+      "desc": "Welcome event for the new batch — club roadmap, track selection, mentor pairing and a live demo of the Web and Systems tracks.",
+      "image": "event-orientation"
+    },
+    {
+      "title": "GitHub Session",
+      "date": "Sep 25, 2026",
+      "desc": "Hands-on Git basics, branching workflow, and how to open your first pull request. Laptops required, no prior experience needed.",
+      "image": "event-github"
+    },
+    {
+      "title": "DSA Bootcamp",
+      "date": "Oct 09, 2026",
+      "desc": "Six-week competitive programming bootcamp covering arrays, graphs, DP and weekly rated contests on Codeforces.",
+      "image": "event-boot"
+    },
+    {
+      "title": "AI Build Jam",
+      "date": "Oct 23, 2026",
+      "desc": "48-hour jam to ship a small agent or automation using Python and LLM APIs. Teams of three, mentors on site.",
+      "image": "event-jam"
+    }
   ],
   "notices": [
-    { "date": "Oct 1, 2026", "tag": "new", "title": "GitHub Cohort", "body": "A 4-week structured cohort starting Nov 1. Sessions every Thursday 6-8 PM, in the LTCOE computer lab." },
-    { "date": "Oct 5, 2026", "tag": "urgent", "title": "Lab slot booking", "body": "Members who want a dedicated slot for the DSA bootcamp must register before Oct 12." },
-    { "date": "Sep 30, 2026", "tag": "won", "title": "Regional round cleared", "body": "CCLTCE qualified for the inter-college round with two teams in the top 12." }
+    {
+      "date": "Oct 1, 2026",
+      "tag": "new",
+      "title": "GitHub Cohort",
+      "body": "A 4-week structured cohort starting Nov 1. Sessions every Thursday 6-8 PM, in the LTCOE computer lab."
+    },
+    {
+      "date": "Oct 5, 2026",
+      "tag": "urgent",
+      "title": "Lab slot booking",
+      "body": "Members who want a dedicated slot for the DSA bootcamp must register before Oct 12."
+    },
+    {
+      "date": "Sep 30, 2026",
+      "tag": "won",
+      "title": "Regional round cleared",
+      "body": "CCLTCE qualified for the inter-college round with two teams in the top 12."
+    }
   ],
   "challenges": [
     {
@@ -199,8 +292,14 @@
       "due": "Oct 8, 2026",
       "badge": "Beginner",
       "links": [
-        { "label": "MDN: Responsive design", "url": "https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Responsive_Design" },
-        { "label": "Frontend Mentor", "url": "https://www.frontendmentor.io" }
+        {
+          "label": "MDN: Responsive design",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Responsive_Design"
+        },
+        {
+          "label": "Frontend Mentor",
+          "url": "https://www.frontendmentor.io"
+        }
       ]
     },
     {
@@ -209,8 +308,14 @@
       "due": "Oct 15, 2026",
       "badge": "Advanced",
       "links": [
-        { "label": "Three.js docs", "url": "https://threejs.org/docs" },
-        { "label": "Live examples", "url": "https://threejs.org/examples" }
+        {
+          "label": "Three.js docs",
+          "url": "https://threejs.org/docs"
+        },
+        {
+          "label": "Live examples",
+          "url": "https://threejs.org/examples"
+        }
       ]
     },
     {
@@ -219,8 +324,14 @@
       "due": "Oct 18, 2026",
       "badge": "Beginner",
       "links": [
-        { "label": "Node.js fs API", "url": "https://nodejs.org/api/fs.html" },
-        { "label": "Commander.js guide", "url": "https://github.com/tj/commander.js" }
+        {
+          "label": "Node.js fs API",
+          "url": "https://nodejs.org/api/fs.html"
+        },
+        {
+          "label": "Commander.js guide",
+          "url": "https://github.com/tj/commander.js"
+        }
       ]
     },
     {
@@ -229,8 +340,14 @@
       "due": "Oct 22, 2026",
       "badge": "Advanced",
       "links": [
-        { "label": "Redis: rate limiting", "url": "https://redis.io/guide/docs/about/rate-limiting" },
-        { "label": "System Design Primer", "url": "https://github.com/donnemartin/system-design-primer" }
+        {
+          "label": "Redis: rate limiting",
+          "url": "https://redis.io/guide/docs/about/rate-limiting"
+        },
+        {
+          "label": "System Design Primer",
+          "url": "https://github.com/donnemartin/system-design-primer"
+        }
       ]
     }
   ]
