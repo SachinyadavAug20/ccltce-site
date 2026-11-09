@@ -5,6 +5,7 @@ export function M(w, h, d, color) {
   return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: color }));
 }
 function add(grp, mesh, x, y, z) { mesh.position.set(x, y, z); grp.add(mesh); return mesh; }
+function E(mesh, hex) { mesh.material.emissive = new THREE.Color(hex); return mesh; }
 function part(p, w, h, d, color, x, y, z) { var m = M(w, h, d, color); m.position.set(x, y, z); p.add(m); return m; }
 function pair(p, w, h, d, color, sx, y, z) { [-1, 1].forEach(function (s) { part(p, w, h, d, color, s * sx, y, z); }); }
 // Hinged parts keep their world box and only move the origin — neck for heads, hip for legs,
@@ -101,7 +102,10 @@ export function hoglin(g, x, y, z) {
 export function ghast(g, x, y, z) {
   var grp = new THREE.Group(); grp.position.set(x, y, z);
   add(grp, M(2.5, 2.5, 2.5, 0xeeeeee), 0, 0, 0);
-  pair(grp, 0.3, 0.3, 0.2, 0xd42020, 0.5, 0.3, 1.3); pair(grp, 0.16, 0.16, 0.1, 0x1a1a1a, 0.5, 0.3, 1.42);   // eyes
+  E(add(grp, M(0.3, 0.3, 0.2, 0xd42020), -0.5, 0.3, 1.3), 0xff3b3b);   // glowing ember eyes
+  E(add(grp, M(0.3, 0.3, 0.2, 0xd42020), 0.5, 0.3, 1.3), 0xff3b3b);
+  E(add(grp, M(0.16, 0.16, 0.1, 0x1a1a1a), -0.5, 0.3, 1.42), 0x300000);
+  E(add(grp, M(0.16, 0.16, 0.1, 0x1a1a1a), 0.5, 0.3, 1.42), 0x300000);
   add(grp, M(0.8, 0.4, 0.2, 0x4a4a4a), 0, -0.5, 1.3);                                                            // mouth
   for (var t = 0; t < 8; t++) { var tn = M(0.15, 1.5 + (t % 3) * 0.5, 0.15, 0xeeeeee);
     tn.position.set((t % 4 - 1.5) * 0.6, -1.5 - (t % 3) * 0.3, t < 4 ? -0.5 : 0.5); tn.userData.leg = t * 0.7; grp.add(tn); }
@@ -110,8 +114,8 @@ export function ghast(g, x, y, z) {
 }
 export function magmaCube(g, x, y, z) {
   var grp = new THREE.Group(); grp.position.set(x, y, z);
-  add(grp, M(1.5, 1.5, 1.5, 0x3a0a0a), 0, 0.75, 0); add(grp, M(1.0, 1.0, 1.0, 0xff4400), 0, 0.75, 0);
-  add(grp, M(0.5, 0.5, 0.5, 0xffaa00), 0, 0.75, 0); grp.userData.pulse = Math.random() * 6;
+  add(grp, M(1.5, 1.5, 1.5, 0x3a0a0a), 0, 0.75, 0); E(add(grp, M(1.0, 1.0, 1.0, 0xff4400), 0, 0.75, 0), 0xdd2c00);
+  E(add(grp, M(0.5, 0.5, 0.5, 0xffaa00), 0, 0.75, 0), 0xffaa00); grp.userData.pulse = Math.random() * 6;
   g.add(grp); return grp;
 }
 export function blaze(g, x, y, z) {
@@ -119,7 +123,8 @@ export function blaze(g, x, y, z) {
   add(grp, M(0.6, 0.6, 0.6, 0xffaa00), 0, 1.8, 0); add(grp, M(0.5, 0.8, 0.5, 0x4a3a1a), 0, 1.2, 0);
   for (var r = 0; r < 3; r++) for (var rod = 0; rod < 4; rod++) { var a = rod * Math.PI / 2 + r * 0.5;
     var rb = M(0.12, 0.8, 0.12, 0xffaa00); rb.position.set(Math.cos(a) * (0.5 + r * 0.25), 0.8 + r * 0.35, Math.sin(a) * (0.5 + r * 0.25));
-    rb.userData.tail = a + r; grp.add(rb); }                                                                        // rods drift
+    E(rb, 0xffaa00);
+    rb.userData.tail = a + r; grp.add(rb); }                                                                        // rods glow + drift
   grp.userData.float = Math.random() * Math.PI * 2;
   g.add(grp); return grp;
 }
@@ -127,7 +132,8 @@ export function witherSkeleton(g, x, y, z) {
   var grp = new THREE.Group(); grp.position.set(x, y, z);
   add(grp, M(0.6, 1.0, 0.35, 0x2a2a2a), 0, 1.2, 0);
   var h = head(grp, 0.5, 0.5, 0.5, 0x1a1a1a, 0, 2.0, 0, 8.2);
-  pair(h, 0.14, 0.1, 0.08, 0xd42020, 0.14, 0.34, 0.25);                                                            // ember eyes
+  E(part(h, 0.14, 0.1, 0.08, 0xd42020, -0.14, 0.34, 0.25), 0xff3b3b);   // ember eyes
+  E(part(h, 0.14, 0.1, 0.08, 0xd42020, 0.14, 0.34, 0.25), 0xff3b3b);
   add(grp, M(0.7, 0.08, 0.08, 0x3a3a3a), 0, 1.5, 0); add(grp, M(0.7, 0.08, 0.08, 0x3a3a3a), 0, 1.2, 0);           // ribs
   var sword = M(0.08, 1.2, 0.08, 0x4a4a4a); sword.position.set(0.5, 1.2, 0.2); sword.rotation.z = -0.3; grp.add(sword);
   legs(grp, [[-0.18, 0.5, 0], [0.18, 0.5, 0]], 0.15, 1.0, 0.15, 0x2a2a2a, 3.3);

@@ -188,7 +188,7 @@ export function initDragon(scene, camera, host) {
         for (var e2 = 0; e2 < eyes.length; e2++) eyes[e2].material.emissiveIntensity = eg;
         if (el >= nextRoar) { roarT = el; nextRoar = el + 5.5 + Math.random() * 3.5; breath(); }
         var roarOp = Math.max(0, Math.min(1, (el - roarT) / 1.2));
-        jaw.rotation.x = -0.55 * Math.sin(roarOp * Math.PI);
+        jaw.rotation.x = 0.55 * Math.sin(roarOp * Math.PI);        // front tips down = open
         if (el - tHit < 0.35) {
           root.position.x += (Math.random() - 0.5) * 1.4; root.position.y += (Math.random() - 0.5);
           root.rotation.z += (Math.random() - 0.5) * 0.25;
